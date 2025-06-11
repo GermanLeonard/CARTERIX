@@ -1,6 +1,6 @@
 package com.tuapp.myapplication.data.repository
 
-import com.tuapp.myapplication.data.dao.IngresoDao
+import com.tuapp.myapplication.data.database.dao.IngresoDao
 import com.tuapp.myapplication.data.models.Ingreso
 import kotlinx.coroutines.flow.Flow
 

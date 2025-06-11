@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.tuapp.myapplication.data.dao.CategoriaEgresoDao
-import com.tuapp.myapplication.data.dao.SubcategoriaDao
-import com.tuapp.myapplication.data.dao.IngresoDao
+import com.tuapp.myapplication.data.database.dao.CategoriaEgresoDao
+import com.tuapp.myapplication.data.database.dao.SubcategoriaDao
+import com.tuapp.myapplication.data.database.dao.IngresoDao
 import com.tuapp.myapplication.data.models.CategoriaEgreso
 import com.tuapp.myapplication.data.models.Subcategoria
 import com.tuapp.myapplication.data.models.Ingreso

@@ -30,6 +30,10 @@ class UserRepositoryImpl(
                 sensitiveInfoRepository.saveToken(loginResponse.token)
             }
 
+            if(loginResponse.datos_user != null) {
+
+            }
+
             emit(Resourse.Success(loginResponse.toDomain()))
         } catch (e: HttpException) {
                 val errorBody = e.response()?.errorBody()?.string()
