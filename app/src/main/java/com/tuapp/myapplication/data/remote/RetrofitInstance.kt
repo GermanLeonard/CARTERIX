@@ -1,12 +1,13 @@
 package com.tuapp.myapplication.data.remote
 
 import com.tuapp.myapplication.data.remote.interceptors.AuthInterceptor
+import com.tuapp.myapplication.data.remote.user.UserService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class RetrofitInstance {
+object RetrofitInstance {
     private val BASE_URL = "http://localhost:8000/"
 
     val client = OkHttpClient.Builder()
@@ -22,4 +23,7 @@ class RetrofitInstance {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
+    val userService: UserService by lazy {
+        retrofit.create(UserService::class.java)
+    }
 }

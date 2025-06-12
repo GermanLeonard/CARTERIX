@@ -7,17 +7,20 @@ import androidx.room.RoomDatabase
 import com.tuapp.myapplication.data.database.dao.CategoriaEgresoDao
 import com.tuapp.myapplication.data.database.dao.SubcategoriaDao
 import com.tuapp.myapplication.data.database.dao.IngresoDao
+import com.tuapp.myapplication.data.database.dao.UserDao
+import com.tuapp.myapplication.data.database.entities.UserEntity
 import com.tuapp.myapplication.data.models.CategoriaEgreso
 import com.tuapp.myapplication.data.models.Subcategoria
 import com.tuapp.myapplication.data.models.Ingreso
 
 @Database(
-    entities = [CategoriaEgreso::class, Subcategoria::class, Ingreso::class],
-    version = 3,
+    entities = [CategoriaEgreso::class, Subcategoria::class, Ingreso::class, UserEntity::class],
+    version = 4,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
+    abstract fun userDao(): UserDao
     abstract fun categoriaEgresoDao(): CategoriaEgresoDao
     abstract fun subcategoriaDao(): SubcategoriaDao
     abstract fun ingresoDao(): IngresoDao
