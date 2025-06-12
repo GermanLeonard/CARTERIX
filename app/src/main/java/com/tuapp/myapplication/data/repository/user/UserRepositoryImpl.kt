@@ -2,8 +2,8 @@ package com.tuapp.myapplication.data.repository.user
 
 import android.util.Log
 import com.google.gson.Gson
-import com.tuapp.myapplication.data.database.dao.UserDao
-import com.tuapp.myapplication.data.database.entities.toDomain
+import com.tuapp.myapplication.data.database.dao.user.UserDao
+import com.tuapp.myapplication.data.database.entities.user.toDomain
 import com.tuapp.myapplication.data.models.authModels.LoginRequestDomain
 import com.tuapp.myapplication.data.models.authModels.LoginResponseDomain
 import com.tuapp.myapplication.data.models.authModels.RegisterRequestDomain
@@ -65,10 +65,10 @@ class UserRepositoryImpl(
 
             emit(Resourse.Error(httpCode = e.code(), message = msg))
         }catch(e: Exception) {
-            Log.d("UserRepository", "Error fetching movies: ${e.message}")
+            Log.d("UserRepository", "Error al hacer la petición: ${e.message}")
             emit(Resourse.Error(message = "Error inesperado: ${e.localizedMessage ?: "Desconocido"}"))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun loginUser(loginRequestDomain: LoginRequestDomain): Flow<Resourse<LoginResponseDomain>> = flow {
         emit(Resourse.Loading)
@@ -97,7 +97,7 @@ class UserRepositoryImpl(
 
                 emit(Resourse.Error(httpCode = e.code(), message = msg))
         } catch (e: Exception) {
-            Log.d("UserRepository", "Error fetching movies: ${e.message}")
+            Log.d("UserRepository", "Error al hacer la petición: ${e.message}")
             emit(Resourse.Error(message = "Error inesperado: ${e.localizedMessage ?: "Desconocido"}"))
         }
     }.flowOn(Dispatchers.IO)
@@ -125,10 +125,10 @@ class UserRepositoryImpl(
 
             emit(Resourse.Error(httpCode = e.code(), message = msg))
         } catch (e: Exception){
-            Log.d("UserRepository", "Error fetching movies: ${e.message}")
+            Log.d("UserRepository", "Error al hacer la petición: ${e.message}")
             emit(Resourse.Error(message = "Error inesperado: ${e.localizedMessage ?: "Desconocido"}"))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun changePassword(changePasswordRequest: ChangePasswordRequestDomain): Flow<Resourse<RegisterResponseDomain>> = flow {
         emit(Resourse.Loading)
@@ -152,8 +152,8 @@ class UserRepositoryImpl(
 
             emit(Resourse.Error(httpCode = e.code(), message = msg))
         } catch (e: Exception){
-            Log.d("UserRepository", "Error fetching movies: ${e.message}")
+            Log.d("UserRepository", "Error al hacer la petición: ${e.message}")
             emit(Resourse.Error(message = "Error inesperado: ${e.localizedMessage ?: "Desconocido"}"))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 }

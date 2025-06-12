@@ -1,7 +1,7 @@
 package com.tuapp.myapplication.data.remote.responses.authResponse
 
 import com.google.gson.annotations.SerializedName
-import com.tuapp.myapplication.data.database.entities.UserEntity
+import com.tuapp.myapplication.data.database.entities.user.UserEntity
 
 data class UserDataResponse(
     @SerializedName("id")

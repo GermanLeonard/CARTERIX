@@ -7,20 +7,38 @@ import androidx.room.RoomDatabase
 import com.tuapp.myapplication.data.database.dao.CategoriaEgresoDao
 import com.tuapp.myapplication.data.database.dao.SubcategoriaDao
 import com.tuapp.myapplication.data.database.dao.IngresoDao
-import com.tuapp.myapplication.data.database.dao.UserDao
-import com.tuapp.myapplication.data.database.entities.UserEntity
+import com.tuapp.myapplication.data.database.dao.finance.CategorieDataDao
+import com.tuapp.myapplication.data.database.dao.finance.FinanceSummaryDao
+import com.tuapp.myapplication.data.database.dao.user.UserDao
+import com.tuapp.myapplication.data.database.entities.finance.CategorieDataEntity
+import com.tuapp.myapplication.data.database.entities.finance.FinanceSummaryEntity
+import com.tuapp.myapplication.data.database.entities.user.UserEntity
 import com.tuapp.myapplication.data.models.CategoriaEgreso
 import com.tuapp.myapplication.data.models.Subcategoria
 import com.tuapp.myapplication.data.models.Ingreso
 
 @Database(
-    entities = [CategoriaEgreso::class, Subcategoria::class, Ingreso::class, UserEntity::class],
-    version = 4,
+    entities = [
+        CategoriaEgreso::class,
+        Subcategoria::class,
+        Ingreso::class,
+        UserEntity::class,
+        FinanceSummaryEntity::class,
+        CategorieDataEntity::class,
+               ],
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
+    //User
     abstract fun userDao(): UserDao
+
+    //Finanza
+    abstract fun resumenFinancieroDao(): FinanceSummaryDao
+    abstract fun categoriaDataDao(): CategorieDataDao
+
+    //BD
     abstract fun categoriaEgresoDao(): CategoriaEgresoDao
     abstract fun subcategoriaDao(): SubcategoriaDao
     abstract fun ingresoDao(): IngresoDao

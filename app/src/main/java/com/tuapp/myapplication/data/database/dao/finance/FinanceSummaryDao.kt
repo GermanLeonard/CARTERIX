@@ -1,0 +1,21 @@
+package com.tuapp.myapplication.data.database.dao.finance
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.tuapp.myapplication.data.database.entities.finance.FinanceSummaryEntity
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface FinanceSummaryDao {
+
+    @Query("SELECT * FROM resumen_financiero LIMIT 1")
+    fun getSummary(): Flow<FinanceSummaryEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSummary(resumen: FinanceSummaryEntity)
+
+    @Query("DELETE FROM resumen_financiero")
+    suspend fun cleaSummary()
+}
