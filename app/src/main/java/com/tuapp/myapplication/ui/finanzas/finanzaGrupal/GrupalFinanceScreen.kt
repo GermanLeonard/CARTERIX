@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.ui.finanzaGrupal
+package com.tuapp.myapplication.ui.finanzas.finanzaGrupal
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

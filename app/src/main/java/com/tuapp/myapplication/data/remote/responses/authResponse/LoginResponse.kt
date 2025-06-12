@@ -21,6 +21,7 @@ fun LoginResponse.toDomain(): LoginResponseDomain{
         token,
         datos_user = datos_user?.let {  UserDataDomain(
             id = it.id,
+            finanzaId = it.finanza_id,
             nombre = it.nombre,
             correo = it.correo,
         )},

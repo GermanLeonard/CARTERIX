@@ -5,6 +5,8 @@ import com.tuapp.myapplication.data.database.entities.finance.CategorieDataEntit
 import com.tuapp.myapplication.data.models.financeModels.CategorieResponseDomain
 
 data class CategoriaResponse(
+    @SerializedName("finanza_id")
+    val finanza_id: Int,
     @SerializedName("categoria_nombre")
     val categoria_nombre: String,
     @SerializedName("diferencia")
@@ -17,6 +19,7 @@ data class CategoriaResponse(
 
 fun CategoriaResponse.toEntity(): CategorieDataEntity {
     return CategorieDataEntity(
+        finanzaId = finanza_id,
         categoriaNombre = categoria_nombre,
         diferencia = diferencia,
         gasto = gasto,

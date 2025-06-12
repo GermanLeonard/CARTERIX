@@ -1,5 +1,6 @@
 package com.tuapp.myapplication.data.remote
 
+import com.tuapp.myapplication.data.remote.finance.FinanceService
 import com.tuapp.myapplication.data.remote.interceptors.AuthInterceptor
 import com.tuapp.myapplication.data.remote.user.UserService
 import com.tuapp.myapplication.data.repository.sensitive.SensitiveInfoRepository
@@ -28,5 +29,9 @@ object RetrofitInstance {
 
     fun getUserService(repository: SensitiveInfoRepository): UserService{
         return getInstance(repository).create(UserService::class.java)
+    }
+
+    fun getFinanceService(repository: SensitiveInfoRepository): FinanceService{
+        return getInstance(repository).create(FinanceService::class.java)
     }
 }

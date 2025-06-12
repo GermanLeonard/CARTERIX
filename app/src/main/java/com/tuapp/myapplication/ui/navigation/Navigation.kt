@@ -10,13 +10,13 @@ import androidx.navigation.compose.composable
 import com.tuapp.myapplication.ui.auth.LoginScreen
 import com.tuapp.myapplication.ui.auth.RegisterScreen
 import com.tuapp.myapplication.ui.auth.UserViewModel
-import com.tuapp.myapplication.ui.finanzaGrupal.GrupalFinanceScreen
-import com.tuapp.myapplication.ui.finanzaIndividual.BDHomeScreen
-import com.tuapp.myapplication.ui.finanzaIndividual.CategoriasEgresoScreen
-import com.tuapp.myapplication.ui.finanzaIndividual.IndividualFinanceScreen
-import com.tuapp.myapplication.ui.finanzaIndividual.IngresosScreen
-import com.tuapp.myapplication.ui.finanzaIndividual.RegistrarSubcategoriaScreen
-import com.tuapp.myapplication.ui.finanzaIndividual.SubcategoriasScreen
+import com.tuapp.myapplication.ui.finanzas.finanzaGrupal.GrupalFinanceScreen
+import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.BDHomeScreen
+import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.CategoriasEgresoScreen
+import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.IndividualFinanceScreen
+import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.IngresosScreen
+import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.RegistrarSubcategoriaScreen
+import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.SubcategoriasScreen
 import com.tuapp.myapplication.ui.profile.ProfileScreen
 
 @Composable

@@ -8,6 +8,7 @@ import com.tuapp.myapplication.data.models.authModels.UserDataDomain
 data class UserEntity(
     @PrimaryKey(autoGenerate = false)
     val id: Int,
+    val finanzaId: Int,
     val nombre: String,
     val correo: String,
 )
@@ -15,6 +16,7 @@ data class UserEntity(
 fun UserEntity.toDomain(): UserDataDomain {
    return UserDataDomain(
        id,
+       finanzaId,
        nombre,
        correo
    )

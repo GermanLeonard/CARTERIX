@@ -35,6 +35,7 @@ class UserViewModel(
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = UserDataDomain(
             id = 1,
+            finanzaId = 1,
             nombre = "",
             correo = "",
         )
@@ -50,7 +51,7 @@ class UserViewModel(
                         }
                         is Resourse.Success -> {
                             //Manejen el "success"
-                            //resource.data.message
+                            resource.data.message
                         }
                         is Resourse.Error -> {
                             //Manejen el "error"
@@ -70,7 +71,7 @@ class UserViewModel(
                         }
                         is Resourse.Success -> {
                             //Manejen el "success"
-                            //resource.data.message
+                            resource.data.message
                         }
                         is Resourse.Error -> {
                             //Manejen el "error"
@@ -90,7 +91,7 @@ class UserViewModel(
                         }
                         is Resourse.Success -> {
                             //Manejen el "success"
-                            //resource.data.message
+                            resource.data.message
                         }
                         is Resourse.Error -> {
                             //Manejen el "error"
@@ -110,7 +111,7 @@ class UserViewModel(
                         }
                         is Resourse.Success -> {
                             //Manejen el "success"
-                            //resource.data.message
+                            resource.data.message
                         }
                         is Resourse.Error -> {
                             //Manejen el "error"

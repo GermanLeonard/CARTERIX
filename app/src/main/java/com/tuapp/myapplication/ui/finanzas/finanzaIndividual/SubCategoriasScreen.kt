@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.ui.finanzaIndividual
+package com.tuapp.myapplication.ui.finanzas.finanzaIndividual
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

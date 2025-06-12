@@ -1,9 +1,12 @@
 package com.tuapp.myapplication.data.repository.finance
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.gson.Gson
 import com.tuapp.myapplication.data.database.dao.finance.CategorieDataDao
 import com.tuapp.myapplication.data.database.dao.finance.FinanceSummaryDao
+import com.tuapp.myapplication.data.database.dao.user.UserDao
 import com.tuapp.myapplication.data.database.entities.finance.toDomain
 import com.tuapp.myapplication.data.models.financeModels.DataResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.SummaryResponseDomain
@@ -15,17 +18,26 @@ import com.tuapp.myapplication.data.remote.responses.financeResponse.summary.toE
 import com.tuapp.myapplication.helpers.Resourse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import retrofit2.HttpException
 
 class FinanceRepositoryImpl(
     private val financeService: FinanceService,
+    private val userDao: UserDao,
     private val financeSummaryDao: FinanceSummaryDao,
     private val categorieDataDao: CategorieDataDao,
 ): FinanceRepository {
+
+    suspend fun getFinanceId(): Int {
+        return userDao.getUser().map { it.finanzaId }.firstOrNull() ?: 0
+    }
 
     override suspend fun getSummary(mes: Int, anio: Int, finanza_id: Int?): Flow<Resourse<SummaryResponseDomain>> = flow {
         emit(Resourse.Loading)
@@ -50,9 +62,10 @@ class FinanceRepositoryImpl(
             return@flow
         }
 
-        val financeSummary = financeSummaryDao.getSummary().map { entity ->
+        val financeSummary = financeSummaryDao.getSummary(
+            if(finanza_id != null) finanza_id else getFinanceId()
+        ).map { entity ->
             val summary = entity.toDomain()
-
             Resourse.Success(summary)
         }
 
@@ -65,6 +78,9 @@ class FinanceRepositoryImpl(
             val dataResponse = financeService.getData(mes, anio, finanza_id)
 
             if(dataResponse.success){
+                categorieDataDao.clear(
+                    if(finanza_id != null) finanza_id else getFinanceId()
+                )
                 categorieDataDao.insertCategorias(dataResponse.toEntityList())
             }
         }catch (e: HttpException){
@@ -82,7 +98,9 @@ class FinanceRepositoryImpl(
             return@flow
         }
 
-        val dataFinances = categorieDataDao.getCategorias().map { entities ->
+        val dataFinances = categorieDataDao.getCategorias(
+            if(finanza_id != null) finanza_id else getFinanceId()
+        ).map { entities ->
             val categories = entities.map { it.toDomain() }
 
             if(categories.isEmpty()){

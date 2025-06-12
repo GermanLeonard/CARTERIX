@@ -8,6 +8,7 @@ import com.tuapp.myapplication.data.models.financeModels.CategorieResponseDomain
 data class CategorieDataEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val finanzaId: Int,
 
     val categoriaNombre: String,
     val totalPresupuesto: Float,
@@ -17,6 +18,7 @@ data class CategorieDataEntity(
 
 fun CategorieDataEntity.toDomain(): CategorieResponseDomain {
     return CategorieResponseDomain(
+        finanzaId,
         categoriaNombre,
         diferencia,
         gasto,
