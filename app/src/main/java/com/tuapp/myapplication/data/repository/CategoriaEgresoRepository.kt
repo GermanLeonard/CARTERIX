@@ -1,6 +1,6 @@
 package com.tuapp.myapplication.data.repository
 
-import com.tuapp.myapplication.data.dao.CategoriaEgresoDao
+import com.tuapp.myapplication.data.database.dao.CategoriaEgresoDao
 import com.tuapp.myapplication.data.models.CategoriaEgreso
 import kotlinx.coroutines.flow.Flow
 
