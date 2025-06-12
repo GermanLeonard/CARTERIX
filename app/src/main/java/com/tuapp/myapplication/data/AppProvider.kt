@@ -21,7 +21,7 @@ class AppProvider(context: Context) {
     private val sensitiveInfoRepository: SensitiveInfoRepository = SensitiveInfoRepositoryImpl(context.dataStore)
 
     private val userDao = appDatabase.userDao()
-    private val userService = RetrofitInstance.userService
+    private val userService = RetrofitInstance.getUserService(sensitiveInfoRepository)
     private val userRepository = UserRepositoryImpl(userService, userDao, sensitiveInfoRepository )
 
     fun provideUserRepository(): UserRepository {

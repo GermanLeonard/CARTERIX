@@ -37,7 +37,9 @@ abstract class AppDatabase : RoomDatabase() {
                     "carterix_db"
                 ).fallbackToDestructiveMigration() // ← para evitar errores si cambia la versión
                     .build()
-                INSTANCE = instance
+                    .also{
+                        INSTANCE = it
+                    }
                 instance
             }
         }

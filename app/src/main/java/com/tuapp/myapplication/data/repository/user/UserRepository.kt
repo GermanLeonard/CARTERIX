@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 interface UserRepository {
 
     fun getCredentials(): Flow<UserDataDomain>
+    suspend fun closeSession()
 
     suspend fun registerUser(registerRequest: RegisterRequestDomain): Flow<Resourse<RegisterResponseDomain>>
     suspend fun loginUser(loginRequest: LoginRequestDomain): Flow<Resourse<LoginResponseDomain>>

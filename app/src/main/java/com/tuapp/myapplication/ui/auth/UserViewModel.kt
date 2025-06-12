@@ -120,6 +120,12 @@ class UserViewModel(
         }
     }
 
+    fun closeSession() {
+        viewModelScope.launch {
+            userRepository.closeSession()
+        }
+    }
+
     val token: StateFlow<String?> = sensitiveInfoRepository.authenticationToken.map { it }
         .stateIn(
             scope = viewModelScope,

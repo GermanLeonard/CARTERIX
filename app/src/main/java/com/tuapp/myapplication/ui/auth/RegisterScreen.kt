@@ -158,7 +158,10 @@ fun RegisterScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
                 Text("¿Ya tienes cuenta?", fontSize = 14.sp)
                 Spacer(modifier = Modifier.width(4.dp))
                 TextButton(onClick = {
