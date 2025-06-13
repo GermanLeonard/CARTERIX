@@ -2,7 +2,6 @@ package com.tuapp.myapplication.data.remote.responses.financeResponse.data
 
 import com.google.gson.annotations.SerializedName
 import com.tuapp.myapplication.data.database.entities.finance.CategorieDataEntity
-import com.tuapp.myapplication.data.models.financeModels.CategorieResponseDomain
 
 data class CategoriaResponse(
     @SerializedName("finanza_id")
@@ -10,11 +9,11 @@ data class CategoriaResponse(
     @SerializedName("categoria_nombre")
     val categoria_nombre: String,
     @SerializedName("diferencia")
-    val diferencia: Float,
+    val diferencia: Double,
     @SerializedName("gasto")
-    val gasto: Float,
+    val gasto: Double,
     @SerializedName("total_presupuesto")
-    val total_presupuesto: Float
+    val total_presupuesto: Double
 )
 
 fun CategoriaResponse.toEntity(): CategorieDataEntity {

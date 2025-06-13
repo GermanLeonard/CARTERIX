@@ -2,7 +2,7 @@ package com.tuapp.myapplication.data.database.entities.finance
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.tuapp.myapplication.data.models.financeModels.CategorieResponseDomain
+import com.tuapp.myapplication.data.models.financeModels.response.CategorieResponseDomain
 
 @Entity(tableName = "categorias_data")
 data class CategorieDataEntity(
@@ -11,9 +11,9 @@ data class CategorieDataEntity(
     val finanzaId: Int,
 
     val categoriaNombre: String,
-    val totalPresupuesto: Float,
-    val gasto: Float,
-    val diferencia: Float,
+    val totalPresupuesto: Double,
+    val gasto: Double,
+    val diferencia: Double,
 )
 
 fun CategorieDataEntity.toDomain(): CategorieResponseDomain {

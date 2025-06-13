@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface FinanceSummaryDao {
 
-    @Query("SELECT * FROM resumen_financiero WHERE id = :finanza_id LIMIT 1")
-    fun getSummary(finanza_id: Int): Flow<FinanceSummaryEntity>
+    @Query("SELECT * FROM resumen_financiero WHERE id = :finanzaId LIMIT 1")
+    fun getSummary(finanzaId: Int): Flow<FinanceSummaryEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSummary(resumen: FinanceSummaryEntity)

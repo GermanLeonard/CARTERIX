@@ -22,11 +22,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.data.database.AppDatabase
 import com.tuapp.myapplication.data.repository.CategoriaEgresoRepository
-import com.tuapp.myapplication.data.repository.SubcategoriaRepository
 import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModel
 import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModelFactory
-import com.tuapp.myapplication.ui.viewmodel.SubcategoriaViewModel
-import com.tuapp.myapplication.ui.viewmodel.SubcategoriaViewModelFactory
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.navigation.RegistrarSubCategoriaScreen
 import com.tuapp.myapplication.ui.navigation.Routes
@@ -37,13 +34,9 @@ fun SubcategoriasScreen(navController: NavController) {
     val subcategoriaDao = AppDatabase.getDatabase(context).subcategoriaDao()
     val categoriaDao = AppDatabase.getDatabase(context).categoriaEgresoDao()
 
-    val subcategoriaRepository = SubcategoriaRepository(subcategoriaDao)
     val categoriaRepository = CategoriaEgresoRepository(categoriaDao)
 
-    val subcategoriaViewModel: SubcategoriaViewModel = viewModel(factory = SubcategoriaViewModelFactory(subcategoriaRepository))
     val categoriaViewModel: CategoriaEgresoViewModel = viewModel(factory = CategoriaEgresoViewModelFactory(categoriaRepository))
-
-    val subcategorias by subcategoriaViewModel.subcategorias.collectAsState()
     val categorias by categoriaViewModel.categorias.collectAsState()
 
     var selectedCategoria by remember { mutableStateOf("") }
@@ -96,11 +89,11 @@ fun SubcategoriasScreen(navController: NavController) {
                     ) {
                         categorias.forEach {
                             Text(
-                                text = it.nombre,
+                                text = it.nombreCategoria,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        selectedCategoria = it.nombre
+                                        selectedCategoria = it.nombreCategoria
                                         showMenu = false
                                     }
                                     .padding(12.dp)
@@ -111,24 +104,24 @@ fun SubcategoriasScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(subcategorias.filter {
-                        selectedCategoria.isEmpty() || it.categoriaPadre == selectedCategoria
-                    }) { sub ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 6.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
-                        ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
-                                Text("${sub.categoriaPadre}", color = Color.Black, fontWeight = FontWeight.Bold)
-                                Text("${sub.nombre} - ${sub.tipo}")
-                                Text("Presupuesto: $${sub.presupuesto}", color = verde)
-                            }
-                        }
-                    }
-                }
+                //LazyColumn(modifier = Modifier.fillMaxSize()) {
+                //    items(subcategorias.filter {
+                //        selectedCategoria.isEmpty() || it.categoriaPadre == selectedCategoria
+                //    }) { sub ->
+                //        Card(
+                //            modifier = Modifier
+                //                .fillMaxWidth()
+                //                .padding(vertical = 6.dp),
+                //            colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+                //        ) {
+                //            Column(modifier = Modifier.padding(12.dp)) {
+                //                Text("${sub.categoriaPadre}", color = Color.Black, fontWeight = FontWeight.Bold)
+                //                Text("${sub.nombre} - ${sub.tipo}")
+                //               Text("Presupuesto: $${sub.presupuesto}", color = verde)
+                //            }
+                //        }
+                //    }
+                //}
             }
         }
 

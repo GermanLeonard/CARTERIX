@@ -1,33 +1,30 @@
 package com.tuapp.myapplication.data.remote.responses.financeResponse.summary
 
 import com.google.gson.annotations.SerializedName
-import com.tuapp.myapplication.data.models.financeModels.ResumenAhorrosResponseDomain
-import com.tuapp.myapplication.data.models.financeModels.ResumenEgresosResponseDomain
-import com.tuapp.myapplication.data.models.financeModels.ResumenFinancieroResponseDomain
 
 data class ResumenEgresosResponse(
     @SerializedName("consumo_mensual")
-    val consumo_mensual: Float,
+    val consumo_mensual: Double,
     @SerializedName("presupuesto_mensual")
-    val presupuesto_mensual: Float,
+    val presupuesto_mensual: Double,
     @SerializedName("variacion_mensual")
-    val variacion_mensual: Float
+    val variacion_mensual: Double
 )
 
 data class ResumenAhorrosResponse(
     @SerializedName("acumulado")
-    val acumulado: Float,
+    val acumulado: Double,
     @SerializedName("meta")
-    val meta: Float,
+    val meta: Double,
     @SerializedName("progreso_porcentaje")
-    val progreso_porcentaje: Float
+    val progreso_porcentaje: Double
 )
 
 data class ResumenFinancieroResponse(
     @SerializedName("diferencia")
-    val diferencia: Float,
+    val diferencia: Double,
     @SerializedName("egresos_totales")
-    val egresos_totales: Float,
+    val egresos_totales: Double,
     @SerializedName("ingresos_totales")
-    val ingresos_totales: Float
+    val ingresos_totales: Double
 )

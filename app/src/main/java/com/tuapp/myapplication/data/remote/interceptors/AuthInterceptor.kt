@@ -17,7 +17,7 @@ class AuthInterceptor(private val repository: SensitiveInfoRepository) : Interce
         }
 
         val token = runBlocking {
-            repository.authenticationToken.first() ?: ""
+            repository.authenticationToken.first()
         }
 
         val newRequest = request.newBuilder().apply {

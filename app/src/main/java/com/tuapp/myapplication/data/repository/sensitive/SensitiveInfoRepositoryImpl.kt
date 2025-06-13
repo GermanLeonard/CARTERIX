@@ -26,7 +26,7 @@ class SensitiveInfoRepositoryImpl(
             }
         }
         .map { preferences ->
-            preferences[AUTHENTICATION_TOKEN] ?: null
+            preferences[AUTHENTICATION_TOKEN]
         }
 
     override suspend fun saveToken(token: String) {

@@ -1,5 +1,6 @@
 package com.tuapp.myapplication.data.remote
 
+import com.tuapp.myapplication.data.remote.categories.CategoriesService
 import com.tuapp.myapplication.data.remote.finance.FinanceService
 import com.tuapp.myapplication.data.remote.interceptors.AuthInterceptor
 import com.tuapp.myapplication.data.remote.user.UserService
@@ -10,7 +11,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
-    private val BASE_URL = "http://localhost:8000/"
+    private val BASE_URL = "http://10.0.2.2:8000/"
 
     fun getInstance(repository: SensitiveInfoRepository): Retrofit {
         val client = OkHttpClient.Builder()
@@ -33,5 +34,9 @@ object RetrofitInstance {
 
     fun getFinanceService(repository: SensitiveInfoRepository): FinanceService{
         return getInstance(repository).create(FinanceService::class.java)
+    }
+
+    fun getCategoryService(repository: SensitiveInfoRepository): CategoriesService{
+        return getInstance(repository).create(CategoriesService::class.java)
     }
 }

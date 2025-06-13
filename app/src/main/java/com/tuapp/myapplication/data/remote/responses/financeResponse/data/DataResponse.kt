@@ -6,12 +6,8 @@ import com.tuapp.myapplication.data.database.entities.finance.CategorieDataEntit
 data class DataResponse(
     @SerializedName("categorias")
     val categorias: List<CategoriaResponse>,
-    @SerializedName("finanza_id")
-    val finanza_id: Int? = null,
     @SerializedName("success")
     val success: Boolean,
-    @SerializedName("message")
-    val message: String? = null
 )
 
 fun DataResponse.toEntityList(): List<CategorieDataEntity> {

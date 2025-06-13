@@ -8,27 +8,34 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tuapp.myapplication.CarterixApplication
 import com.tuapp.myapplication.data.repository.finance.FinanceRepository
-import com.tuapp.myapplication.helpers.Resourse
+import com.tuapp.myapplication.helpers.Resource
 import kotlinx.coroutines.launch
 
 class FinanzasViewModel(
    private val finanzaRepository: FinanceRepository
 ): ViewModel() {
 
+    //CREEN USTEDES LOS ESTADOS QUE SERAN NECESARIOS A MOSTRAR EN LA VISTA
+    // (la informacion, estados de cargando, mensajes de error, etc.)
+
     //PONER EL ID DE LA FINANZA EN CASO DE SER CONJUNTA
+    //ESTO ES LO QUE SE MOSTRARA EN LA PANTALLA PRINCIPAL
+    //ESTO SE MOSTRARA EN LA PANTALLA DE LA FINANZA EN EL APARTADO "ANALISIS" "RESUMEN"
     fun financeSummary(mes: Int, anio: Int, finanza_id: Int? = null) {
         viewModelScope.launch {
             finanzaRepository.getSummary(mes, anio, finanza_id)
                 .collect { resource ->
                     when(resource){
-                        is Resourse.Loading -> {
+                        is Resource.Loading -> {
                             //Manejen el "cargando"
                         }
-                        is Resourse.Success -> {
+                        is Resource.Success -> {
                             //Manejen el "success"
-                            resource.data.finanza_principal
+                            resource.data.resumen_ahorros
+                            resource.data.resumen_financiero
+                            resource.data.resumen_egresos
                         }
-                        is Resourse.Error -> {
+                        is Resource.Error -> {
                             //Manejen el "error"
                         }
                     }
@@ -37,19 +44,20 @@ class FinanzasViewModel(
     }
 
     //PONER EL ID DE LA FINANZA EN CASO DE SER CONJUNTA
+    //ESTO SE MOSTRARA EN LA PANTALLA DE LA FINANZA EN EL APARTADO "ANALISIS" "DATOS"
     fun financeData(mes: Int, anio: Int, finanza_id: Int? = null){
         viewModelScope.launch {
             finanzaRepository.getData(mes, anio, finanza_id)
                 .collect { resource ->
                     when(resource){
-                        is Resourse.Loading -> {
+                        is Resource.Loading -> {
                             //Manejen el "cargando"
                         }
-                        is Resourse.Success -> {
+                        is Resource.Success -> {
                             //Manejen el "success"
-                            resource.data.categorias
+                            resource.data
                         }
-                        is Resourse.Error -> {
+                        is Resource.Error -> {
                             //Manejen el "error"
                         }
                     }

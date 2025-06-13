@@ -16,15 +16,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.R
 import com.tuapp.myapplication.ui.navigation.FinanzaIndividualScreen
 import com.tuapp.myapplication.ui.navigation.RegisterScreen
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(
+    navController: NavController,
+    userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory),
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val isLoggedIn by userViewModel.isLoggedIn.collectAsState()
 
     val verde = Color(0xFF2E7D32)
     val verdeClaro = Color(0xFF66BB6A)
@@ -145,7 +151,13 @@ fun LoginScreen(navController: NavController) {
 
             // Botón
             Button(
-                onClick = { navController.navigate(FinanzaIndividualScreen) },
+                onClick = {
+                    //ESTA ES UNA PRUEBA, CAMBIEN SEGUN EL CASO
+                    userViewModel.loginUser(email, password)
+                    if(isLoggedIn){
+                        navController.navigate(FinanzaIndividualScreen)
+                    }
+                          },
                 shape = RoundedCornerShape(50),
                 modifier = Modifier
                     .fillMaxWidth()

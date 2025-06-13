@@ -10,13 +10,13 @@ interface FinanceService {
     suspend fun getSummary(
         @Query("mes") mes: Int,
         @Query("anio") anio: Int,
-        @Query("finanza_id") finanza_id: Int?,
+        @Query("finanza_id") finanzaId: Int?,
     ): SummaryResponse
 
     @GET("finanza/datos")
     suspend fun getData(
         @Query("mes") mes: Int,
         @Query("anio") anio: Int,
-        @Query("finanza_id") finanza_id: Int?,
+        @Query("finanza_id") finanzaId: Int?,
     ): DataResponse
 }

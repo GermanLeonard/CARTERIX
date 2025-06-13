@@ -2,31 +2,30 @@ package com.tuapp.myapplication.data.database.entities.finance
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.tuapp.myapplication.data.models.financeModels.PrincipalFinanceResponseDomain
-import com.tuapp.myapplication.data.models.financeModels.ResumenAhorrosResponseDomain
-import com.tuapp.myapplication.data.models.financeModels.ResumenEgresosResponseDomain
-import com.tuapp.myapplication.data.models.financeModels.ResumenFinancieroResponseDomain
-import com.tuapp.myapplication.data.models.financeModels.SummaryResponseDomain
+import com.tuapp.myapplication.data.models.financeModels.response.PrincipalFinanceResponseDomain
+import com.tuapp.myapplication.data.models.financeModels.response.ResumenAhorrosResponseDomain
+import com.tuapp.myapplication.data.models.financeModels.response.ResumenEgresosResponseDomain
+import com.tuapp.myapplication.data.models.financeModels.response.ResumenFinancieroResponseDomain
 
 @Entity(tableName = "resumen_financiero")
 data class FinanceSummaryEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
-    val acumulado: Float,
-    val meta: Float,
-    val progresoPorcentaje: Float,
+    val acumulado: Double,
+    val meta: Double,
+    val progresoPorcentaje: Double,
 
-    val consumoMensual: Float,
-    val presupuestoMensual: Float,
-    val variacionMensual: Float,
+    val consumoMensual: Double,
+    val presupuestoMensual: Double,
+    val variacionMensual: Double,
 
-    val diferencia: Float,
-    val egresosTotales: Float,
-    val ingresosTotales: Float
+    val diferencia: Double,
+    val egresosTotales: Double,
+    val ingresosTotales: Double
 )
 
-fun FinanceSummaryEntity.toDomain(): SummaryResponseDomain {
+fun FinanceSummaryEntity.toDomain(): PrincipalFinanceResponseDomain {
     val resumenAhorros = ResumenAhorrosResponseDomain(
         acumulado = this.acumulado,
         meta = this.meta,
@@ -51,7 +50,5 @@ fun FinanceSummaryEntity.toDomain(): SummaryResponseDomain {
         resumen_financiero = resumenFinanciero
     )
 
-    return SummaryResponseDomain(
-        finanza_principal = principal,
-    )
+    return principal
 }

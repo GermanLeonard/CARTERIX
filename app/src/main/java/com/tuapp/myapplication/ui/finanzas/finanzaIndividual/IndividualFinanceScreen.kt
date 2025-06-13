@@ -16,13 +16,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.finanzas.FinanzasViewModel
 import com.tuapp.myapplication.ui.navigation.BDHomeScreen
 import com.tuapp.myapplication.ui.navigation.Routes
+import java.util.Date
 
 @Composable
-fun IndividualFinanceScreen(navController: NavController) {
+fun IndividualFinanceScreen(
+    navController: NavController,
+    finanzaViewModel: FinanzasViewModel = viewModel(factory = FinanzasViewModel.Factory)
+) {
     val verde = Color(0xFF2E7D32)
     val verdeClaro = Color(0xFF66BB6A)
     val verdePastel = Color(0xFFE6F4EA)
@@ -33,6 +39,10 @@ fun IndividualFinanceScreen(navController: NavController) {
 
     var selectedTab by remember { mutableStateOf("Analisis") }
     var selectedView by remember { mutableStateOf("Resumen") }
+
+    LaunchedEffect(Unit) {
+        //Aqui tienen que hacer las llamadas segun sea el caso
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -68,8 +78,8 @@ fun IndividualFinanceScreen(navController: NavController) {
                     .fillMaxWidth()
                     .background(verdePastel, RoundedCornerShape(50))
                     .border(BorderStroke(2.dp, verde), shape = RoundedCornerShape(50))
-                    .padding(6.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                    .padding(top = 6.dp, start = 3.dp, end = 3.dp, bottom = 6.dp),
+                horizontalArrangement = Arrangement.Center,
             ) {
                 listOf("Analisis", "Transacciones", "BD").forEach { label ->
                     val isSelected = label == selectedTab

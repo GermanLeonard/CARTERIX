@@ -21,11 +21,8 @@ import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.data.database.AppDatabase
 import com.tuapp.myapplication.data.models.Subcategoria
 import com.tuapp.myapplication.data.repository.CategoriaEgresoRepository
-import com.tuapp.myapplication.data.repository.SubcategoriaRepository
 import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModel
 import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModelFactory
-import com.tuapp.myapplication.ui.viewmodel.SubcategoriaViewModel
-import com.tuapp.myapplication.ui.viewmodel.SubcategoriaViewModelFactory
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
@@ -35,12 +32,6 @@ fun RegistrarSubcategoriaScreen(navController: NavController) {
     val categoriaViewModel: CategoriaEgresoViewModel = viewModel(
         factory = CategoriaEgresoViewModelFactory(
             CategoriaEgresoRepository(AppDatabase.getDatabase(context).categoriaEgresoDao())
-        )
-    )
-
-    val subcategoriaViewModel: SubcategoriaViewModel = viewModel(
-        factory = SubcategoriaViewModelFactory(
-            SubcategoriaRepository(AppDatabase.getDatabase(context).subcategoriaDao())
         )
     )
 
@@ -108,11 +99,11 @@ fun RegistrarSubcategoriaScreen(navController: NavController) {
                     ) {
                         categorias.forEach {
                             Text(
-                                text = it.nombre,
+                                text = it.nombreCategoria,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        categoriaPadre = it.nombre
+                                        categoriaPadre = it.nombreCategoria
                                         showCategoriaMenu = false
                                     }
                                     .padding(12.dp)
@@ -185,14 +176,14 @@ fun RegistrarSubcategoriaScreen(navController: NavController) {
                 Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
                     Button(
                         onClick = {
-                            subcategoriaViewModel.agregar(
-                                Subcategoria(
-                                    categoriaPadre = categoriaPadre,
-                                    nombre = nombre,
-                                    tipo = tipoGasto,
-                                    presupuesto = presupuesto.toDoubleOrNull() ?: 0.0
-                                )
-                            )
+                            //subcategoriaViewModel.agregar(
+                            //Subcategoria(
+                            //       categoriaPadre = categoriaPadre,
+                            //        nombre = nombre,
+                            //        tipo = tipoGasto,
+                            //        presupuesto = presupuesto.toDoubleOrNull() ?: 0.0
+                            //    )
+                            //)
                             navController.popBackStack()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = verde)

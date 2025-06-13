@@ -6,6 +6,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.tuapp.myapplication.data.database.AppDatabase
 import com.tuapp.myapplication.data.remote.RetrofitInstance
+import com.tuapp.myapplication.data.repository.categories.CategoryRepository
+import com.tuapp.myapplication.data.repository.categories.CategoryRepositoryImpl
 import com.tuapp.myapplication.data.repository.finance.FinanceRepository
 import com.tuapp.myapplication.data.repository.finance.FinanceRepositoryImpl
 import com.tuapp.myapplication.data.repository.sensitive.SensitiveInfoRepository
@@ -31,6 +33,10 @@ class AppProvider(context: Context) {
     private val financeService = RetrofitInstance.getFinanceService(sensitiveInfoRepository)
     private val financeRepository = FinanceRepositoryImpl(financeService, userDao, financeSummaryDao, financeDataDao)
 
+    private val categoryService = RetrofitInstance.getCategoryService(sensitiveInfoRepository)
+    private val categoryDao = appDatabase.categoriaEgresoDao()
+    private val categoryRepository = CategoryRepositoryImpl(categoryService,categoryDao,userDao)
+
     fun provideUserRepository(): UserRepository {
         return userRepository
     }
@@ -41,5 +47,9 @@ class AppProvider(context: Context) {
 
     fun provideFinanceRepository(): FinanceRepository {
         return financeRepository
+    }
+
+    fun provideCategoryRepository(): CategoryRepository{
+        return categoryRepository
     }
 }
