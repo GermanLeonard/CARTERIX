@@ -3,6 +3,7 @@ package com.tuapp.myapplication.data.remote
 import com.tuapp.myapplication.data.remote.categories.CategoriesService
 import com.tuapp.myapplication.data.remote.finance.FinanceService
 import com.tuapp.myapplication.data.remote.interceptors.AuthInterceptor
+import com.tuapp.myapplication.data.remote.subCategories.SubCategoriesService
 import com.tuapp.myapplication.data.remote.user.UserService
 import com.tuapp.myapplication.data.repository.sensitive.SensitiveInfoRepository
 import okhttp3.OkHttpClient
@@ -38,5 +39,9 @@ object RetrofitInstance {
 
     fun getCategoryService(repository: SensitiveInfoRepository): CategoriesService{
         return getInstance(repository).create(CategoriesService::class.java)
+    }
+
+    fun getSubcategoryService(repository: SensitiveInfoRepository): SubCategoriesService{
+        return getInstance(repository).create(SubCategoriesService::class.java)
     }
 }

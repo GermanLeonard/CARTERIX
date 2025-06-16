@@ -61,7 +61,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "carterix_db"
-                ).fallbackToDestructiveMigration() // ← para evitar errores si cambia la versión
+                ).fallbackToDestructiveMigration(true)
                     .build()
                     .also{
                         INSTANCE = it

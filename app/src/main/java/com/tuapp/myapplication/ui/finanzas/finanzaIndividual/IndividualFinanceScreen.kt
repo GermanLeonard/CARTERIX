@@ -42,6 +42,12 @@ fun IndividualFinanceScreen(
 
     LaunchedEffect(Unit) {
         //Aqui tienen que hacer las llamadas segun sea el caso
+        //NO QUEMEN LA FECHA, AGARREN LA FECHA ACTUAL AL NOMAS INICIAR LA APLICACION
+        //DE AHI CUANDO SE QUIERA FILTRAR SE CAMBIA EL ESTADO DE LA FECHA PARA QUE HAGA EL NUEVO FILTRO
+        //TIENE QUE USAR MES Y AÑO
+        //EL TERCER PARAMETRO DE LAS FUNCIONES POR SI ACASO HAY FINANZA CONJUNTA, SE PASA EL ID
+        //finanzaViewModel.financeData(6,2025)
+        //finanzaViewModel.financeSummary(6,2025)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

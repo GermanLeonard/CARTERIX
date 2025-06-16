@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.ui.finanzas.finanzaIndividual
+package com.tuapp.myapplication.ui.subCategorias
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,7 +19,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.data.database.AppDatabase
-import com.tuapp.myapplication.data.models.Subcategoria
 import com.tuapp.myapplication.data.repository.CategoriaEgresoRepository
 import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModel
 import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModelFactory

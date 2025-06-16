@@ -1,10 +1,8 @@
-package com.tuapp.myapplication.ui.finanzas.finanzaIndividual
+package com.tuapp.myapplication.ui.subCategorias
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -29,8 +27,13 @@ import com.tuapp.myapplication.ui.navigation.RegistrarSubCategoriaScreen
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
-fun SubcategoriasScreen(navController: NavController) {
+fun SubcategoriasScreen(
+    navController: NavController,
+    subCategoryViewModel: SubCategoriesViewModel = viewModel(factory = SubCategoriesViewModel.Factory)
+) {
     val context = LocalContext.current
+    //ESTO YA NO VA
+    //NO LO QUITO PORQUE SE ROMPE, REFACTORICEN USTEDES
     val subcategoriaDao = AppDatabase.getDatabase(context).subcategoriaDao()
     val categoriaDao = AppDatabase.getDatabase(context).categoriaEgresoDao()
 
@@ -38,6 +41,12 @@ fun SubcategoriasScreen(navController: NavController) {
 
     val categoriaViewModel: CategoriaEgresoViewModel = viewModel(factory = CategoriaEgresoViewModelFactory(categoriaRepository))
     val categorias by categoriaViewModel.categorias.collectAsState()
+    //TODO ESTO YA NO VA
+
+    LaunchedEffect(Unit) {
+        //ESTO ES DE PRUEBA
+        //subCategoryViewModel.getSubCategoriesList()
+    }
 
     var selectedCategoria by remember { mutableStateOf("") }
     var showMenu by remember { mutableStateOf(false) }
@@ -88,6 +97,8 @@ fun SubcategoriasScreen(navController: NavController) {
                             .padding(4.dp)
                     ) {
                         categorias.forEach {
+                            //UNA VEZ ELEGIDO TIENE QUE SER FILTRADO EN LA LISTA QUE REGRESA EL VIEWMODEL
+                            //POR MEDIO DEL NOMBRE CATEGORIA
                             Text(
                                 text = it.nombreCategoria,
                                 modifier = Modifier

@@ -1,11 +1,9 @@
 package com.tuapp.myapplication.ui.navigation
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,8 +21,8 @@ import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.BDHomeScreen
 import com.tuapp.myapplication.ui.categories.CategoriasEgresoScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.IndividualFinanceScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.IngresosScreen
-import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.RegistrarSubcategoriaScreen
-import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.SubcategoriasScreen
+import com.tuapp.myapplication.ui.subCategorias.RegistrarSubcategoriaScreen
+import com.tuapp.myapplication.ui.subCategorias.SubcategoriasScreen
 import com.tuapp.myapplication.ui.profile.ProfileScreen
 
 @Composable

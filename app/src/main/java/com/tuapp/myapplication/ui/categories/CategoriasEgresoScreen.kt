@@ -45,6 +45,7 @@ fun CategoriasEgresoScreen(
 
     LaunchedEffect(Unit) {
         //AQUI TIENEN QUE HACER LA LLAMADA DEL VIEWMODEL PARA TENER LAS CATEGORIAS
+        //ESTO ES PARA PROBAR
         categoryViewModel.getCategoriesList()
     }
 

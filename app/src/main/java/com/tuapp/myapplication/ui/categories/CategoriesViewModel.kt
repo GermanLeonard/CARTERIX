@@ -32,6 +32,7 @@ class CategoriesViewModel(
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
+                            //LISTA DE LAS OPCIONES DE CATEGORIAS PARA LOS SELECTS DE LOS FORMULARIOS
                             resource.data
                         }
                         is Resource.Error -> {
@@ -53,6 +54,7 @@ class CategoriesViewModel(
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
+                            //LISTA DE SUB CATEGORIAS
                             resource.data
                         }
                         is Resource.Error -> {
@@ -74,6 +76,7 @@ class CategoriesViewModel(
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
+                            //DETALLES DEL FILTRADO POR CATEGORIAS
                             resource.data
                         }
                         is Resource.Error -> {
@@ -95,6 +98,7 @@ class CategoriesViewModel(
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
+                            //RESPUESTA DE LA CREACION DE LA CATEGORIA
                             resource.data
                         }
                         is Resource.Error -> {
@@ -117,6 +121,7 @@ class CategoriesViewModel(
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
+                            //RESPUESTA DE LA ACTUALIZACION DE LA CATEGORIA
                             resource.data
                         }
                         is Resource.Error -> {

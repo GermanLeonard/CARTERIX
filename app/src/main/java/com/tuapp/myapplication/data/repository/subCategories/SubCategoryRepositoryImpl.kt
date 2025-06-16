@@ -7,12 +7,16 @@ import com.tuapp.myapplication.data.database.dao.subCategory.SubCategoryDao
 import com.tuapp.myapplication.data.database.dao.user.UserDao
 import com.tuapp.myapplication.data.database.entities.subCategory.toDomain
 import com.tuapp.myapplication.data.models.CommonResponseDomain
+import com.tuapp.myapplication.data.models.categoryModels.request.CreateOrUpdateCategorieRequestDomain
+import com.tuapp.myapplication.data.models.subCategoryModels.request.CreateOrUpdateSubCategoryDomain
+import com.tuapp.myapplication.data.models.subCategoryModels.request.toRequest
 import com.tuapp.myapplication.data.models.subCategoryModels.response.ListaSubCategoriasDomain
 import com.tuapp.myapplication.data.models.subCategoryModels.response.OptionsDomain
 import com.tuapp.myapplication.data.models.subCategoryModels.response.SubCategoriaDomain
 import com.tuapp.myapplication.data.remote.responses.CommonResponse
 import com.tuapp.myapplication.data.remote.responses.subCategoriesResponse.toDomain
 import com.tuapp.myapplication.data.remote.responses.subCategoriesResponse.toEntity
+import com.tuapp.myapplication.data.remote.responses.toDomain
 import com.tuapp.myapplication.data.remote.subCategories.SubCategoriesService
 import com.tuapp.myapplication.helpers.Resource
 import com.tuapp.myapplication.helpers.getFinanceId
@@ -43,7 +47,7 @@ class SubCategoryRepositoryImpl(
                 )
                 subCategoryDao.insertSubCategories(subCategoriesListResponse.toEntity())
             } else {
-                emit(Resource.Success(emptyList<ListaSubCategoriasDomain>()))
+                emit(Resource.Success(emptyList()))
             }
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -97,11 +101,21 @@ class SubCategoryRepositoryImpl(
         emit(Resource.Loading)
         try {
             val expensesTypes = expensesTypesDao.getExpensesTypes().map { entities ->
-                val types = entities.map { it.toDomain() }
+                var types = entities.map { it.toDomain() }
 
-                types
+                if(types.isEmpty()){
+                    val expensesResponse = subCategoryService.getExpensesOptions()
+                    types = expensesResponse.toDomain()
+
+                    expensesTypesDao.insertTypes(expensesResponse.toEntity())
+                }
+                Resource.Success(types)
             }
+            emitAll(expensesTypes)
         } catch (e: HttpException) {
+            //OJO
+            //EN EL FRONT
+            //MANEJEN LOS ERRORES 500: SERVER ERROR
             val errorBody = e.response()?.errorBody()?.string()
             val gson = Gson()
 
@@ -115,10 +129,12 @@ class SubCategoryRepositoryImpl(
         }
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun createSubCategory(finanzaId: Int?): Flow<Resource<CommonResponseDomain>> = flow {
+    override suspend fun createSubCategory(finanzaId: Int?, createOrUpdateCategory: CreateOrUpdateSubCategoryDomain): Flow<Resource<CommonResponseDomain>> = flow {
         emit(Resource.Loading)
         try {
+            val createResponse = subCategoryService.createSubCategory(finanzaId, createOrUpdateCategory.toRequest())
 
+            emit(Resource.Success(createResponse.toDomain()))
         } catch (e: HttpException) {
             //ERRORES
             //400: BAD REQUEST, 500: ERROR DEL SERVER
@@ -135,10 +151,12 @@ class SubCategoryRepositoryImpl(
         }
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun updateSubCategory(subCategoryId: Int): Flow<Resource<CommonResponseDomain>> = flow {
+    override suspend fun updateSubCategory(subCategoryId: Int, createOrUpdateCategory: CreateOrUpdateSubCategoryDomain): Flow<Resource<CommonResponseDomain>> = flow {
         emit(Resource.Loading)
         try {
+            val updateResponse = subCategoryService.updateSubCategory(subCategoryId, createOrUpdateCategory.toRequest())
 
+            emit(Resource.Success(updateResponse.toDomain()))
         } catch (e: HttpException) {
             //ERRORES
             //400: BAD REQUEST, 404: NOT FOUND, 500: ERROR DEL SERVER
