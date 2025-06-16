@@ -7,13 +7,16 @@ import androidx.room.RoomDatabase
 import com.tuapp.myapplication.data.dao.CategoriaEgresoDao
 import com.tuapp.myapplication.data.dao.SubcategoriaDao
 import com.tuapp.myapplication.data.dao.IngresoDao
+import com.tuapp.myapplication.data.dao.TransaccionDao
 import com.tuapp.myapplication.data.models.CategoriaEgreso
 import com.tuapp.myapplication.data.models.Subcategoria
 import com.tuapp.myapplication.data.models.Ingreso
+import com.tuapp.myapplication.data.models.Transaccion
+
 
 @Database(
-    entities = [CategoriaEgreso::class, Subcategoria::class, Ingreso::class],
-    version = 3,
+    entities = [CategoriaEgreso::class, Subcategoria::class, Ingreso::class, Transaccion::class],
+    version = 4,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -21,6 +24,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun categoriaEgresoDao(): CategoriaEgresoDao
     abstract fun subcategoriaDao(): SubcategoriaDao
     abstract fun ingresoDao(): IngresoDao
+    abstract fun transaccionDao(): TransaccionDao
+
 
     companion object {
         @Volatile

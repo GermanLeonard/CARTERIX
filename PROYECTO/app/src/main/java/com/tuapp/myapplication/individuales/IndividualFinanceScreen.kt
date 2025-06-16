@@ -82,8 +82,10 @@ fun IndividualFinanceScreen(navController: NavController) {
                             )
                             .clickable {
                                 selectedTab = label
-                                if (label == "BD") {
-                                    navController.navigate(Routes.BD_HOME)
+                                when (label) {
+                                    "Analisis" -> navController.navigate(Routes.INDIVIDUAL)
+                                    "Transacciones" -> navController.navigate("transacciones")
+                                    "BD" -> navController.navigate(Routes.BD_HOME)
                                 }
                             }
                             .padding(vertical = 8.dp),
