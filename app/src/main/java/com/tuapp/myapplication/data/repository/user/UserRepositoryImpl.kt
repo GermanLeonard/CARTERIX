@@ -20,6 +20,7 @@ import com.tuapp.myapplication.data.remote.responses.authResponse.toEntity
 import com.tuapp.myapplication.data.remote.user.UserService
 import com.tuapp.myapplication.data.repository.sensitive.SensitiveInfoRepository
 import com.tuapp.myapplication.helpers.Resource
+import com.tuapp.myapplication.helpers.errorParsing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -54,11 +55,7 @@ class UserRepositoryImpl(
             //EN EL FRONT
             //MANEJEN LOS ERRORES, CODIGO 400: BAD REQUEST,
             // 409: CONFLICTO (ej. correo ya usado), 500 ERROR DEL SERVIDOR
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            val msg = errorParsing(e)
 
             emit(Resource.Error(httpCode = e.code(), message = msg))
         }catch(e: Exception) {
@@ -67,10 +64,10 @@ class UserRepositoryImpl(
         }
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun loginUser(loginRequestDomain: LoginRequestDomain): Flow<Resource<LoginResponseDomain>> = flow {
+    override suspend fun loginUser(loginRequest: LoginRequestDomain): Flow<Resource<LoginResponseDomain>> = flow {
         emit(Resource.Loading)
         try {
-            val loginResponse = userService.loginUser(loginRequestDomain.toRequest())
+            val loginResponse = userService.loginUser(loginRequest.toRequest())
 
             sensitiveInfoRepository.saveToken(loginResponse.token)
             userDao.insertUser(loginResponse.datos_user.toEntity())
@@ -81,13 +78,9 @@ class UserRepositoryImpl(
             //EN EL FRONT
             //MANEJEN LOS ERRORES, CODIGO 400: BAD REQUEST, 404: NOT FOUND,
             // 409: CONFLICT (ej. contraseña incorrecta), 500 ERROR DEL SERVIDOR
-                val errorBody = e.response()?.errorBody()?.string()
-                val gson = Gson()
+            val msg = errorParsing(e)
 
-                val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-                val msg = errorResponse.message
-
-                emit(Resource.Error(httpCode = e.code(), message = msg))
+            emit(Resource.Error(httpCode = e.code(), message = msg))
         } catch (e: Exception) {
             Log.d("UserRepository", "Error al hacer la petición: ${e.message}")
             emit(Resource.Error(message = "Error inesperado: ${e.localizedMessage ?: "Desconocido"}"))
@@ -107,11 +100,7 @@ class UserRepositoryImpl(
             //EN EL FRONT
             //MANEJEN LOS ERRORES, CODIGO 400: BAD REQUEST, 404: NOT FOUND,
             //500 ERROR DEL SERVIDOR
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            val msg = errorParsing(e)
 
             emit(Resource.Error(httpCode = e.code(), message = msg))
         } catch (e: Exception){
@@ -134,11 +123,7 @@ class UserRepositoryImpl(
             //EN EL FRONT
             //MANEJEN LOS ERRORES, CODIGO 400: BAD REQUEST, 404: NOT FOUND,
             // 409: CONFLICT(ej. contraseñas no coinciden), 500 ERROR DEL SERVIDOR
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            val msg = errorParsing(e)
 
             emit(Resource.Error(httpCode = e.code(), message = msg))
         } catch (e: Exception){

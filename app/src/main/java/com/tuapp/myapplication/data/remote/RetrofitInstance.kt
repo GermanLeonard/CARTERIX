@@ -2,6 +2,7 @@ package com.tuapp.myapplication.data.remote
 
 import com.tuapp.myapplication.data.remote.categories.CategoriesService
 import com.tuapp.myapplication.data.remote.finance.FinanceService
+import com.tuapp.myapplication.data.remote.ingresos.IncomesService
 import com.tuapp.myapplication.data.remote.interceptors.AuthInterceptor
 import com.tuapp.myapplication.data.remote.subCategories.SubCategoriesService
 import com.tuapp.myapplication.data.remote.user.UserService
@@ -43,5 +44,9 @@ object RetrofitInstance {
 
     fun getSubcategoryService(repository: SensitiveInfoRepository): SubCategoriesService{
         return getInstance(repository).create(SubCategoriesService::class.java)
+    }
+
+    fun getIncomesService(repository: SensitiveInfoRepository): IncomesService {
+        return getInstance(repository).create(IncomesService::class.java)
     }
 }

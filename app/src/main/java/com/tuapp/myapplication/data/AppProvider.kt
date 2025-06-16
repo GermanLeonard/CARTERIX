@@ -10,6 +10,8 @@ import com.tuapp.myapplication.data.repository.categories.CategoryRepository
 import com.tuapp.myapplication.data.repository.categories.CategoryRepositoryImpl
 import com.tuapp.myapplication.data.repository.finance.FinanceRepository
 import com.tuapp.myapplication.data.repository.finance.FinanceRepositoryImpl
+import com.tuapp.myapplication.data.repository.incomes.IncomesRepository
+import com.tuapp.myapplication.data.repository.incomes.IncomesRepositoryImpl
 import com.tuapp.myapplication.data.repository.sensitive.SensitiveInfoRepository
 import com.tuapp.myapplication.data.repository.sensitive.SensitiveInfoRepositoryImpl
 import com.tuapp.myapplication.data.repository.subCategories.SubCategoryRepository
@@ -44,6 +46,10 @@ class AppProvider(context: Context) {
     private val expensesTypeDao = appDatabase.tipoGastosDao()
     private val subCategoryRepository = SubCategoryRepositoryImpl(subCategoryService, subCategoryDao, expensesTypeDao, userDao)
 
+    private val incomesService = RetrofitInstance.getIncomesService(sensitiveInfoRepository)
+    private val incomesDao = appDatabase.ingresoDao()
+    private val incomesRepository = IncomesRepositoryImpl(incomesService, incomesDao, userDao)
+
     fun provideUserRepository(): UserRepository {
         return userRepository
     }
@@ -62,5 +68,9 @@ class AppProvider(context: Context) {
 
     fun provideSubCategoryRepository(): SubCategoryRepository {
         return subCategoryRepository
+    }
+
+    fun provideIncomesRepository(): IncomesRepository {
+        return incomesRepository
     }
 }

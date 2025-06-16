@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.data.remote.request.categorieRequest
+package com.tuapp.myapplication.data.remote.request.categoriesRequest
 
 import com.google.gson.annotations.SerializedName
 

@@ -7,7 +7,6 @@ import com.tuapp.myapplication.data.database.dao.subCategory.SubCategoryDao
 import com.tuapp.myapplication.data.database.dao.user.UserDao
 import com.tuapp.myapplication.data.database.entities.subCategory.toDomain
 import com.tuapp.myapplication.data.models.CommonResponseDomain
-import com.tuapp.myapplication.data.models.categoryModels.request.CreateOrUpdateCategorieRequestDomain
 import com.tuapp.myapplication.data.models.subCategoryModels.request.CreateOrUpdateSubCategoryDomain
 import com.tuapp.myapplication.data.models.subCategoryModels.request.toRequest
 import com.tuapp.myapplication.data.models.subCategoryModels.response.ListaSubCategoriasDomain
@@ -19,6 +18,7 @@ import com.tuapp.myapplication.data.remote.responses.subCategoriesResponse.toEnt
 import com.tuapp.myapplication.data.remote.responses.toDomain
 import com.tuapp.myapplication.data.remote.subCategories.SubCategoriesService
 import com.tuapp.myapplication.helpers.Resource
+import com.tuapp.myapplication.helpers.errorParsing
 import com.tuapp.myapplication.helpers.getFinanceId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -48,13 +48,10 @@ class SubCategoryRepositoryImpl(
                 subCategoryDao.insertSubCategories(subCategoriesListResponse.toEntity())
             } else {
                 emit(Resource.Success(emptyList()))
+                return@flow
             }
         } catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            val msg = errorParsing(e)
 
             emit(Resource.Error(message = msg))
             return@flow
@@ -85,11 +82,7 @@ class SubCategoryRepositoryImpl(
             //OJO
             //EN EL FRONT
             //MANEJEN LOS ERRORES,404: NOT FOUND, 500: SERVER ERROR
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            val msg = errorParsing(e)
             emit(Resource.Error(httpCode = e.code(), message = msg))
         } catch(e: Exception) {
             Log.d("SubCategoryRepository", "Error al hacer la petición: ${e.message}")
@@ -116,11 +109,7 @@ class SubCategoryRepositoryImpl(
             //OJO
             //EN EL FRONT
             //MANEJEN LOS ERRORES 500: SERVER ERROR
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            val msg = errorParsing(e)
 
             emit(Resource.Error(message = msg))
         } catch(e: Exception) {
@@ -138,11 +127,7 @@ class SubCategoryRepositoryImpl(
         } catch (e: HttpException) {
             //ERRORES
             //400: BAD REQUEST, 500: ERROR DEL SERVER
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            val msg = errorParsing(e)
 
             emit(Resource.Error(httpCode = e.code(), message = msg))
         } catch(e: Exception) {
@@ -160,11 +145,7 @@ class SubCategoryRepositoryImpl(
         } catch (e: HttpException) {
             //ERRORES
             //400: BAD REQUEST, 404: NOT FOUND, 500: ERROR DEL SERVER
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            val msg = errorParsing(e)
 
             emit(Resource.Error(httpCode = e.code(), message = msg))
         } catch(e: Exception) {

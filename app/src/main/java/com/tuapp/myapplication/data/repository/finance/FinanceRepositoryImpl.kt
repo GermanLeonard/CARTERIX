@@ -1,7 +1,6 @@
 package com.tuapp.myapplication.data.repository.finance
 
 import android.util.Log
-import com.google.gson.Gson
 import com.tuapp.myapplication.data.database.dao.finance.CategorieDataDao
 import com.tuapp.myapplication.data.database.dao.finance.FinanceSummaryDao
 import com.tuapp.myapplication.data.database.dao.user.UserDao
@@ -9,10 +8,10 @@ import com.tuapp.myapplication.data.database.entities.finance.toDomain
 import com.tuapp.myapplication.data.models.financeModels.response.CategorieResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.PrincipalFinanceResponseDomain
 import com.tuapp.myapplication.data.remote.finance.FinanceService
-import com.tuapp.myapplication.data.remote.responses.CommonResponse
 import com.tuapp.myapplication.data.remote.responses.financeResponse.data.toEntityList
 import com.tuapp.myapplication.data.remote.responses.financeResponse.summary.toEntity
 import com.tuapp.myapplication.helpers.Resource
+import com.tuapp.myapplication.helpers.errorParsing
 import com.tuapp.myapplication.helpers.getFinanceId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -37,11 +36,7 @@ class FinanceRepositoryImpl(
 
             financeSummaryDao.insertSummary(summaryResponse.toEntity())
         }catch (e: HttpException){
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            val msg = errorParsing(e)
 
             emit(Resource.Error(message = msg))
             return@flow
@@ -72,14 +67,11 @@ class FinanceRepositoryImpl(
                 )
                 categorieDataDao.insertCategorias(dataResponse.toEntityList())
             } else {
-                emit(Resource.Success(emptyList<CategorieResponseDomain>()))
+                emit(Resource.Success(emptyList()))
+                return@flow
             }
         }catch (e: HttpException){
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            val msg = errorParsing(e)
 
             emit(Resource.Error(message = msg))
             return@flow

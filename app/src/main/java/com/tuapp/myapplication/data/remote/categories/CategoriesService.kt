@@ -1,6 +1,6 @@
 package com.tuapp.myapplication.data.remote.categories
 
-import com.tuapp.myapplication.data.remote.request.categorieRequest.CreateOrUpdateCategorieRequest
+import com.tuapp.myapplication.data.remote.request.categoriesRequest.CreateOrUpdateCategorieRequest
 import com.tuapp.myapplication.data.remote.responses.CommonResponse
 import com.tuapp.myapplication.data.remote.responses.categorieResponse.CategorieDataResponse
 import com.tuapp.myapplication.data.remote.responses.categorieResponse.CategoriesListResponse

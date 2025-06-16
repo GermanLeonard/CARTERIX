@@ -20,7 +20,7 @@ import com.tuapp.myapplication.ui.finanzas.finanzaGrupal.GrupalFinanceScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.BDHomeScreen
 import com.tuapp.myapplication.ui.categories.CategoriasEgresoScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.IndividualFinanceScreen
-import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.IngresosScreen
+import com.tuapp.myapplication.ui.ingresos.IngresosScreen
 import com.tuapp.myapplication.ui.subCategorias.RegistrarSubcategoriaScreen
 import com.tuapp.myapplication.ui.subCategorias.SubcategoriasScreen
 import com.tuapp.myapplication.ui.profile.ProfileScreen

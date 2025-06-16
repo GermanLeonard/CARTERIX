@@ -5,8 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.tuapp.myapplication.data.database.dao.category.CategoriaEgresoDao
-import com.tuapp.myapplication.data.database.dao.SubcategoriaDao
-import com.tuapp.myapplication.data.database.dao.IngresoDao
+import com.tuapp.myapplication.data.database.dao.income.IncomeDao
 import com.tuapp.myapplication.data.database.dao.finance.CategorieDataDao
 import com.tuapp.myapplication.data.database.dao.finance.FinanceSummaryDao
 import com.tuapp.myapplication.data.database.dao.subCategory.ExpensesTypeDao
@@ -16,22 +15,21 @@ import com.tuapp.myapplication.data.database.entities.finance.CategorieDataEntit
 import com.tuapp.myapplication.data.database.entities.finance.FinanceSummaryEntity
 import com.tuapp.myapplication.data.database.entities.user.UserEntity
 import com.tuapp.myapplication.data.database.entities.category.CategoriaEgresoEntity
+import com.tuapp.myapplication.data.database.entities.income.IncomesEntity
 import com.tuapp.myapplication.data.database.entities.subCategory.ExpensesTypesEntity
 import com.tuapp.myapplication.data.database.entities.subCategory.SubCategoriaEgresoEntity
-import com.tuapp.myapplication.data.models.Subcategoria
-import com.tuapp.myapplication.data.models.Ingreso
 
 @Database(
     entities = [
-        Ingreso::class,
         UserEntity::class,
         FinanceSummaryEntity::class,
         CategorieDataEntity::class,
         CategoriaEgresoEntity::class,
         SubCategoriaEgresoEntity::class,
         ExpensesTypesEntity::class,
+        IncomesEntity::class,
                ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -39,9 +37,12 @@ abstract class AppDatabase : RoomDatabase() {
     //User
     abstract fun userDao(): UserDao
 
-    //Finanza
+    //Finanza individual y conjunta
     abstract fun resumenFinancieroDao(): FinanceSummaryDao
     abstract fun categoriaDataDao(): CategorieDataDao
+
+    //Transacciones
+
 
     //Tipos
     abstract fun tipoGastosDao(): ExpensesTypeDao
@@ -49,7 +50,9 @@ abstract class AppDatabase : RoomDatabase() {
     //BD
     abstract fun categoriaEgresoDao(): CategoriaEgresoDao
     abstract fun subcategoriaDao(): SubCategoryDao
-    abstract fun ingresoDao(): IngresoDao
+    abstract fun ingresoDao(): IncomeDao
+
+    //Ahorros
 
     companion object {
         @Volatile
@@ -61,7 +64,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "carterix_db"
-                ).fallbackToDestructiveMigration(true)
+                ).fallbackToDestructiveMigration(false)
                     .build()
                     .also{
                         INSTANCE = it

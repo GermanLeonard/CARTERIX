@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.ui.finanzas.finanzaIndividual
+package com.tuapp.myapplication.ui.ingresos
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,32 +10,30 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
-import com.tuapp.myapplication.data.database.AppDatabase
-import com.tuapp.myapplication.data.models.Ingreso
-import com.tuapp.myapplication.data.repository.IngresoRepository
-import com.tuapp.myapplication.ui.viewmodel.IngresoViewModel
-import com.tuapp.myapplication.ui.viewmodel.IngresoViewModelFactory
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
-fun IngresosScreen(navController: NavController) {
-    val context = LocalContext.current
-    val dao = AppDatabase.getDatabase(context).ingresoDao()
-    val repo = IngresoRepository(dao)
-    val viewModel: IngresoViewModel = viewModel(factory = IngresoViewModelFactory(repo))
-    val ingresos by viewModel.ingresos.collectAsState()
+fun IngresosScreen(
+    navController: NavController,
+    incomeViewModel: IngresosViewModel = viewModel(factory = IngresosViewModel.Factory)
+) {
+    val ingresos by incomeViewModel.incomeList.collectAsStateWithLifecycle()
 
     var showDialog by remember { mutableStateOf(false) }
     var nombre by remember { mutableStateOf("") }
     var monto by remember { mutableStateOf("") }
     val verde = Color(0xFF2E7D32)
+
+    LaunchedEffect(Unit) {
+        incomeViewModel.getIncomesList()
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -64,8 +62,8 @@ fun IngresosScreen(navController: NavController) {
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
-                            Text(it.nombre, fontWeight = FontWeight.Bold)
-                            Text("$${it.monto}", color = verde)
+                            Text(it.nombre_ingreso, fontWeight = FontWeight.Bold)
+                            Text("$${it.monto_ingreso}", color = verde)
                         }
                     }
                 }
@@ -92,9 +90,6 @@ fun IngresosScreen(navController: NavController) {
                 confirmButton = {
                     TextButton(onClick = {
                         if (nombre.isNotBlank() && monto.isNotBlank()) {
-                            viewModel.agregar(
-                                Ingreso(nombre = nombre, monto = monto.toDoubleOrNull() ?: 0.0)
-                            )
                             nombre = ""
                             monto = ""
                             showDialog = false

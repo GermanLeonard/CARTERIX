@@ -1,7 +1,6 @@
 package com.tuapp.myapplication.data.repository.categories
 
 import android.util.Log
-import com.google.gson.Gson
 import com.tuapp.myapplication.data.database.dao.category.CategoriaEgresoDao
 import com.tuapp.myapplication.data.database.dao.user.UserDao
 import com.tuapp.myapplication.data.database.entities.category.toDomain
@@ -12,11 +11,11 @@ import com.tuapp.myapplication.data.models.categoryModels.response.CategorieData
 import com.tuapp.myapplication.data.models.categoryModels.response.CategoriesListDomain
 import com.tuapp.myapplication.data.models.categoryModels.response.CategoriesOptionsDomain
 import com.tuapp.myapplication.data.remote.categories.CategoriesService
-import com.tuapp.myapplication.data.remote.responses.CommonResponse
 import com.tuapp.myapplication.data.remote.responses.categorieResponse.toDomain
 import com.tuapp.myapplication.data.remote.responses.categorieResponse.toEntity
 import com.tuapp.myapplication.data.remote.responses.toDomain
 import com.tuapp.myapplication.helpers.Resource
+import com.tuapp.myapplication.helpers.errorParsing
 import com.tuapp.myapplication.helpers.getFinanceId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -40,11 +39,7 @@ class CategoryRepositoryImpl(
 
             emit(Resource.Success(categorieOptions.toDomain()))
         } catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            val msg = errorParsing(e)
 
             emit(Resource.Error(message = msg))
         } catch(e: Exception) {
@@ -64,15 +59,11 @@ class CategoryRepositoryImpl(
                 )
                 categoriaEgresoDao.insertCategories(categoriesList.toEntity())
             }else{
-                emit(Resource.Success(emptyList<CategoriesListDomain>()))
+                emit(Resource.Success(emptyList()))
+                return@flow
             }
-
         } catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            val msg = errorParsing(e)
 
             emit(Resource.Error(message = msg))
             return@flow
@@ -102,11 +93,10 @@ class CategoryRepositoryImpl(
 
             emit(Resource.Success(categorieData.toDomain()))
         } catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            //OJO
+            //EN EL FRONT
+            //MANEJEN LOS ERRORES, CODIGO 400: BAD REQUEST, 404: NOT FOUND, 500: SERVER ERROR
+            val msg = errorParsing(e)
 
             emit(Resource.Error(message = msg))
         } catch(e: Exception) {
@@ -129,11 +119,10 @@ class CategoryRepositoryImpl(
                 emit(Resource.Success(createCategorieResponse.toDomain()))
             }
         }catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            //OJO
+            //EN EL FRONT
+            //MANEJEN LOS ERRORES, CODIGO 400: BAD REQUEST 500: SERVER ERROR
+            val msg = errorParsing(e)
 
             emit(Resource.Error(message = msg))
         }catch(e: Exception) {
@@ -160,11 +149,7 @@ class CategoryRepositoryImpl(
             //OJO
             //EN EL FRONT
             //MANEJEN LOS ERRORES, CODIGO 400: BAD REQUEST, 404: NOT FOUND, 500: SERVER ERROR
-            val errorBody = e.response()?.errorBody()?.string()
-            val gson = Gson()
-
-            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)
-            val msg = errorResponse.message
+            val msg = errorParsing(e)
 
             emit(Resource.Error(httpCode = e.code(), message = msg))
         }catch(e: Exception) {
