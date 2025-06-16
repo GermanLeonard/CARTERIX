@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tuapp.myapplication.components.BottomNavBar
-import com.tuapp.myapplication.navigation.Routes
 
 @Composable
 fun EditProfileScreen(navController: NavController) {

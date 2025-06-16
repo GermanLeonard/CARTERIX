@@ -13,17 +13,20 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.tuapp.myapplication.helpers.TokenState
+import com.tuapp.myapplication.profile.ProfileScreen
 import com.tuapp.myapplication.ui.auth.LoginScreen
 import com.tuapp.myapplication.ui.auth.RegisterScreen
 import com.tuapp.myapplication.ui.auth.UserViewModel
 import com.tuapp.myapplication.ui.finanzas.finanzaGrupal.GrupalFinanceScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.BDHomeScreen
-import com.tuapp.myapplication.ui.categories.CategoriasEgresoScreen
+import com.tuapp.myapplication.ui.categorias.CategoriasEgresoScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.IndividualFinanceScreen
 import com.tuapp.myapplication.ui.ingresos.IngresosScreen
 import com.tuapp.myapplication.ui.subCategorias.RegistrarSubcategoriaScreen
 import com.tuapp.myapplication.ui.subCategorias.SubcategoriasScreen
-import com.tuapp.myapplication.ui.profile.ProfileScreen
+import com.tuapp.myapplication.ui.transacciones.DetalleTransaccionScreen
+import com.tuapp.myapplication.ui.transacciones.RegistrarTransaccionScreen
+import com.tuapp.myapplication.ui.transacciones.TransaccionesScreen
 
 @Composable
 fun AppNavigation(
@@ -67,6 +70,19 @@ fun AppNavigation(
 
                 composable<PerfilScreen> {
                     ProfileScreen(navController)
+                }
+
+                composable<TransaccionesScreen> {
+                    TransaccionesScreen(navController)
+                }
+
+                composable<RegistrarTransaccionScreen> {
+                    RegistrarTransaccionScreen(navController)
+                }
+
+                composable<DetalleTransaccionScreen> { backStackEntry ->
+                    val id = backStackEntry.arguments?.getInt("id") ?: return@composable
+                    DetalleTransaccionScreen(id)
                 }
 
                 composable<BDHomeScreen> {

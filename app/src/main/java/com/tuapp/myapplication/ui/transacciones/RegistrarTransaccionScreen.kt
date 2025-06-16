@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.individuales
+package com.tuapp.myapplication.ui.transacciones
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,7 +22,6 @@ import com.tuapp.myapplication.data.models.Transaccion
 import com.tuapp.myapplication.data.repository.TransaccionRepository
 import com.tuapp.myapplication.data.viewmodel.TransaccionViewModel
 import com.tuapp.myapplication.data.viewmodel.TransaccionViewModelFactory
-import com.tuapp.myapplication.navigation.Routes
 
 @Composable
 fun RegistrarTransaccionScreen(navController: NavController) {

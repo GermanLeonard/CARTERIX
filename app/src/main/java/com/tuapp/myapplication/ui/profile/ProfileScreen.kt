@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tuapp.myapplication.components.BottomNavBar
-import com.tuapp.myapplication.navigation.Routes
 import com.tuapp.myapplication.profile.components.LogoutDialog
 
 @Composable

@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.ui.categories
+package com.tuapp.myapplication.ui.categorias
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

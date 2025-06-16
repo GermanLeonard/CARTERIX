@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.individuales
+package com.tuapp.myapplication.ui.transacciones
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,7 +19,6 @@ import com.tuapp.myapplication.data.database.AppDatabase
 import com.tuapp.myapplication.data.repository.TransaccionRepository
 import com.tuapp.myapplication.data.viewmodel.TransaccionViewModel
 import com.tuapp.myapplication.data.viewmodel.TransaccionViewModelFactory
-import com.tuapp.myapplication.navigation.Routes
 
 @Composable
 fun DetalleTransaccionScreen(navController: NavController, transaccionId: Int) {

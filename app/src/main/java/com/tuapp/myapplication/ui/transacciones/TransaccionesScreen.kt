@@ -1,5 +1,5 @@
 // reemplaza la vista anterior
-package com.tuapp.myapplication.individuales
+package com.tuapp.myapplication.ui.transacciones
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -24,11 +23,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.components.BottomNavBar
 import com.tuapp.myapplication.data.database.AppDatabase
-import com.tuapp.myapplication.data.models.Transaccion
 import com.tuapp.myapplication.data.repository.TransaccionRepository
 import com.tuapp.myapplication.data.viewmodel.TransaccionViewModel
 import com.tuapp.myapplication.data.viewmodel.TransaccionViewModelFactory
-import com.tuapp.myapplication.navigation.Routes
 
 @Composable
 fun TransaccionesScreen(navController: NavController) {

@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.ui.categories
+package com.tuapp.myapplication.ui.categorias
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
