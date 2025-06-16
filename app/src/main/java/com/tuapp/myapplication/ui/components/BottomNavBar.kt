@@ -24,6 +24,7 @@ import com.tuapp.myapplication.ui.navigation.Routes
 fun BottomNavBar(navController: NavController, currentRoute: String) {
     val green = Color(0xFF2E7D32)
     val highlight = Color.White
+    TODO("CONVIERTAN ESTO A UN SCAFFOLD")
 
     Row(
         modifier = Modifier

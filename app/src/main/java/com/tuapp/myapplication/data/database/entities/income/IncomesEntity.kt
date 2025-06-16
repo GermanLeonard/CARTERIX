@@ -2,7 +2,7 @@ package com.tuapp.myapplication.data.database.entities.income
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.tuapp.myapplication.data.models.incomes.response.IngresoResponseDomain
+import com.tuapp.myapplication.data.models.incomesModels.response.IngresoResponseDomain
 
 @Entity(tableName = "categoria_ingresos")
 data class IncomesEntity(

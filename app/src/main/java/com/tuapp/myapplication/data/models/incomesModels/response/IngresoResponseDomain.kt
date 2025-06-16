@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.data.models.incomes.response
+package com.tuapp.myapplication.data.models.incomesModels.response
 
 data class IngresoResponseDomain(
     val id_ingreso: Int,

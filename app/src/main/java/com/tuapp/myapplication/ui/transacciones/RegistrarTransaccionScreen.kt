@@ -11,25 +11,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.tuapp.myapplication.components.BottomNavBar
-import com.tuapp.myapplication.data.database.AppDatabase
-import com.tuapp.myapplication.data.models.Transaccion
-import com.tuapp.myapplication.data.repository.TransaccionRepository
-import com.tuapp.myapplication.data.viewmodel.TransaccionViewModel
-import com.tuapp.myapplication.data.viewmodel.TransaccionViewModelFactory
+import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
-fun RegistrarTransaccionScreen(navController: NavController) {
+fun RegistrarTransaccionScreen(
+    navController: NavController,
+    transaccionesViewModel: TransaccionesViewModel = viewModel(factory = TransaccionesViewModel.Factory)
+) {
     val verde = Color(0xFF2E7D32)
-    val context = LocalContext.current
-    val dao = AppDatabase.getDatabase(context).transaccionDao()
-    val repo = TransaccionRepository(dao)
-    val viewModel: TransaccionViewModel = viewModel(factory = TransaccionViewModelFactory(repo))
 
     val tipos = listOf("Ingreso", "Egreso")
     val categorias = listOf("Salario", "Comida", "Transporte")
@@ -131,14 +125,9 @@ fun RegistrarTransaccionScreen(navController: NavController) {
                 Button(
                     onClick = {
                         if (tipo.isNotBlank() && categoria.isNotBlank() && monto.isNotBlank()) {
-                            viewModel.agregar(
-                                Transaccion(
-                                    tipo = tipo,
-                                    categoria = categoria,
-                                    monto = monto.toDoubleOrNull() ?: 0.0,
-                                    descripcion = descripcion
-                                )
-                            )
+                            //AQUI TIENEN QUE PASAR SOLO LAS PARAMETROS QUE SE TE PIDAN
+                            TODO("IMPLEMENTAR ESTO")
+                            //transaccionesViewModel.createTransaction()
                             navController.popBackStack()
                         }
                     },

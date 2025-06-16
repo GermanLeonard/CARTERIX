@@ -7,8 +7,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tuapp.myapplication.CarterixApplication
-import com.tuapp.myapplication.data.models.incomes.request.CreateOrUpdateIncomeRequestDomain
-import com.tuapp.myapplication.data.models.incomes.response.IngresoResponseDomain
+import com.tuapp.myapplication.data.models.incomesModels.request.CreateOrUpdateIncomeRequestDomain
+import com.tuapp.myapplication.data.models.incomesModels.response.IngresoResponseDomain
 import com.tuapp.myapplication.data.repository.incomes.IncomesRepository
 import com.tuapp.myapplication.helpers.Resource
 import kotlinx.coroutines.flow.MutableStateFlow

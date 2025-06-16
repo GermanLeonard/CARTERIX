@@ -12,11 +12,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.tuapp.myapplication.components.BottomNavBar
+import com.tuapp.myapplication.ui.auth.UserViewModel
+import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
-fun EditProfileScreen(navController: NavController) {
+fun EditProfileScreen(
+    navController: NavController,
+    userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
+) {
     val verde = Color(0xFF2E7D32)
 
     var nombre by remember { mutableStateOf("") }
@@ -49,7 +55,9 @@ fun EditProfileScreen(navController: NavController) {
                 CustomField("Email", email) { email = it }
 
                 Button(
-                    onClick = { /* TODO: guardar nombre/email */ },
+                    onClick = {
+                        TODO("IMPLEMENTAR CAMBIO DE PERFIL")
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = verde),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 ) {
@@ -64,7 +72,9 @@ fun EditProfileScreen(navController: NavController) {
                 CustomField("Confirmar contraseña", confirmarContrasena) { confirmarContrasena = it }
 
                 Button(
-                    onClick = { /* TODO: cambiar contraseña */ },
+                    onClick = {
+                        TODO("IMPLEMENTAR CAMBIO DE CONTRASEÑA")
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = verde),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 ) {

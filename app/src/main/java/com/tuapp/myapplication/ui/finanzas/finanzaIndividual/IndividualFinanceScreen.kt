@@ -29,6 +29,9 @@ fun IndividualFinanceScreen(
     navController: NavController,
     finanzaViewModel: FinanzasViewModel = viewModel(factory = FinanzasViewModel.Factory)
 ) {
+
+    TODO("IMPLEMENTEN LAS DOS VISTAS DEL DASHBOARD")
+
     val verde = Color(0xFF2E7D32)
     val verdeClaro = Color(0xFF66BB6A)
     val verdePastel = Color(0xFFE6F4EA)

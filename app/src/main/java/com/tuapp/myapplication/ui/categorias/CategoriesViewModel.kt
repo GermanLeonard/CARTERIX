@@ -8,14 +8,24 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tuapp.myapplication.CarterixApplication
 import com.tuapp.myapplication.data.models.categoryModels.request.CreateOrUpdateCategorieRequestDomain
+import com.tuapp.myapplication.data.models.categoryModels.response.CategoriesListDomain
+import com.tuapp.myapplication.data.models.categoryModels.response.CategoriesOptionsDomain
 import com.tuapp.myapplication.data.repository.categories.CategoryRepository
 import com.tuapp.myapplication.helpers.Resource
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class CategoriesViewModel(
     private val categoriesRepository: CategoryRepository
 ): ViewModel() {
 
+    private var _categoriesList = MutableStateFlow<List<CategoriesListDomain>>(emptyList())
+    val categoriesList: StateFlow<List<CategoriesListDomain>> = _categoriesList
+
+
+    private var _categoriesOptions = MutableStateFlow<List<CategoriesOptionsDomain>>(emptyList())
+    val categoriesOptions: StateFlow<List<CategoriesOptionsDomain>> = _categoriesOptions
     //CREEN USTEDES LOS ESTADOS QUE SERAN NECESARIOS A MOSTRAR EN LA VISTA
     // (lista de categorias, estados de cargando, mensajes de error, etc.)
 
@@ -33,7 +43,7 @@ class CategoriesViewModel(
                         is Resource.Success -> {
                             //Manejen el "success"
                             //LISTA DE LAS OPCIONES DE CATEGORIAS PARA LOS SELECTS DE LOS FORMULARIOS
-                            resource.data
+                            _categoriesOptions.value = resource.data
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
@@ -55,7 +65,7 @@ class CategoriesViewModel(
                         is Resource.Success -> {
                             //Manejen el "success"
                             //LISTA DE SUB CATEGORIAS
-                            resource.data
+                            _categoriesList.value = resource.data
                         }
                         is Resource.Error -> {
                             //Manejen el "error"

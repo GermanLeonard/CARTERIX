@@ -20,7 +20,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.data.database.AppDatabase
-import com.tuapp.myapplication.data.repository.CategoriaEgresoRepository
 import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModel
 import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModelFactory
 import com.tuapp.myapplication.ui.navigation.Routes
@@ -30,16 +29,9 @@ fun CategoriasEgresoScreen(
     navController: NavController,
     categoryViewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory)
 ) {
-    //QUITEN TODO ESTO, NO SE VA A USAR, USEN EL CATEGORIESVIEWMODEL DE AHI SAQUEN LA LISTA DE CATEGORIAS
-    val context = LocalContext.current
-    val dao = AppDatabase.getDatabase(context).categoriaEgresoDao()
-    val repository = CategoriaEgresoRepository(dao)
-    val viewModel: CategoriaEgresoViewModel = viewModel(factory = CategoriaEgresoViewModelFactory(repository))
-    //ESTO YA NO
-
     val currentRoute = Routes.INDIVIDUAL
     //CAMBIEN ESTE VIEWMODEL POR EL OTRO, NO LO QUITO PORQUE SE ROMPE TODO
-    val categorias by viewModel.categorias.collectAsStateWithLifecycle()
+    val categorias by categoryViewModel.categoriesList.collectAsStateWithLifecycle()
     var showDialog by remember { mutableStateOf(false) }
     var nuevaCategoria by remember { mutableStateOf("") }
 
@@ -94,7 +86,7 @@ fun CategoriasEgresoScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    categoria.nombreCategoria,
+                                    categoria.categoria_nombre,
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 18.sp
                                 )
@@ -107,6 +99,7 @@ fun CategoriasEgresoScreen(
 
         FloatingActionButton(
             onClick = {
+                TODO("IMPLEMENTAR CREACION DE CATEGORIA")
                 nuevaCategoria = ""
                 showDialog = true
             },
@@ -126,6 +119,7 @@ fun CategoriasEgresoScreen(
             AlertDialog(
                 onDismissRequest = { showDialog = false },
                 confirmButton = {
+                    TODO("IMPLEMENTAR")
                     TextButton(onClick = {
                         showDialog = false
                     }) {

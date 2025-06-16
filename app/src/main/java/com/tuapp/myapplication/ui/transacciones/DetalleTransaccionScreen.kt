@@ -8,27 +8,28 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.tuapp.myapplication.components.BottomNavBar
-import com.tuapp.myapplication.data.database.AppDatabase
-import com.tuapp.myapplication.data.repository.TransaccionRepository
-import com.tuapp.myapplication.data.viewmodel.TransaccionViewModel
-import com.tuapp.myapplication.data.viewmodel.TransaccionViewModelFactory
+import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
-fun DetalleTransaccionScreen(navController: NavController, transaccionId: Int) {
+fun DetalleTransaccionScreen(
+    navController: NavController,
+    transaccionId: Int,
+    transaccionesViewModel: TransaccionesViewModel = viewModel(factory = TransaccionesViewModel.Factory)
+) {
     val verde = Color(0xFF2E7D32)
-    val context = LocalContext.current
-    val dao = AppDatabase.getDatabase(context).transaccionDao()
-    val repo = TransaccionRepository(dao)
-    val viewModel: TransaccionViewModel = viewModel(factory = TransaccionViewModelFactory(repo))
 
-    val transaccion by viewModel.getById(transaccionId).collectAsState(initial = null)
+    val transaccion by transaccionesViewModel.transactionDetails.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        transaccionesViewModel.getTransactionDetails(transaccionId)
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -42,7 +43,7 @@ fun DetalleTransaccionScreen(navController: NavController, transaccionId: Int) {
                 Text("Detalle de Transacción", color = Color.White, fontSize = 22.sp, modifier = Modifier.padding(top = 32.dp))
             }
 
-            transaccion?.let { t ->
+            transaccion.let { t ->
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -50,7 +51,7 @@ fun DetalleTransaccionScreen(navController: NavController, transaccionId: Int) {
                         .padding(24.dp)
                 ) {
                     Text("Tipo:", fontWeight = FontWeight.Bold)
-                    Text(t.tipo, fontSize = 18.sp)
+                    Text(t.tipo_movimiento, fontSize = 18.sp)
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text("Categoría:", fontWeight = FontWeight.Bold)
@@ -58,15 +59,11 @@ fun DetalleTransaccionScreen(navController: NavController, transaccionId: Int) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text("Monto:", fontWeight = FontWeight.Bold)
-                    Text("$${t.monto}", fontSize = 18.sp, color = if (t.tipo == "Ingreso") verde else Color.Red)
+                    Text("$${t.monto}", fontSize = 18.sp, color = if (t.tipo_movimiento == "Ingreso") verde else Color.Red)
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text("Descripción:", fontWeight = FontWeight.Bold)
-                    Text(t.descripcion, fontSize = 18.sp)
-                }
-            } ?: run {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Cargando...", color = Color.Gray)
+                    Text(t.descripcion_gasto, fontSize = 18.sp)
                 }
             }
         }

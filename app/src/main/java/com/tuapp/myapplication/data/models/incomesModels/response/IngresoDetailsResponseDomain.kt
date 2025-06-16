@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.data.models.incomes.response
+package com.tuapp.myapplication.data.models.incomesModels.response
 
 data class IngresoDetailsResponseDomain(
     val descripcion_ingreso: String,

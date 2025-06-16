@@ -29,6 +29,7 @@ fun BDHomeScreen(navController: NavController) {
     val verdePastel = Color(0xFFE6F4EA)
     val currentRoute = Routes.BD_HOME
 
+
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier

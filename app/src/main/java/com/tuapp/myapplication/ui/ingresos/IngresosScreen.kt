@@ -89,6 +89,7 @@ fun IngresosScreen(
                 onDismissRequest = { showDialog = false },
                 confirmButton = {
                     TextButton(onClick = {
+                        TODO("IMPLEMENTAR EL AGREGAR INGRESO")
                         if (nombre.isNotBlank() && monto.isNotBlank()) {
                             nombre = ""
                             monto = ""

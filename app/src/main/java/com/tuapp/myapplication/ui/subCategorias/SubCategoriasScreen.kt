@@ -16,36 +16,30 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.data.database.AppDatabase
-import com.tuapp.myapplication.data.repository.CategoriaEgresoRepository
 import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModel
 import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModelFactory
 import androidx.navigation.NavController
+import com.tuapp.myapplication.ui.categorias.CategoriesViewModel
 import com.tuapp.myapplication.ui.navigation.RegistrarSubCategoriaScreen
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
 fun SubcategoriasScreen(
     navController: NavController,
+    categoriasViewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory),
     subCategoryViewModel: SubCategoriesViewModel = viewModel(factory = SubCategoriesViewModel.Factory)
 ) {
-    val context = LocalContext.current
-    //ESTO YA NO VA
-    //NO LO QUITO PORQUE SE ROMPE, REFACTORICEN USTEDES
-    val subcategoriaDao = AppDatabase.getDatabase(context).subcategoriaDao()
-    val categoriaDao = AppDatabase.getDatabase(context).categoriaEgresoDao()
-
-    val categoriaRepository = CategoriaEgresoRepository(categoriaDao)
-
-    val categoriaViewModel: CategoriaEgresoViewModel = viewModel(factory = CategoriaEgresoViewModelFactory(categoriaRepository))
-    val categorias by categoriaViewModel.categorias.collectAsState()
-    //TODO ESTO YA NO VA
+    val subCategoriasList by subCategoryViewModel.subCategoriesList.collectAsStateWithLifecycle()
+    val categories by categoriasViewModel.categoriesOptions.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         //ESTO ES DE PRUEBA
-        //subCategoryViewModel.getSubCategoriesList()
+        categoriasViewModel.getCategoriesOptions()
+        subCategoryViewModel.getSubCategoriesList()
     }
 
     var selectedCategoria by remember { mutableStateOf("") }
@@ -96,15 +90,15 @@ fun SubcategoriasScreen(
                             .background(Color.White)
                             .padding(4.dp)
                     ) {
-                        categorias.forEach {
+                        categories.forEach {
                             //UNA VEZ ELEGIDO TIENE QUE SER FILTRADO EN LA LISTA QUE REGRESA EL VIEWMODEL
                             //POR MEDIO DEL NOMBRE CATEGORIA
                             Text(
-                                text = it.nombreCategoria,
+                                text = it.categoria_nombre,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        selectedCategoria = it.nombreCategoria
+                                        selectedCategoria = it.categoria_nombre
                                         showMenu = false
                                     }
                                     .padding(12.dp)
@@ -115,6 +109,7 @@ fun SubcategoriasScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+                TODO("IMPLEMENTAR ESTO CON LA LISTA QUE TE DI ARRIBA Y EL ESATADO DEL FILTRO")
                 //LazyColumn(modifier = Modifier.fillMaxSize()) {
                 //    items(subcategorias.filter {
                 //        selectedCategoria.isEmpty() || it.categoriaPadre == selectedCategoria

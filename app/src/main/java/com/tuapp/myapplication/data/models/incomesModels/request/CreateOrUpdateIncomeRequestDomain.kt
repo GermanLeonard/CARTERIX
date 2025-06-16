@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.data.models.incomes.request
+package com.tuapp.myapplication.data.models.incomesModels.request
 
 import com.tuapp.myapplication.data.remote.request.incomesRequest.CreateOrUpdateIncomeRequest
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -15,26 +16,27 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.tuapp.myapplication.components.BottomNavBar
-import com.tuapp.myapplication.data.database.AppDatabase
-import com.tuapp.myapplication.data.repository.TransaccionRepository
-import com.tuapp.myapplication.data.viewmodel.TransaccionViewModel
-import com.tuapp.myapplication.data.viewmodel.TransaccionViewModelFactory
+import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.navigation.DetalleTransaccionScreen
+import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
-fun TransaccionesScreen(navController: NavController) {
-    val context = LocalContext.current
-    val dao = AppDatabase.getDatabase(context).transaccionDao()
-    val repo = TransaccionRepository(dao)
-    val viewModel: TransaccionViewModel = viewModel(factory = TransaccionViewModelFactory(repo))
+fun TransaccionesScreen(
+    navController: NavController,
+    transaccionViewModel: TransaccionesViewModel = viewModel(factory = TransaccionesViewModel.Factory)
+    ) {
 
-    val transacciones by viewModel.transacciones.collectAsState()
+    val transacciones by transaccionViewModel.transactionsList.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        transaccionViewModel.getTransactionsList()
+    }
 
     val verde = Color(0xFF2E7D32)
     val verdeClaro = Color(0xFF66BB6A)
@@ -105,14 +107,14 @@ fun TransaccionesScreen(navController: NavController) {
                                     .fillMaxWidth()
                                     .padding(vertical = 6.dp)
                                     .clickable {
-                                        navController.navigate(Routes.detalleTransaccionRoute(t.id))
+                                        navController.navigate(DetalleTransaccionScreen(t.transaccion_id))
 
                                     },
                                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
                             ) {
                                 Column(modifier = Modifier.padding(12.dp)) {
-                                    Text("${t.tipo} - ${t.categoria}", fontWeight = FontWeight.Bold)
-                                    Text("$${t.monto}", color = if (t.tipo == "Ingreso") verde else Color.Red)
+                                    Text("${t.tipo_movimiento_id} - ${t.nombre_categoria}", fontWeight = FontWeight.Bold)
+                                    Text("$${t.monto_transaccion}", color = if (t.tipo_movimiento_nombre == "Ingreso") verde else Color.Red)
                                 }
                             }
                         }

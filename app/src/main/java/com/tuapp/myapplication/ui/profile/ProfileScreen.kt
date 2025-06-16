@@ -17,18 +17,25 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.tuapp.myapplication.components.BottomNavBar
+import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.profile.components.LogoutDialog
+import com.tuapp.myapplication.ui.auth.UserViewModel
+import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(
+    navController: NavController,
+    userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
+) {
     val verde = Color(0xFF2E7D32)
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     // Reemplazar esta línea en backend
 
-    val nombreUsuario by remember { mutableStateOf("Cris RKT") }
+    val datosUsuario = userViewModel.userCredential.collectAsStateWithLifecycle()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -57,11 +64,11 @@ fun ProfileScreen(navController: NavController) {
                         .offset(y = (-40).dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text(nombreUsuario.first().toString(), fontSize = 30.sp, fontWeight = FontWeight.Bold, color = verde)
+                        Text(datosUsuario.value.nombre, fontSize = 30.sp, fontWeight = FontWeight.Bold, color = verde)
                     }
                 }
 
-                Text(nombreUsuario, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 12.dp))
+                Text(datosUsuario.value.nombre, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 12.dp))
 
                 Spacer(modifier = Modifier.height(8.dp))
 

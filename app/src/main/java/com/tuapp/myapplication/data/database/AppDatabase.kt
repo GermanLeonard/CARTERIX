@@ -10,6 +10,7 @@ import com.tuapp.myapplication.data.database.dao.finance.CategorieDataDao
 import com.tuapp.myapplication.data.database.dao.finance.FinanceSummaryDao
 import com.tuapp.myapplication.data.database.dao.subCategory.ExpensesTypeDao
 import com.tuapp.myapplication.data.database.dao.subCategory.SubCategoryDao
+import com.tuapp.myapplication.data.database.dao.transactions.TransactionDao
 import com.tuapp.myapplication.data.database.dao.user.UserDao
 import com.tuapp.myapplication.data.database.entities.finance.CategorieDataEntity
 import com.tuapp.myapplication.data.database.entities.finance.FinanceSummaryEntity
@@ -18,6 +19,7 @@ import com.tuapp.myapplication.data.database.entities.category.CategoriaEgresoEn
 import com.tuapp.myapplication.data.database.entities.income.IncomesEntity
 import com.tuapp.myapplication.data.database.entities.subCategory.ExpensesTypesEntity
 import com.tuapp.myapplication.data.database.entities.subCategory.SubCategoriaEgresoEntity
+import com.tuapp.myapplication.data.database.entities.transactions.TransactionEntity
 
 @Database(
     entities = [
@@ -28,8 +30,9 @@ import com.tuapp.myapplication.data.database.entities.subCategory.SubCategoriaEg
         SubCategoriaEgresoEntity::class,
         ExpensesTypesEntity::class,
         IncomesEntity::class,
+        TransactionEntity::class
                ],
-    version = 8,
+    version = 9,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -42,7 +45,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun categoriaDataDao(): CategorieDataDao
 
     //Transacciones
-
+    abstract fun transaccionDao(): TransactionDao
 
     //Tipos
     abstract fun tipoGastosDao(): ExpensesTypeDao

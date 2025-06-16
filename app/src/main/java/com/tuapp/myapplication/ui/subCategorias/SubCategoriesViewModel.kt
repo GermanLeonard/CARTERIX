@@ -8,13 +8,19 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tuapp.myapplication.CarterixApplication
 import com.tuapp.myapplication.data.models.subCategoryModels.request.CreateOrUpdateSubCategoryDomain
+import com.tuapp.myapplication.data.models.subCategoryModels.response.ListaSubCategoriasDomain
 import com.tuapp.myapplication.data.repository.subCategories.SubCategoryRepository
 import com.tuapp.myapplication.helpers.Resource
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SubCategoriesViewModel(
     private val subCategoryRepository: SubCategoryRepository
 ): ViewModel(){
+
+    private var _subCategoriesList = MutableStateFlow<List<ListaSubCategoriasDomain>>(emptyList())
+    val subCategoriesList: StateFlow<List<ListaSubCategoriasDomain>> = _subCategoriesList
 
     fun getSubCategoriesList(finanzaId: Int? = null){
         viewModelScope.launch {
@@ -27,7 +33,7 @@ class SubCategoriesViewModel(
                         is Resource.Success -> {
                             //Manejen el "success"
                             //LISTA DE SUB CATEGORIAS
-                            resource.data
+                            _subCategoriesList.value = resource.data
                         }
                         is Resource.Error -> {
                             //Manejen el "error"

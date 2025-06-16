@@ -20,6 +20,8 @@ fun GrupalFinanceScreen(navController: NavController) {
     val currentRoute = Routes.GROUP
     val verde = Color(0xFF2E7D32)
 
+    TODO("IMPLEMENTAR ESTO")
+
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
