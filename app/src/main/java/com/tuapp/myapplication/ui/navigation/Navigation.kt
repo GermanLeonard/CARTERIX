@@ -49,7 +49,8 @@ fun AppNavigation(
 
             NavHost(
                 navController = navController,
-                startDestination = if(token != null) FinanzaIndividualScreen else LoginScreen
+                //startDestination = if(token != null) FinanzaIndividualScreen else LoginScreen
+                startDestination = LoginScreen
             ) {
 
                 composable <LoginScreen> {

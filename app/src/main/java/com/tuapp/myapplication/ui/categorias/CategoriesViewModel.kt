@@ -23,7 +23,6 @@ class CategoriesViewModel(
     private var _categoriesList = MutableStateFlow<List<CategoriesListDomain>>(emptyList())
     val categoriesList: StateFlow<List<CategoriesListDomain>> = _categoriesList
 
-
     private var _categoriesOptions = MutableStateFlow<List<CategoriesOptionsDomain>>(emptyList())
     val categoriesOptions: StateFlow<List<CategoriesOptionsDomain>> = _categoriesOptions
     //CREEN USTEDES LOS ESTADOS QUE SERAN NECESARIOS A MOSTRAR EN LA VISTA

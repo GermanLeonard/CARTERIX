@@ -93,7 +93,6 @@ fun RegistrarSubcategoriaScreen(
                             .background(Color.White)
                             .padding(4.dp)
                     ) {
-                        TODO("USAR EL ID AQUI PARA REGISTRAR LA SUB CATEGORIA, NO EL NOMBRE")
                         categoriesOptions.forEach {
                             Text(
                                 text = it.categoria_nombre,

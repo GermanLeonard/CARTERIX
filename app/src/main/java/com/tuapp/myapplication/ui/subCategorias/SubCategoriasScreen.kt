@@ -12,16 +12,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tuapp.myapplication.ui.components.BottomNavBar
-import com.tuapp.myapplication.data.database.AppDatabase
-import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModel
-import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModelFactory
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.categorias.CategoriesViewModel
 import com.tuapp.myapplication.ui.navigation.RegistrarSubCategoriaScreen
@@ -109,7 +105,6 @@ fun SubcategoriasScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                TODO("IMPLEMENTAR ESTO CON LA LISTA QUE TE DI ARRIBA Y EL ESATADO DEL FILTRO")
                 //LazyColumn(modifier = Modifier.fillMaxSize()) {
                 //    items(subcategorias.filter {
                 //        selectedCategoria.isEmpty() || it.categoriaPadre == selectedCategoria
