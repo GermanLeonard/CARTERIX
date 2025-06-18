@@ -9,7 +9,7 @@ import com.tuapp.myapplication.helpers.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface TransactionsRepository {
-    suspend fun getTransactionsList(finanzaId: Int?): Flow<Resource<List<TransactionListResponseDomain>>>
+    suspend fun getTransactionsList(mes: Int, anio: Int, finanzaId: Int?): Flow<Resource<List<TransactionListResponseDomain>>>
     suspend fun getTransactionOptions(finanzaId: Int?): Flow<Resource<List<TransactionsOptionsDomain>>>
     suspend fun getTransactionDetails(idTransaccion: Int): Flow<Resource<TransactionsDetailsDomain>>
     suspend fun createTransaction(

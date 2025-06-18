@@ -3,6 +3,8 @@ package com.tuapp.myapplication.ui.subCategorias
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -12,16 +14,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tuapp.myapplication.ui.components.BottomNavBar
-import com.tuapp.myapplication.data.database.AppDatabase
-import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModel
-import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModelFactory
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.categorias.CategoriesViewModel
 import com.tuapp.myapplication.ui.navigation.RegistrarSubCategoriaScreen
@@ -78,7 +76,7 @@ fun SubcategoriasScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = if (selectedCategoria.isNotEmpty()) selectedCategoria else "Filtrar por Categoria")
+                        Text(text = selectedCategoria.ifEmpty { "Filtrar por Categoria" })
                         Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                     }
                 }
@@ -109,25 +107,24 @@ fun SubcategoriasScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                TODO("IMPLEMENTAR ESTO CON LA LISTA QUE TE DI ARRIBA Y EL ESATADO DEL FILTRO")
-                //LazyColumn(modifier = Modifier.fillMaxSize()) {
-                //    items(subcategorias.filter {
-                //        selectedCategoria.isEmpty() || it.categoriaPadre == selectedCategoria
-                //    }) { sub ->
-                //        Card(
-                //            modifier = Modifier
-                //                .fillMaxWidth()
-                //                .padding(vertical = 6.dp),
-                //            colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
-                //        ) {
-                //            Column(modifier = Modifier.padding(12.dp)) {
-                //                Text("${sub.categoriaPadre}", color = Color.Black, fontWeight = FontWeight.Bold)
-                //                Text("${sub.nombre} - ${sub.tipo}")
-                //               Text("Presupuesto: $${sub.presupuesto}", color = verde)
-                //            }
-                //        }
-                //    }
-                //}
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(subCategoriasList.filter {
+                        selectedCategoria.isEmpty() || it.categoria_nombre == selectedCategoria
+                    }) { sub ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text(sub.categoria_nombre, color = Color.Black, fontWeight = FontWeight.Bold)
+                                Text("${sub.sub_categoria_nombre} - ${sub.tipo_gasto}")
+                               Text("Presupuesto: $${sub.presupuesto}", color = verde)
+                            }
+                        }
+                    }
+                }
             }
         }
 

@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,9 +18,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
-import com.tuapp.myapplication.data.database.AppDatabase
-import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModel
-import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModelFactory
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
@@ -30,8 +26,9 @@ fun CategoriasEgresoScreen(
     categoryViewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory)
 ) {
     val currentRoute = Routes.INDIVIDUAL
-    //CAMBIEN ESTE VIEWMODEL POR EL OTRO, NO LO QUITO PORQUE SE ROMPE TODO
+
     val categorias by categoryViewModel.categoriesList.collectAsStateWithLifecycle()
+
     var showDialog by remember { mutableStateOf(false) }
     var nuevaCategoria by remember { mutableStateOf("") }
 
@@ -99,7 +96,6 @@ fun CategoriasEgresoScreen(
 
         FloatingActionButton(
             onClick = {
-                TODO("IMPLEMENTAR CREACION DE CATEGORIA")
                 nuevaCategoria = ""
                 showDialog = true
             },
@@ -119,7 +115,6 @@ fun CategoriasEgresoScreen(
             AlertDialog(
                 onDismissRequest = { showDialog = false },
                 confirmButton = {
-                    TODO("IMPLEMENTAR")
                     TextButton(onClick = {
                         showDialog = false
                     }) {

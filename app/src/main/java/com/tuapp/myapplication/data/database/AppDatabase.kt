@@ -8,6 +8,7 @@ import com.tuapp.myapplication.data.database.dao.category.CategoriaEgresoDao
 import com.tuapp.myapplication.data.database.dao.income.IncomeDao
 import com.tuapp.myapplication.data.database.dao.finance.CategorieDataDao
 import com.tuapp.myapplication.data.database.dao.finance.FinanceSummaryDao
+import com.tuapp.myapplication.data.database.dao.saving.SavingsDao
 import com.tuapp.myapplication.data.database.dao.subCategory.ExpensesTypeDao
 import com.tuapp.myapplication.data.database.dao.subCategory.SubCategoryDao
 import com.tuapp.myapplication.data.database.dao.transactions.TransactionDao
@@ -17,6 +18,7 @@ import com.tuapp.myapplication.data.database.entities.finance.FinanceSummaryEnti
 import com.tuapp.myapplication.data.database.entities.user.UserEntity
 import com.tuapp.myapplication.data.database.entities.category.CategoriaEgresoEntity
 import com.tuapp.myapplication.data.database.entities.income.IncomesEntity
+import com.tuapp.myapplication.data.database.entities.savings.SavingsEntity
 import com.tuapp.myapplication.data.database.entities.subCategory.ExpensesTypesEntity
 import com.tuapp.myapplication.data.database.entities.subCategory.SubCategoriaEgresoEntity
 import com.tuapp.myapplication.data.database.entities.transactions.TransactionEntity
@@ -30,9 +32,10 @@ import com.tuapp.myapplication.data.database.entities.transactions.TransactionEn
         SubCategoriaEgresoEntity::class,
         ExpensesTypesEntity::class,
         IncomesEntity::class,
-        TransactionEntity::class
+        TransactionEntity::class,
+        SavingsEntity::class
                ],
-    version = 9,
+    version = 11,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -56,6 +59,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun ingresoDao(): IncomeDao
 
     //Ahorros
+    abstract fun ahorroDao(): SavingsDao
 
     companion object {
         @Volatile

@@ -126,7 +126,6 @@ fun RegistrarTransaccionScreen(
                     onClick = {
                         if (tipo.isNotBlank() && categoria.isNotBlank() && monto.isNotBlank()) {
                             //AQUI TIENEN QUE PASAR SOLO LAS PARAMETROS QUE SE TE PIDAN
-                            TODO("IMPLEMENTAR ESTO")
                             //transaccionesViewModel.createTransaction()
                             navController.popBackStack()
                         }

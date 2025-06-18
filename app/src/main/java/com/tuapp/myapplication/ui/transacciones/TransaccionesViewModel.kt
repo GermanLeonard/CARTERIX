@@ -23,14 +23,14 @@ class TransaccionesViewModel(
     private var _transactionsList = MutableStateFlow< List<TransactionListResponseDomain>>(emptyList())
     val transactionsList: StateFlow<List<TransactionListResponseDomain>> = _transactionsList
 
-    private var _transactionDetails = MutableStateFlow<TransactionsDetailsDomain>(
+    private var _transactionDetails = MutableStateFlow(
         TransactionsDetailsDomain("", "", 0.0, "", "", 0.0, "", "", 0)
     )
     val transactionDetails: StateFlow<TransactionsDetailsDomain> = _transactionDetails
 
-    fun getTransactionsList(finanzaId: Int? = null){
+    fun getTransactionsList(mes: Int, anio: Int, finanzaId: Int? = null){
         viewModelScope.launch {
-            transaccionRepository.getTransactionsList(finanzaId)
+            transaccionRepository.getTransactionsList(mes, anio, finanzaId)
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {

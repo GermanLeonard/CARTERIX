@@ -145,7 +145,6 @@ fun RegisterScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    TODO("IMPLEMENTAR REGISTRO DE USUARIO")
                     // logica
                 },
                 shape = RoundedCornerShape(50),

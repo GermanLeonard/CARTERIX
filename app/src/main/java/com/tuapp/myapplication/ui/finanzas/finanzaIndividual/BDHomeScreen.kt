@@ -16,11 +16,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.navigation.BDHomeScreen
 import com.tuapp.myapplication.ui.navigation.CategoriaEgresoScreen
 import com.tuapp.myapplication.ui.navigation.FinanzaIndividualScreen
 import com.tuapp.myapplication.ui.navigation.IngresosScreen
 import com.tuapp.myapplication.ui.navigation.Routes
 import com.tuapp.myapplication.ui.navigation.SubCategoriaScreen
+import com.tuapp.myapplication.ui.navigation.TransaccionesScreen
 
 @Composable
 fun BDHomeScreen(navController: NavController) {
@@ -81,8 +83,8 @@ fun BDHomeScreen(navController: NavController) {
                             .clickable {
                                 when (tab) {
                                     "Analisis" -> navController.navigate(FinanzaIndividualScreen)
-                                    "Transacciones" -> {}
-                                    "BD" -> {}
+                                    "Transacciones" -> navController.navigate(TransaccionesScreen)
+                                    "BD" -> navController.navigate(BDHomeScreen)
                                 }
                             }
                             .padding(vertical = 8.dp),

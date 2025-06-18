@@ -56,7 +56,6 @@ fun EditProfileScreen(
 
                 Button(
                     onClick = {
-                        TODO("IMPLEMENTAR CAMBIO DE PERFIL")
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = verde),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
@@ -73,7 +72,6 @@ fun EditProfileScreen(
 
                 Button(
                     onClick = {
-                        TODO("IMPLEMENTAR CAMBIO DE CONTRASEÑA")
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = verde),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)

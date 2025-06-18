@@ -16,6 +16,8 @@ data class TransactionEntity(
     val tipoMovimientoId: Int,
     val tipoMovimientoNombre: String,
     val fechaTransaccion: String,
+    val mes: Int,
+    val anio: Int,
 )
 
 fun TransactionEntity.toDomain(): TransactionListResponseDomain {
