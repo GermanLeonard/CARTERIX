@@ -1,9 +1,9 @@
 package com.tuapp.myapplication.ui.finanzas.finanzaIndividual
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,19 +19,17 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.components.TabSelector
 import com.tuapp.myapplication.ui.finanzas.FinanzasViewModel
 import com.tuapp.myapplication.ui.navigation.BDHomeScreen
 import com.tuapp.myapplication.ui.navigation.Routes
 import com.tuapp.myapplication.ui.navigation.TransaccionesScreen
-import java.util.Date
 
 @Composable
 fun IndividualFinanceScreen(
     navController: NavController,
     finanzaViewModel: FinanzasViewModel = viewModel(factory = FinanzasViewModel.Factory)
 ) {
-
-
     val verde = Color(0xFF2E7D32)
     val verdeClaro = Color(0xFF66BB6A)
     val verdePastel = Color(0xFFE6F4EA)
@@ -82,39 +80,11 @@ fun IndividualFinanceScreen(
         ) {
             Spacer(modifier = Modifier.height(12.dp))
 
-            //CONVIERTANLO EN UN COMPONENTE
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .background(verdePastel, RoundedCornerShape(50))
-                    .border(BorderStroke(2.dp, verde), shape = RoundedCornerShape(50))
-                    .padding(top = 6.dp, start = 3.dp, end = 3.dp, bottom = 6.dp),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                listOf("Analisis", "Transacciones", "BD").forEach { label ->
-                    val isSelected = label == selectedTab
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 4.dp)
-                            .background(
-                                if (isSelected) verdeClaro else Color.Transparent,
-                                RoundedCornerShape(50)
-                            )
-                            .clickable {
-                                selectedTab = label
-                                when(selectedTab){
-                                    "BD" -> navController.navigate(BDHomeScreen)
-                                    "Transacciones" -> navController.navigate(TransaccionesScreen)
-                                }
-                            }
-                            .padding(vertical = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(label, color = Color.Black, fontWeight = FontWeight.SemiBold)
-                    }
-                }
-            }
+            TabSelector(
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it },
+                navController = navController
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -181,7 +151,7 @@ fun IndividualFinanceScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

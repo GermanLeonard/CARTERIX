@@ -49,7 +49,7 @@ fun AppNavigation(
 
         is TokenState.Loaded -> {
 
-            val token = (tokenState as TokenState.Loaded).token
+            val token = "12345"//(tokenState as TokenState.Loaded).token LA CAMBIE SOLO PARA PODER ACCEDER A LAS VISTAS CUANDO SE HAGA EL MERGE SE CAMBIA
 
             NavHost(
                 navController = navController,

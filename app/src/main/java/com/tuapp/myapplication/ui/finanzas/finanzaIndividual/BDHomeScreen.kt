@@ -1,13 +1,11 @@
 package com.tuapp.myapplication.ui.finanzas.finanzaIndividual
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,21 +14,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
-import com.tuapp.myapplication.ui.navigation.BDHomeScreen
-import com.tuapp.myapplication.ui.navigation.CategoriaEgresoScreen
-import com.tuapp.myapplication.ui.navigation.FinanzaIndividualScreen
-import com.tuapp.myapplication.ui.navigation.IngresosScreen
-import com.tuapp.myapplication.ui.navigation.Routes
-import com.tuapp.myapplication.ui.navigation.SubCategoriaScreen
-import com.tuapp.myapplication.ui.navigation.TransaccionesScreen
+import com.tuapp.myapplication.ui.components.TabSelector
+import com.tuapp.myapplication.ui.navigation.*
 
 @Composable
 fun BDHomeScreen(navController: NavController) {
     val verde = Color(0xFF2E7D32)
-    val verdeClaro = Color(0xFF66BB6A)
     val verdePastel = Color(0xFFE6F4EA)
     val currentRoute = Routes.BD_HOME
-
+    var selectedTab by remember { mutableStateOf("BD") }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -62,41 +54,11 @@ fun BDHomeScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(verdePastel, RoundedCornerShape(50))
-                    .border(BorderStroke(2.dp, verde), shape = RoundedCornerShape(50))
-                    .padding(6.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                listOf("Analisis", "Transacciones", "BD").forEach { tab ->
-                    val isSelected = tab == "BD"
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 4.dp)
-                            .background(
-                                if (isSelected) verdeClaro else Color.Transparent,
-                                RoundedCornerShape(50)
-                            )
-                            .clickable {
-                                when (tab) {
-                                    "Analisis" -> navController.navigate(FinanzaIndividualScreen)
-                                    "Transacciones" -> navController.navigate(TransaccionesScreen)
-                                    "BD" -> navController.navigate(BDHomeScreen)
-                                }
-                            }
-                            .padding(vertical = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = tab,
-                            color = Color.Black
-                        )
-                    }
-                }
-            }
+            TabSelector(
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it },
+                navController = navController
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
