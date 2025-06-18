@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +36,9 @@ fun AppNavigation(
 ) {
 
     val tokenState by userViewModel.token.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        userViewModel.checkUser()
+    }
 
     when(tokenState){
         TokenState.Loading -> {
@@ -49,8 +53,7 @@ fun AppNavigation(
 
             NavHost(
                 navController = navController,
-                //startDestination = if(token != null) FinanzaIndividualScreen else LoginScreen
-                startDestination = LoginScreen
+                startDestination = if(token != null) FinanzaIndividualScreen else LoginScreen
             ) {
 
                 composable <LoginScreen> {

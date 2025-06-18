@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SavingsDao {
 
-    @Query("SELECT * FROM datos_ahorro WHERE finanzaId = :finanzaId")
-    fun getSavingsData(finanzaId: Int): Flow<List<SavingsEntity>>
+    @Query("SELECT * FROM datos_ahorro WHERE finanzaId = :finanzaId AND anio = :anio")
+    fun getSavingsData(finanzaId: Int, anio: Int): Flow<List<SavingsEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSavingData(savingData: List<SavingsEntity>)

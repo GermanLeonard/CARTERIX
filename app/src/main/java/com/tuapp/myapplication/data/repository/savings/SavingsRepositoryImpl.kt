@@ -6,8 +6,10 @@ import com.tuapp.myapplication.data.database.dao.user.UserDao
 import com.tuapp.myapplication.data.database.entities.savings.toDomain
 import com.tuapp.myapplication.data.models.CommonResponseDomain
 import com.tuapp.myapplication.data.models.savingsModels.request.CreateOrUpdateSavingDomain
+import com.tuapp.myapplication.data.models.savingsModels.request.toRequest
 import com.tuapp.myapplication.data.models.savingsModels.response.SavingsDataDomain
 import com.tuapp.myapplication.data.remote.responses.savingResponse.toEntity
+import com.tuapp.myapplication.data.remote.responses.toDomain
 import com.tuapp.myapplication.data.remote.saving.SavingService
 import com.tuapp.myapplication.helpers.Resource
 import com.tuapp.myapplication.helpers.errorParsing
@@ -26,10 +28,10 @@ class SavingsRepositoryImpl(
     private val userDao: UserDao,
 ): SavingsRepository {
 
-    override suspend fun getSavingsData(finanzaId: Int?): Flow<Resource<List<SavingsDataDomain>>> = flow {
+    override suspend fun getSavingsData(finanzaId: Int?, anio: Int): Flow<Resource<List<SavingsDataDomain>>> = flow {
         emit(Resource.Loading)
         try {
-            val savingsResponse = savingsService.getSavingsData(finanzaId)
+            val savingsResponse = savingsService.getSavingsData(anio, finanzaId)
 
             if(savingsResponse.data.isNotEmpty()){
                 savingsDao.clearSavingData(
@@ -52,7 +54,7 @@ class SavingsRepositoryImpl(
         }
 
         val savingsList = savingsDao.getSavingsData(
-            finanzaId ?: getFinanceId(userDao)
+            finanzaId ?: getFinanceId(userDao), anio
         ).map { entities ->
             val list = entities.map { it.toDomain() }
 
@@ -67,7 +69,9 @@ class SavingsRepositoryImpl(
     ): Flow<Resource<CommonResponseDomain>> = flow {
         emit(Resource.Loading)
         try {
+            val createResponse = savingsService.createOrUpdateSavingGoal(finanzaId, createOrUpdateSaving.toRequest())
 
+            emit(Resource.Success(createResponse.toDomain()))
         }catch (e :HttpException) {
             //ERRORES
             //400: BAD REQUEST, 500: ERROR DEL SERVER

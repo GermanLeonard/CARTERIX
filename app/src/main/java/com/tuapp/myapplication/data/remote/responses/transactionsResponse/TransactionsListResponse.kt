@@ -8,6 +8,10 @@ data class TransactionsListResponse(
     val success: Boolean,
     @SerializedName("finanza_id")
     val finanza_id: Int,
+    @SerializedName("mes")
+    val mes: Int,
+    @SerializedName("anio")
+    val anio: Int,
     @SerializedName("transacciones")
     val transacciones: List<TransaccionesLista>
 )
@@ -29,7 +33,7 @@ data class TransaccionesLista(
     val transaccion_id: Int
 )
 
-fun TransaccionesLista.toEntity(finanzaId: Int): TransactionEntity {
+fun TransaccionesLista.toEntity(finanzaId: Int, mes:Int, anio: Int): TransactionEntity {
     return TransactionEntity(
         finanzaId = finanzaId,
         transaccionId = transaccion_id,
@@ -39,9 +43,11 @@ fun TransaccionesLista.toEntity(finanzaId: Int): TransactionEntity {
         tipoMovimientoId = tipo_movimiento_id,
         tipoMovimientoNombre = tipo_movimiento_nombre,
         fechaTransaccion = fecha_transaccion,
+        mes = mes,
+        anio = anio,
     )
 }
 
 fun TransactionsListResponse.toEntity(): List<TransactionEntity> {
-    return transacciones.map { it.toEntity(finanza_id) }
+    return transacciones.map { it.toEntity(finanza_id, mes, anio) }
 }

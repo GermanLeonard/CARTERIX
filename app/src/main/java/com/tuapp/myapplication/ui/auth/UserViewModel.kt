@@ -50,6 +50,12 @@ class UserViewModel(
         )
     )
 
+    fun checkUser(){
+        viewModelScope.launch {
+            userRepository.checkUserAndDeleteToken()
+        }
+    }
+
     fun registerUser(nombre: String, correo: String, contrasena: String) {
         viewModelScope.launch {
             userRepository.registerUser(RegisterRequestDomain(nombre, correo, contrasena))

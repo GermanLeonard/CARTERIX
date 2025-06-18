@@ -11,7 +11,8 @@ import retrofit2.http.Query
 interface SavingService {
     @GET("ahorro/lista")
     suspend fun getSavingsData(
-        @Query("finanza_id") finanzaId: Int?
+        @Query("anio") anio: Int,
+        @Query("finanza_id") finanzaId: Int?,
     ): SavingsDataResponse
 
     @POST("ahorro/crear-meta")

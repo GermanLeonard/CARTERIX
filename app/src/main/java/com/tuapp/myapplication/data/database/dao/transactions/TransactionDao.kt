@@ -10,12 +10,12 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TransactionDao {
 
-    @Query("SELECT * FROM transacciones WHERE finanzaId = :finanzaId")
-    fun getTransactions(finanzaId: Int): Flow<List<TransactionEntity>>
+    @Query("SELECT * FROM transacciones WHERE finanzaId = :finanzaId AND mes = :mes AND anio = :anio")
+    fun getTransactions(finanzaId: Int, mes: Int, anio: Int): Flow<List<TransactionEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransactions(transactions: List<TransactionEntity>)
 
-    @Query("DELETE FROM transacciones WHERE finanzaId = :finanzaId")
-    suspend fun clearTransactions(finanzaId: Int)
+    @Query("DELETE FROM transacciones WHERE finanzaId = :finanzaId AND mes = :mes AND anio = :anio")
+    suspend fun clearTransactions(finanzaId: Int, mes: Int, anio: Int)
 }

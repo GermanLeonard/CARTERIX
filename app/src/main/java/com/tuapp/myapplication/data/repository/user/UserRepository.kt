@@ -15,6 +15,7 @@ interface UserRepository {
 
     fun getCredentials(): Flow<UserDataDomain>
     suspend fun closeSession()
+    suspend fun checkUserAndDeleteToken()
 
     suspend fun registerUser(registerRequest: RegisterRequestDomain): Flow<Resource<CommonResponseDomain>>
     suspend fun loginUser(loginRequest: LoginRequestDomain): Flow<Resource<LoginResponseDomain>>

@@ -35,7 +35,7 @@ import com.tuapp.myapplication.data.database.entities.transactions.TransactionEn
         TransactionEntity::class,
         SavingsEntity::class
                ],
-    version = 10,
+    version = 11,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

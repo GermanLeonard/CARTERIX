@@ -4,6 +4,7 @@ import com.tuapp.myapplication.data.remote.categories.CategoriesService
 import com.tuapp.myapplication.data.remote.finance.FinanceService
 import com.tuapp.myapplication.data.remote.ingresos.IncomesService
 import com.tuapp.myapplication.data.remote.interceptors.AuthInterceptor
+import com.tuapp.myapplication.data.remote.saving.SavingService
 import com.tuapp.myapplication.data.remote.subCategories.SubCategoriesService
 import com.tuapp.myapplication.data.remote.transactions.TransactionsService
 import com.tuapp.myapplication.data.remote.user.UserService
@@ -53,5 +54,9 @@ object RetrofitInstance {
 
     fun getTransactionsService(repository: SensitiveInfoRepository): TransactionsService {
         return getInstance(repository).create(TransactionsService::class.java)
+    }
+
+    fun getSavingsService(repository: SensitiveInfoRepository): SavingService {
+        return getInstance(repository).create(SavingService::class.java)
     }
 }

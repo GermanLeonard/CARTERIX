@@ -31,13 +31,13 @@ class TransactionsRepositoryImpl(
     private val userDao: UserDao,
 ): TransactionsRepository {
 
-    override suspend fun getTransactionsList(finanzaId: Int?): Flow<Resource<List<TransactionListResponseDomain>>> = flow {
+    override suspend fun getTransactionsList(mes: Int, anio: Int, finanzaId: Int?): Flow<Resource<List<TransactionListResponseDomain>>> = flow {
         emit(Resource.Loading)
         try {
-            val transactionsResponse = transactionsService.getTransactionsList(finanzaId)
+            val transactionsResponse = transactionsService.getTransactionsList(mes, anio, finanzaId)
             if(transactionsResponse.transacciones.isNotEmpty()){
                 transactionsDao.clearTransactions(
-                    finanzaId ?: getFinanceId(userDao)
+                    finanzaId ?: getFinanceId(userDao), mes, anio
                 )
                 transactionsDao.insertTransactions(transactionsResponse.toEntity())
             } else {
@@ -56,7 +56,7 @@ class TransactionsRepositoryImpl(
         }
 
         val transactionList = transactionsDao.getTransactions(
-            finanzaId ?: getFinanceId(userDao)
+            finanzaId ?: getFinanceId(userDao), mes, anio
         ).map { entities ->
             val transactions = entities.map { it.toDomain() }
 

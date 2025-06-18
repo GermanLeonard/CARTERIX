@@ -23,7 +23,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.navigation.BDHomeScreen
 import com.tuapp.myapplication.ui.navigation.DetalleTransaccionScreen
+import com.tuapp.myapplication.ui.navigation.FinanzaIndividualScreen
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
@@ -32,10 +34,11 @@ fun TransaccionesScreen(
     transaccionViewModel: TransaccionesViewModel = viewModel(factory = TransaccionesViewModel.Factory)
     ) {
 
-    val transacciones by transaccionViewModel.transactionsList.collectAsStateWithLifecycle()
+    val transactions by transaccionViewModel.transactionsList.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        transaccionViewModel.getTransactionsList()
+        //CAMBIEN ESTO
+        transaccionViewModel.getTransactionsList(6,2025)
     }
 
     val verde = Color(0xFF2E7D32)
@@ -61,6 +64,7 @@ fun TransaccionesScreen(
                     .background(Color.White, RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp))
                     .padding(horizontal = 16.dp, vertical = 16.dp)
             ) {
+                //TODO HAGAN ESTO UN COMPONENTE POR FAVOR
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -81,8 +85,8 @@ fun TransaccionesScreen(
                                 )
                                 .clickable {
                                     when (tab) {
-                                        "Analisis" -> navController.navigate(Routes.INDIVIDUAL)
-                                        "BD" -> navController.navigate(Routes.BD_HOME)
+                                        "Analisis" -> navController.navigate(FinanzaIndividualScreen)
+                                        "BD" -> navController.navigate(BDHomeScreen)
                                     }
                                 }
                                 .padding(vertical = 8.dp),
@@ -95,13 +99,13 @@ fun TransaccionesScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (transacciones.isEmpty()) {
+                if (transactions.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text("No hay transacciones registradas.", color = Color.Gray)
                     }
                 } else {
                     LazyColumn {
-                        items(transacciones) { t ->
+                        items(transactions) { t ->
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -113,7 +117,7 @@ fun TransaccionesScreen(
                                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
                             ) {
                                 Column(modifier = Modifier.padding(12.dp)) {
-                                    Text("${t.tipo_movimiento_id} - ${t.nombre_categoria}", fontWeight = FontWeight.Bold)
+                                    Text("${t.tipo_movimiento_nombre} - ${t.nombre_categoria}", fontWeight = FontWeight.Bold)
                                     Text("$${t.monto_transaccion}", color = if (t.tipo_movimiento_nombre == "Ingreso") verde else Color.Red)
                                 }
                             }

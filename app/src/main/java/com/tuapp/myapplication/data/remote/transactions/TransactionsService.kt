@@ -12,8 +12,10 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface TransactionsService {
-    @GET("transacciones/lista-transacciones")
+    @GET("transacciones/lista-transaccion")
     suspend fun getTransactionsList(
+        @Query("mes") mes: Int,
+        @Query("anio") anio: Int,
         @Query("finanza_id") finanzaId: Int?
     ): TransactionsListResponse
 

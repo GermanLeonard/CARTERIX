@@ -7,6 +7,6 @@ import com.tuapp.myapplication.helpers.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface SavingsRepository {
-    suspend fun getSavingsData(finanzaId: Int?): Flow<Resource<List<SavingsDataDomain>>>
+    suspend fun getSavingsData(finanzaId: Int?, anio: Int): Flow<Resource<List<SavingsDataDomain>>>
     suspend fun createOrUpdateSavings(finanzaId: Int?, createOrUpdateSaving: CreateOrUpdateSavingDomain): Flow<Resource<CommonResponseDomain>>
 }

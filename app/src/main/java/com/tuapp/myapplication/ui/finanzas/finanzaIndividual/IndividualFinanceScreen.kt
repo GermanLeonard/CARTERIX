@@ -22,6 +22,7 @@ import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.ui.finanzas.FinanzasViewModel
 import com.tuapp.myapplication.ui.navigation.BDHomeScreen
 import com.tuapp.myapplication.ui.navigation.Routes
+import com.tuapp.myapplication.ui.navigation.TransaccionesScreen
 import java.util.Date
 
 @Composable
@@ -81,6 +82,7 @@ fun IndividualFinanceScreen(
         ) {
             Spacer(modifier = Modifier.height(12.dp))
 
+            //CONVIERTANLO EN UN COMPONENTE
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -101,8 +103,9 @@ fun IndividualFinanceScreen(
                             )
                             .clickable {
                                 selectedTab = label
-                                if (label == "BD") {
-                                    navController.navigate(BDHomeScreen)
+                                when(selectedTab){
+                                    "BD" -> navController.navigate(BDHomeScreen)
+                                    "Transacciones" -> navController.navigate(TransaccionesScreen)
                                 }
                             }
                             .padding(vertical = 8.dp),
