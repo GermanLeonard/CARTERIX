@@ -12,22 +12,50 @@ import com.tuapp.myapplication.data.models.financeModels.request.JoinFinanceRequ
 import com.tuapp.myapplication.data.repository.finance.FinanceRepository
 import com.tuapp.myapplication.helpers.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class FinanzasViewModel(
-   private val finanzaRepository: FinanceRepository
+    private val finanzaRepository: FinanceRepository
 ): ViewModel() {
 
     private var _roleId = MutableStateFlow(0)
     val roleId: StateFlow<Int> = _roleId
 
+    // NUEVOS ESTADOS PARA RESUMEN ANALISIS
+
+    private val _ingresosTotales = MutableStateFlow(0.0)
+    val ingresosTotales: StateFlow<Double> = _ingresosTotales.asStateFlow()
+
+    private val _egresosTotales = MutableStateFlow(0.0)
+    val egresosTotales: StateFlow<Double> = _egresosTotales.asStateFlow()
+
+    private val _diferencia = MutableStateFlow(0.0)
+    val diferencia: StateFlow<Double> = _diferencia.asStateFlow()
+
+    private val _presupuesto = MutableStateFlow(0.0)
+    val presupuesto: StateFlow<Double> = _presupuesto.asStateFlow()
+
+    private val _consumo = MutableStateFlow(0.0)
+    val consumo: StateFlow<Double> = _consumo.asStateFlow()
+
+    private val _variacion = MutableStateFlow(0.0)
+    val variacion: StateFlow<Double> = _variacion.asStateFlow()
+
+    private val _metaMensual = MutableStateFlow<Double?>(null)
+    val metaMensual: StateFlow<Double?> = _metaMensual.asStateFlow()
+
+    private val _ahorroMes = MutableStateFlow<Double?>(null)
+    val ahorroMes: StateFlow<Double?> = _ahorroMes.asStateFlow()
+
+    private val _ahorroAcumulado = MutableStateFlow<Double?>(null)
+    val ahorroAcumulado: StateFlow<Double?> = _ahorroAcumulado.asStateFlow()
+
     fun getRole(finanzaId: Int) {
         viewModelScope.launch {
-            finanzaRepository.getRole(finanzaId).collect{ role ->
-               _roleId.value = role
+            finanzaRepository.getRole(finanzaId).collect { role ->
+                _roleId.value = role
             }
         }
     }
@@ -48,9 +76,22 @@ class FinanzasViewModel(
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
-                            resource.data.resumen_ahorros
-                            resource.data.resumen_financiero
-                            resource.data.resumen_egresos
+                            val resumen = resource.data
+                            _metaMensual.value = resumen.resumen_ahorros?.meta ?: 0.0
+                            _ahorroMes.value = resumen.resumen_ahorros?.progreso_porcentaje ?: 0.0
+                            _ahorroAcumulado.value = resumen.resumen_ahorros?.acumulado ?: 0.0
+
+                            _ingresosTotales.value = resumen.resumen_financiero?.ingresos_totales ?: 0.0
+                            _egresosTotales.value = resumen.resumen_financiero?.egresos_totales ?: 0.0
+                            _diferencia.value = resumen.resumen_financiero?.diferencia ?: 0.0
+
+                            _presupuesto.value = resumen.resumen_egresos?.presupuesto_mensual ?: 0.0
+                            _consumo.value = resumen.resumen_egresos?.consumo_mensual ?: 0.0
+                            _variacion.value = resumen.resumen_egresos?.variacion_mensual ?: 0.0
+
+
+
+
                         }
                         is Resource.Error -> {
                             //Manejen el "error"

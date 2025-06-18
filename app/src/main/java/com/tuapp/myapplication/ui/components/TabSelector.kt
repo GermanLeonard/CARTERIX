@@ -15,8 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.tuapp.myapplication.ui.navigation.BDHomeScreen
-import com.tuapp.myapplication.ui.navigation.TransaccionesScreen
+import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
 fun TabSelector(
@@ -49,8 +48,8 @@ fun TabSelector(
                     .clickable {
                         onTabSelected(label)
                         when (label) {
-                            "BD" -> navController.navigate(BDHomeScreen)
-                            "Transacciones" -> navController.navigate(TransaccionesScreen)
+                            "BD" -> navController.navigate(Routes.BD_HOME)
+                            "Transacciones" -> navController.navigate(Routes.TRANSACCIONES)
                         }
                     }
                     .padding(vertical = 8.dp),
@@ -61,3 +60,4 @@ fun TabSelector(
         }
     }
 }
+

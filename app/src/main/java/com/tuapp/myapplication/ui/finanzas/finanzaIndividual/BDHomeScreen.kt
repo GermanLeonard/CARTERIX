@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.ui.components.TabSelector
-import com.tuapp.myapplication.ui.navigation.*
+import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
 fun BDHomeScreen(navController: NavController) {
@@ -70,16 +70,16 @@ fun BDHomeScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    BDCard("Categorias Egreso") { navController.navigate(CategoriaEgresoScreen) }
-                    BDCard("SubCategorias") { navController.navigate(SubCategoriaScreen) }
+                    BDCard("Categorias Egreso") { navController.navigate(Routes.CATEGORIAS_EGRESO) }
+                    BDCard("SubCategorias") { navController.navigate(Routes.SUBCATEGORIAS) }
                 }
 
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    BDCard("Ingresos") { navController.navigate(IngresosScreen) }
-                    BDCard("Ahorro") { /* futura navegacion */ }
+                    BDCard("Ingresos") { navController.navigate(Routes.INGRESOS) }
+                    BDCard("Ahorro") { /* futura navegación */ }
                 }
             }
         }

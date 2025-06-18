@@ -1,9 +1,11 @@
 package com.tuapp.myapplication.ui.finanzas.finanzaIndividual
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,10 +23,12 @@ import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.ui.components.TabSelector
 import com.tuapp.myapplication.ui.finanzas.FinanzasViewModel
-import com.tuapp.myapplication.ui.navigation.BDHomeScreen
 import com.tuapp.myapplication.ui.navigation.Routes
-import com.tuapp.myapplication.ui.navigation.TransaccionesScreen
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.*
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun IndividualFinanceScreen(
     navController: NavController,
@@ -34,21 +38,34 @@ fun IndividualFinanceScreen(
     val verdeClaro = Color(0xFF66BB6A)
     val verdePastel = Color(0xFFE6F4EA)
 
-    var selectedMonth by remember { mutableStateOf("Marzo") }
-    var showMonthMenu by remember { mutableStateOf(false) }
-    val months = listOf("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio")
+    val currentDate = remember { LocalDate.now() }
+    val currentMonth = remember {
+        currentDate.month.getDisplayName(TextStyle.FULL, Locale("es")).replaceFirstChar { it.uppercase() }
+    }
+    val currentYear = remember { currentDate.year }
 
+    var selectedMonth by remember { mutableStateOf(currentMonth) }
+    var selectedYear by remember { mutableStateOf(currentYear) }
+    var showMonthMenu by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf("Analisis") }
     var selectedView by remember { mutableStateOf("Resumen") }
 
+    val months = listOf("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+
+    val ahorroMes by finanzaViewModel.ahorroMes.collectAsState()
+    val ahorroAcumulado by finanzaViewModel.ahorroAcumulado.collectAsState()
+    val metaMensual by finanzaViewModel.metaMensual.collectAsState()
+
+    val ingresos by finanzaViewModel.ingresosTotales.collectAsState()
+    val egresos by finanzaViewModel.egresosTotales.collectAsState()
+    val diferencia by finanzaViewModel.diferencia.collectAsState()
+    val presupuesto by finanzaViewModel.presupuesto.collectAsState()
+    val consumo by finanzaViewModel.consumo.collectAsState()
+    val variacion by finanzaViewModel.variacion.collectAsState()
+
     LaunchedEffect(Unit) {
-        //Aqui tienen que hacer las llamadas segun sea el caso
-        //NO QUEMEN LA FECHA, AGARREN LA FECHA ACTUAL AL NOMAS INICIAR LA APLICACION
-        //DE AHI CUANDO SE QUIERA FILTRAR SE CAMBIA EL ESTADO DE LA FECHA PARA QUE HAGA EL NUEVO FILTRO
-        //TIENE QUE USAR MES Y AÑO
-        //EL TERCER PARAMETRO DE LAS FUNCIONES POR SI ACASO HAY FINANZA CONJUNTA, SE PASA EL ID
-        //finanzaViewModel.financeData(6,2025)
-        //finanzaViewModel.financeSummary(6,2025)
+        val mes = months.indexOf(currentMonth) + 1
+        finanzaViewModel.financeSummary(mes, currentYear)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -82,7 +99,14 @@ fun IndividualFinanceScreen(
 
             TabSelector(
                 selectedTab = selectedTab,
-                onTabSelected = { selectedTab = it },
+                onTabSelected = {
+                    selectedTab = it
+                    if (it == "Transacciones") {
+                        navController.navigate(Routes.TRANSACCIONES)
+                    } else if (it == "BD") {
+                        navController.navigate(Routes.BD_HOME)
+                    }
+                },
                 navController = navController
             )
 
@@ -92,7 +116,7 @@ fun IndividualFinanceScreen(
                 Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = selectedMonth, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text(text = "$selectedMonth $selectedYear", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Box {
@@ -108,11 +132,14 @@ fun IndividualFinanceScreen(
                         expanded = showMonthMenu,
                         onDismissRequest = { showMonthMenu = false }
                     ) {
-                        months.forEach { month ->
+                        months.forEachIndexed { index, month ->
                             DropdownMenuItem(
                                 text = { Text(month) },
                                 onClick = {
                                     selectedMonth = month
+                                    val mes = index + 1
+                                    selectedYear = LocalDate.now().year
+                                    finanzaViewModel.financeSummary(mes, selectedYear)
                                     showMonthMenu = false
                                 }
                             )
@@ -152,11 +179,21 @@ fun IndividualFinanceScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-            )
+            if (selectedView == "Resumen") {
+                ResumenAnalisisView(
+                    ahorroMes = ahorroMes ?: 0.0,
+                    ahorroAcumulado = ahorroAcumulado ?: 0.0,
+                    metaMensual = metaMensual ?: 0.0,
+                    ingresos = ingresos,
+                    egresos = egresos,
+                    diferencia = diferencia,
+                    presupuesto = presupuesto,
+                    consumo = consumo,
+                    variacion = variacion
+                )
+            } else {
+                Text("Vista de Datos aún no implementada.")
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -166,4 +203,5 @@ fun IndividualFinanceScreen(
         }
     }
 }
+
 
