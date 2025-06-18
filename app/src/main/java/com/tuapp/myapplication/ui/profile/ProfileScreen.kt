@@ -85,8 +85,8 @@ fun ProfileScreen(
         if (showLogoutDialog) {
             LogoutDialog(
                 onConfirm = {
+                    userViewModel.closeSession()
                     showLogoutDialog = false
-                    navController.navigate(Routes.LOGIN) { popUpTo(0) }
                 },
                 onDismiss = { showLogoutDialog = false }
             )

@@ -7,13 +7,30 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tuapp.myapplication.CarterixApplication
+import com.tuapp.myapplication.data.models.financeModels.request.CreateFinanceRequestDomain
+import com.tuapp.myapplication.data.models.financeModels.request.JoinFinanceRequestDomain
 import com.tuapp.myapplication.data.repository.finance.FinanceRepository
 import com.tuapp.myapplication.helpers.Resource
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class FinanzasViewModel(
    private val finanzaRepository: FinanceRepository
 ): ViewModel() {
+
+    private var _roleId = MutableStateFlow(0)
+    val roleId: StateFlow<Int> = _roleId
+
+    fun getRole(finanzaId: Int) {
+        viewModelScope.launch {
+            finanzaRepository.getRole(finanzaId).collect{ role ->
+               _roleId.value = role
+            }
+        }
+    }
 
     //CREEN USTEDES LOS ESTADOS QUE SERAN NECESARIOS A MOSTRAR EN LA VISTA
     // (la informacion, estados de cargando, mensajes de error, etc.)
@@ -48,6 +65,147 @@ class FinanzasViewModel(
     fun financeData(mes: Int, anio: Int, finanza_id: Int? = null){
         viewModelScope.launch {
             finanzaRepository.getData(mes, anio, finanza_id)
+                .collect { resource ->
+                    when(resource){
+                        is Resource.Loading -> {
+                            //Manejen el "cargando"
+                        }
+                        is Resource.Success -> {
+                            //Manejen el "success"
+                            resource.data
+                        }
+                        is Resource.Error -> {
+                            //Manejen el "error"
+                        }
+                    }
+                }
+        }
+    }
+
+    fun createInvite(finanzaId: Int){
+        viewModelScope.launch {
+            finanzaRepository.createInvite(finanzaId)
+                .collect { resource ->
+                    when(resource){
+                        is Resource.Loading -> {
+                            //Manejen el "cargando"
+                        }
+                        is Resource.Success -> {
+                            //Manejen el "success"
+                            resource.data
+                        }
+                        is Resource.Error -> {
+                            //Manejen el "error"
+                        }
+                    }
+                }
+        }
+    }
+
+    fun getFinancesList(){
+        viewModelScope.launch {
+            finanzaRepository.getFinancesList()
+                .collect { resource ->
+                    when(resource){
+                        is Resource.Loading -> {
+                            //Manejen el "cargando"
+                        }
+                        is Resource.Success -> {
+                            //Manejen el "success"
+                            //LISTA DE FINANZAS
+                            resource.data
+                        }
+                        is Resource.Error -> {
+                            //Manejen el "error"
+                        }
+                    }
+                }
+        }
+    }
+
+    fun getFinanceDetails(finanzaId: Int){
+        viewModelScope.launch {
+            finanzaRepository.getFinanceDetails(finanzaId)
+                .collect { resource ->
+                    when(resource){
+                        is Resource.Loading -> {
+                            //Manejen el "cargando"
+                        }
+                        is Resource.Success -> {
+                            //Manejen el "success"
+                            resource.data
+                        }
+                        is Resource.Error -> {
+                            //Manejen el "error"
+                        }
+                    }
+                }
+        }
+    }
+
+    fun joinFinance(codigo: String){
+        viewModelScope.launch {
+            finanzaRepository.joinFinance(JoinFinanceRequestDomain(codigo))
+                .collect { resource ->
+                    when(resource){
+                        is Resource.Loading -> {
+                            //Manejen el "cargando"
+                        }
+                        is Resource.Success -> {
+                            //Manejen el "success"
+                            resource.data
+                        }
+                        is Resource.Error -> {
+                            //Manejen el "error"
+                        }
+                    }
+                }
+        }
+    }
+
+    fun createFinance(titulo: String, descripcion: String) {
+        viewModelScope.launch {
+            finanzaRepository.createFinance(CreateFinanceRequestDomain(titulo, descripcion))
+                .collect { resource ->
+                    when(resource){
+                        is Resource.Loading -> {
+                            //Manejen el "cargando"
+                        }
+                        is Resource.Success -> {
+                            //Manejen el "success"
+                            resource.data
+                        }
+                        is Resource.Error -> {
+                            //Manejen el "error"
+                        }
+                    }
+                }
+        }
+    }
+
+    fun leaveFinance(finanzaId: Int) {
+        viewModelScope.launch {
+            finanzaRepository.leaveFinance(finanzaId)
+                .collect { resource ->
+                    when(resource){
+                        is Resource.Loading -> {
+                            //Manejen el "cargando"
+                        }
+                        is Resource.Success -> {
+                            //Manejen el "success"
+                            resource.data
+                        }
+                        is Resource.Error -> {
+                            //Manejen el "error"
+                        }
+                    }
+                }
+        }
+    }
+
+    fun deleteFromFinance(userId: Int, finanzaId: Int) {
+        viewModelScope.launch {
+            finanzaRepository.deleteFromFinance(userId, finanzaId)
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {

@@ -15,7 +15,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
-    private val BASE_URL = "http://10.0.2.2:8000/"
+    private val BASE_URL = "https://backend-aplicacion-de-finanzas.onrender.com"
 
     fun getInstance(repository: SensitiveInfoRepository): Retrofit {
         val client = OkHttpClient.Builder()

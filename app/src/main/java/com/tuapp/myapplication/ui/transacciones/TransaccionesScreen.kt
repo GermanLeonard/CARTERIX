@@ -26,6 +26,7 @@ import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.ui.navigation.BDHomeScreen
 import com.tuapp.myapplication.ui.navigation.DetalleTransaccionScreen
 import com.tuapp.myapplication.ui.navigation.FinanzaIndividualScreen
+import com.tuapp.myapplication.ui.navigation.RegistrarTransaccionScreen
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
@@ -128,7 +129,7 @@ fun TransaccionesScreen(
         }
 
         FloatingActionButton(
-            onClick = { navController.navigate(Routes.REGISTRAR_TRANSACCION) },
+            onClick = { navController.navigate(RegistrarTransaccionScreen) },
             containerColor = verde,
             modifier = Modifier
                 .align(Alignment.BottomEnd)

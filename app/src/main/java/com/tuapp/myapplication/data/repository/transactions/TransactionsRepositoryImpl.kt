@@ -19,6 +19,7 @@ import com.tuapp.myapplication.helpers.errorParsing
 import com.tuapp.myapplication.helpers.getFinanceId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -61,7 +62,7 @@ class TransactionsRepositoryImpl(
             val transactions = entities.map { it.toDomain() }
 
             Resource.Success(transactions)
-        }
+        }.distinctUntilChanged()
         emitAll(transactionList)
     }.flowOn(Dispatchers.IO)
 

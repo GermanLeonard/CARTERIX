@@ -16,6 +16,7 @@ import com.tuapp.myapplication.helpers.errorParsing
 import com.tuapp.myapplication.helpers.getFinanceId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -40,17 +41,19 @@ class SavingsRepositoryImpl(
                 savingsDao.insertSavingData(savingsResponse.toEntity())
             }else {
                 emit(Resource.Success(emptyList()))
+                return@flow
             }
-
         }catch (e :HttpException) {
             //ERRORES
             //400: BAD REQUEST, 500: ERROR DEL SERVER
             val msg = errorParsing(e)
 
             emit(Resource.Error(httpCode = e.code(), message = msg))
+            return@flow
         }catch (e: Exception) {
             Log.d("SavingsRepositoryImpl", "Error al hacer la petición: ${e.message}")
             emit(Resource.Error(message = "Error inesperado: ${e.localizedMessage ?: "Desconocido"}"))
+            return@flow
         }
 
         val savingsList = savingsDao.getSavingsData(
@@ -59,7 +62,7 @@ class SavingsRepositoryImpl(
             val list = entities.map { it.toDomain() }
 
             Resource.Success(list)
-        }
+        }.distinctUntilChanged()
         emitAll(savingsList)
     }.flowOn(Dispatchers.IO)
 
