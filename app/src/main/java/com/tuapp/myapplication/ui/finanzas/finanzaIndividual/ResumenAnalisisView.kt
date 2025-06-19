@@ -28,9 +28,6 @@ fun ResumenAnalisisView(
     consumo: Double,
     variacion: Double
 ) {
-    val porcentajeCumplimiento = if (metaMensual != 0.0) {
-        (ahorroMes / metaMensual * 100).coerceIn(0.0, 100.0)
-    } else 0.0
 
     Column(modifier = Modifier.fillMaxWidth()) {
 
@@ -91,7 +88,7 @@ fun ResumenAnalisisView(
         ) {
             Column {
                 Text("Ahorro", fontWeight = FontWeight.Medium)
-                Text("L. %.2f".format(ahorroMes), color = Color(0xFF6A1B9A))
+                Text("L. %.2f".format(metaMensual), color = Color(0xFF6A1B9A))
 
                 Spacer(modifier = Modifier.height(4.dp))
 
@@ -117,14 +114,14 @@ fun ResumenAnalisisView(
                     drawArc(
                         color = Color(0xFF2E7D32),
                         startAngle = -90f,
-                        sweepAngle = (porcentajeCumplimiento * 360f / 100).toFloat(),
+                        sweepAngle = (ahorroMes * 360f / 100).toFloat(),
                         useCenter = false,
                         style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                     )
                 }
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("${porcentajeCumplimiento.toInt()}%", color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)
+                    Text("${ahorroMes.toInt()}%", color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)
                     Text("Progreso")
                 }
             }
