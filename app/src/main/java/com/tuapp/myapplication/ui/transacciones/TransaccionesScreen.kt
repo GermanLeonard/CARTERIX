@@ -1,9 +1,7 @@
 // reemplaza la vista anterior
 package com.tuapp.myapplication.ui.transacciones
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,29 +21,25 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
-import com.tuapp.myapplication.ui.navigation.BDHomeScreen
-import com.tuapp.myapplication.ui.navigation.DetalleTransaccionScreen
-import com.tuapp.myapplication.ui.navigation.FinanzaIndividualScreen
-import com.tuapp.myapplication.ui.navigation.RegistrarTransaccionScreen
-import com.tuapp.myapplication.ui.navigation.Routes
+import com.tuapp.myapplication.ui.components.TabSelector
+import com.tuapp.myapplication.ui.navigation.*
 
 @Composable
 fun TransaccionesScreen(
     navController: NavController,
     transaccionViewModel: TransaccionesViewModel = viewModel(factory = TransaccionesViewModel.Factory)
-    ) {
-
+) {
     val transactions by transaccionViewModel.transactionsList.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         //CAMBIEN ESTO
-        transaccionViewModel.getTransactionsList(6,2025)
+        transaccionViewModel.getTransactionsList(6, 2025)
     }
 
     val verde = Color(0xFF2E7D32)
-    val verdeClaro = Color(0xFF66BB6A)
     val verdePastel = Color(0xFFE6F4EA)
     val currentRoute = Routes.INDIVIDUAL
+    var selectedTab by remember { mutableStateOf("Transacciones") }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -56,7 +50,12 @@ fun TransaccionesScreen(
                     .background(verde),
                 contentAlignment = Alignment.TopCenter
             ) {
-                Text("Finanza principal", fontSize = 24.sp, color = Color.White, modifier = Modifier.padding(top = 32.dp))
+                Text(
+                    "Finanza principal",
+                    fontSize = 24.sp,
+                    color = Color.White,
+                    modifier = Modifier.padding(top = 32.dp)
+                )
             }
 
             Column(
@@ -65,38 +64,11 @@ fun TransaccionesScreen(
                     .background(Color.White, RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp))
                     .padding(horizontal = 16.dp, vertical = 16.dp)
             ) {
-                //TODO HAGAN ESTO UN COMPONENTE POR FAVOR
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .background(verdePastel, RoundedCornerShape(50))
-                        .border(BorderStroke(2.dp, verde), RoundedCornerShape(50))
-                        .padding(6.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    listOf("Analisis", "Transacciones", "BD").forEach { tab ->
-                        val isSelected = tab == "Transacciones"
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 4.dp)
-                                .background(
-                                    if (isSelected) verdeClaro else Color.Transparent,
-                                    RoundedCornerShape(50)
-                                )
-                                .clickable {
-                                    when (tab) {
-                                        "Analisis" -> navController.navigate(FinanzaIndividualScreen)
-                                        "BD" -> navController.navigate(BDHomeScreen)
-                                    }
-                                }
-                                .padding(vertical = 8.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(tab, color = Color.Black)
-                        }
-                    }
-                }
+                TabSelector(
+                    selectedTab = selectedTab,
+                    onTabSelected = { selectedTab = it },
+                    navController = navController
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -113,13 +85,15 @@ fun TransaccionesScreen(
                                     .padding(vertical = 6.dp)
                                     .clickable {
                                         navController.navigate(DetalleTransaccionScreen(t.transaccion_id))
-
                                     },
                                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
                             ) {
                                 Column(modifier = Modifier.padding(12.dp)) {
                                     Text("${t.tipo_movimiento_nombre} - ${t.nombre_categoria}", fontWeight = FontWeight.Bold)
-                                    Text("$${t.monto_transaccion}", color = if (t.tipo_movimiento_nombre == "Ingreso") verde else Color.Red)
+                                    Text(
+                                        "$${t.monto_transaccion}",
+                                        color = if (t.tipo_movimiento_nombre == "Ingreso") verde else Color.Red
+                                    )
                                 }
                             }
                         }

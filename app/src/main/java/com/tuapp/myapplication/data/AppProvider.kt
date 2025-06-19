@@ -36,10 +36,13 @@ class AppProvider(context: Context) {
     private val userService = RetrofitInstance.getUserService(sensitiveInfoRepository)
     private val userRepository = UserRepositoryImpl(userService, userDao, sensitiveInfoRepository )
 
-    private val financeSummaryDao = appDatabase.resumenFinancieroDao()
-    private val financeDataDao = appDatabase.categoriaDataDao()
-    private val financeService = RetrofitInstance.getFinanceService(sensitiveInfoRepository)
-    private val financeRepository = FinanceRepositoryImpl(financeService, userDao, financeSummaryDao, financeDataDao)
+    val financeMembersDao = appDatabase.miembrosFinanzasDao()
+    val conjFinanceDao = appDatabase.finanzaConjuntaDao()
+    val financeSummaryDao = appDatabase.resumenFinancieroDao()
+    val categorieDataDao = appDatabase.categoriaDataDao()
+    val financeService = RetrofitInstance.getFinanceService(sensitiveInfoRepository)
+    val financeRepository = FinanceRepositoryImpl(financeService, userDao, financeMembersDao, conjFinanceDao, financeSummaryDao, categorieDataDao)
+
 
     private val categoryService = RetrofitInstance.getCategoryService(sensitiveInfoRepository)
     private val categoryDao = appDatabase.categoriaEgresoDao()

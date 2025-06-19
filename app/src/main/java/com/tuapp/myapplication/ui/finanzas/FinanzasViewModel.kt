@@ -9,25 +9,38 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tuapp.myapplication.CarterixApplication
 import com.tuapp.myapplication.data.models.financeModels.request.CreateFinanceRequestDomain
 import com.tuapp.myapplication.data.models.financeModels.request.JoinFinanceRequestDomain
+import com.tuapp.myapplication.data.models.financeModels.response.ResumenAhorrosResponseDomain
+import com.tuapp.myapplication.data.models.financeModels.response.ResumenEgresosResponseDomain
+import com.tuapp.myapplication.data.models.financeModels.response.ResumenFinancieroResponseDomain
 import com.tuapp.myapplication.data.repository.finance.FinanceRepository
 import com.tuapp.myapplication.helpers.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class FinanzasViewModel(
-   private val finanzaRepository: FinanceRepository
+    private val finanzaRepository: FinanceRepository
 ): ViewModel() {
 
     private var _roleId = MutableStateFlow(0)
     val roleId: StateFlow<Int> = _roleId
 
+    // NUEVOS ESTADOS PARA RESUMEN ANALISIS
+
+    private var _resumenFinanciero = MutableStateFlow(ResumenFinancieroResponseDomain(0.0, 0.0, 0.0))
+    val resumenFinanciero: StateFlow<ResumenFinancieroResponseDomain> = _resumenFinanciero
+
+    private var _resumenEgresos = MutableStateFlow(ResumenEgresosResponseDomain(0.0,0.0,0.0))
+    val resumenEgresos: StateFlow<ResumenEgresosResponseDomain> = _resumenEgresos
+
+    private var _resumenAhorros = MutableStateFlow(ResumenAhorrosResponseDomain(0.0, 0.0, 0.0))
+    val resumenAhorros = _resumenAhorros
+
     fun getRole(finanzaId: Int) {
         viewModelScope.launch {
-            finanzaRepository.getRole(finanzaId).collect{ role ->
-               _roleId.value = role
+            finanzaRepository.getRole(finanzaId).collect { role ->
+                _roleId.value = role
             }
         }
     }
@@ -48,9 +61,9 @@ class FinanzasViewModel(
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
-                            resource.data.resumen_ahorros
-                            resource.data.resumen_financiero
-                            resource.data.resumen_egresos
+                            _resumenFinanciero.value = resource.data.resumen_financiero
+                            _resumenEgresos.value = resource.data.resumen_egresos
+                            _resumenAhorros.value = resource.data.resumen_ahorros
                         }
                         is Resource.Error -> {
                             //Manejen el "error"

@@ -1,5 +1,7 @@
 package com.tuapp.myapplication.ui.finanzas.finanzaIndividual
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,41 +18,48 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.components.TabSelector
 import com.tuapp.myapplication.ui.finanzas.FinanzasViewModel
-import com.tuapp.myapplication.ui.navigation.BDHomeScreen
 import com.tuapp.myapplication.ui.navigation.Routes
-import com.tuapp.myapplication.ui.navigation.TransaccionesScreen
-import java.util.Date
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.*
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun IndividualFinanceScreen(
     navController: NavController,
     finanzaViewModel: FinanzasViewModel = viewModel(factory = FinanzasViewModel.Factory)
 ) {
-
-
     val verde = Color(0xFF2E7D32)
     val verdeClaro = Color(0xFF66BB6A)
     val verdePastel = Color(0xFFE6F4EA)
 
-    var selectedMonth by remember { mutableStateOf("Marzo") }
-    var showMonthMenu by remember { mutableStateOf(false) }
-    val months = listOf("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio")
+    val currentDate = remember { LocalDate.now() }
+    val currentMonth = remember {
+        currentDate.month.getDisplayName(TextStyle.FULL, Locale("es")).replaceFirstChar { it.uppercase() }
+    }
+    val currentYear = remember { currentDate.year }
 
+    var selectedMonth by remember { mutableStateOf(currentMonth) }
+    var selectedYear by remember { mutableStateOf(currentYear) }
+    var showMonthMenu by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf("Analisis") }
     var selectedView by remember { mutableStateOf("Resumen") }
 
+    val months = listOf("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+
+    val resumenFinanciero by finanzaViewModel.resumenFinanciero.collectAsStateWithLifecycle()
+    val resumenEgresos by finanzaViewModel.resumenEgresos.collectAsStateWithLifecycle()
+    val resumenAhorros by finanzaViewModel.resumenAhorros.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
-        //Aqui tienen que hacer las llamadas segun sea el caso
-        //NO QUEMEN LA FECHA, AGARREN LA FECHA ACTUAL AL NOMAS INICIAR LA APLICACION
-        //DE AHI CUANDO SE QUIERA FILTRAR SE CAMBIA EL ESTADO DE LA FECHA PARA QUE HAGA EL NUEVO FILTRO
-        //TIENE QUE USAR MES Y AÑO
-        //EL TERCER PARAMETRO DE LAS FUNCIONES POR SI ACASO HAY FINANZA CONJUNTA, SE PASA EL ID
-        //finanzaViewModel.financeData(6,2025)
-        //finanzaViewModel.financeSummary(6,2025)
+        val mes = months.indexOf(currentMonth) + 1
+        finanzaViewModel.financeSummary(mes, currentYear)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -82,39 +91,11 @@ fun IndividualFinanceScreen(
         ) {
             Spacer(modifier = Modifier.height(12.dp))
 
-            //CONVIERTANLO EN UN COMPONENTE
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .background(verdePastel, RoundedCornerShape(50))
-                    .border(BorderStroke(2.dp, verde), shape = RoundedCornerShape(50))
-                    .padding(top = 6.dp, start = 3.dp, end = 3.dp, bottom = 6.dp),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                listOf("Analisis", "Transacciones", "BD").forEach { label ->
-                    val isSelected = label == selectedTab
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 4.dp)
-                            .background(
-                                if (isSelected) verdeClaro else Color.Transparent,
-                                RoundedCornerShape(50)
-                            )
-                            .clickable {
-                                selectedTab = label
-                                when(selectedTab){
-                                    "BD" -> navController.navigate(BDHomeScreen)
-                                    "Transacciones" -> navController.navigate(TransaccionesScreen)
-                                }
-                            }
-                            .padding(vertical = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(label, color = Color.Black, fontWeight = FontWeight.SemiBold)
-                    }
-                }
-            }
+            TabSelector(
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it },
+                navController = navController
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -122,7 +103,7 @@ fun IndividualFinanceScreen(
                 Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = selectedMonth, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text(text = "$selectedMonth $selectedYear", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Box {
@@ -138,11 +119,14 @@ fun IndividualFinanceScreen(
                         expanded = showMonthMenu,
                         onDismissRequest = { showMonthMenu = false }
                     ) {
-                        months.forEach { month ->
+                        months.forEachIndexed { index, month ->
                             DropdownMenuItem(
                                 text = { Text(month) },
                                 onClick = {
                                     selectedMonth = month
+                                    val mes = index + 1
+                                    selectedYear = LocalDate.now().year
+                                    finanzaViewModel.financeSummary(mes, selectedYear)
                                     showMonthMenu = false
                                 }
                             )
@@ -181,12 +165,16 @@ fun IndividualFinanceScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-            
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-            )
+
+            if (selectedView == "Resumen") {
+                ResumenAnalisisView(
+                    resumenFinanciero,
+                    resumenEgresos,
+                    resumenAhorros
+                )
+            } else {
+                Text("Vista de Datos aún no implementada.")
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -196,4 +184,5 @@ fun IndividualFinanceScreen(
         }
     }
 }
+
 

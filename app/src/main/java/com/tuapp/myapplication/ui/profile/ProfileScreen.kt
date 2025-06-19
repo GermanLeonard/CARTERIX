@@ -23,6 +23,7 @@ import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.profile.components.LogoutDialog
 import com.tuapp.myapplication.ui.auth.UserViewModel
+import com.tuapp.myapplication.ui.navigation.EditProfile
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
@@ -73,7 +74,7 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 ProfileOption(icon = Icons.Default.Person, text = "Editar Perfil") {
-                    navController.navigate(Routes.EDIT_PROFILE)
+                    navController.navigate(EditProfile)
                 }
 
                 ProfileOption(icon = Icons.Default.ExitToApp, text = "Cerrar Sesión", color = Color.Red) {

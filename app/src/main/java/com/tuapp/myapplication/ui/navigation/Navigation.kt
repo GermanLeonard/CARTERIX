@@ -1,5 +1,7 @@
 package com.tuapp.myapplication.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -14,6 +16,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.tuapp.myapplication.helpers.TokenState
+import com.tuapp.myapplication.profile.EditProfileScreen
 import com.tuapp.myapplication.profile.ProfileScreen
 import com.tuapp.myapplication.ui.auth.LoginScreen
 import com.tuapp.myapplication.ui.auth.RegisterScreen
@@ -29,6 +32,7 @@ import com.tuapp.myapplication.ui.transacciones.DetalleTransaccionScreen
 import com.tuapp.myapplication.ui.transacciones.RegistrarTransaccionScreen
 import com.tuapp.myapplication.ui.transacciones.TransaccionesScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation(
     navController: NavHostController,
@@ -74,6 +78,10 @@ fun AppNavigation(
 
                 composable<PerfilScreen> {
                     ProfileScreen(navController)
+                }
+
+                composable<EditProfile> {
+                    EditProfileScreen(navController)
                 }
 
                 composable<TransaccionesScreen> {
