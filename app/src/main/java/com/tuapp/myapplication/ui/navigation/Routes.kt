@@ -18,6 +18,9 @@ object FinanzaGrupalScreen
 object PerfilScreen
 
 @Serializable
+object EditProfile
+
+@Serializable
 object BDHomeScreen
 
 @Serializable

@@ -16,6 +16,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.tuapp.myapplication.helpers.TokenState
+import com.tuapp.myapplication.profile.EditProfileScreen
 import com.tuapp.myapplication.profile.ProfileScreen
 import com.tuapp.myapplication.ui.auth.LoginScreen
 import com.tuapp.myapplication.ui.auth.RegisterScreen
@@ -77,6 +78,10 @@ fun AppNavigation(
 
                 composable<PerfilScreen> {
                     ProfileScreen(navController)
+                }
+
+                composable<EditProfile> {
+                    EditProfileScreen(navController)
                 }
 
                 composable<TransaccionesScreen> {

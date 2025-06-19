@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
@@ -52,16 +53,9 @@ fun IndividualFinanceScreen(
 
     val months = listOf("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
 
-    val ahorroMes by finanzaViewModel.ahorroMes.collectAsState()
-    val ahorroAcumulado by finanzaViewModel.ahorroAcumulado.collectAsState()
-    val metaMensual by finanzaViewModel.metaMensual.collectAsState()
-
-    val ingresos by finanzaViewModel.ingresosTotales.collectAsState()
-    val egresos by finanzaViewModel.egresosTotales.collectAsState()
-    val diferencia by finanzaViewModel.diferencia.collectAsState()
-    val presupuesto by finanzaViewModel.presupuesto.collectAsState()
-    val consumo by finanzaViewModel.consumo.collectAsState()
-    val variacion by finanzaViewModel.variacion.collectAsState()
+    val resumenFinanciero by finanzaViewModel.resumenFinanciero.collectAsStateWithLifecycle()
+    val resumenEgresos by finanzaViewModel.resumenEgresos.collectAsStateWithLifecycle()
+    val resumenAhorros by finanzaViewModel.resumenAhorros.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         val mes = months.indexOf(currentMonth) + 1
@@ -174,15 +168,9 @@ fun IndividualFinanceScreen(
 
             if (selectedView == "Resumen") {
                 ResumenAnalisisView(
-                    ahorroMes = ahorroMes ?: 0.0,
-                    ahorroAcumulado = ahorroAcumulado ?: 0.0,
-                    metaMensual = metaMensual ?: 0.0,
-                    ingresos = ingresos,
-                    egresos = egresos,
-                    diferencia = diferencia,
-                    presupuesto = presupuesto,
-                    consumo = consumo,
-                    variacion = variacion
+                    resumenFinanciero,
+                    resumenEgresos,
+                    resumenAhorros
                 )
             } else {
                 Text("Vista de Datos aún no implementada.")

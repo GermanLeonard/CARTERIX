@@ -9,6 +9,9 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tuapp.myapplication.CarterixApplication
 import com.tuapp.myapplication.data.models.financeModels.request.CreateFinanceRequestDomain
 import com.tuapp.myapplication.data.models.financeModels.request.JoinFinanceRequestDomain
+import com.tuapp.myapplication.data.models.financeModels.response.ResumenAhorrosResponseDomain
+import com.tuapp.myapplication.data.models.financeModels.response.ResumenEgresosResponseDomain
+import com.tuapp.myapplication.data.models.financeModels.response.ResumenFinancieroResponseDomain
 import com.tuapp.myapplication.data.repository.finance.FinanceRepository
 import com.tuapp.myapplication.helpers.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,32 +28,14 @@ class FinanzasViewModel(
 
     // NUEVOS ESTADOS PARA RESUMEN ANALISIS
 
-    private val _ingresosTotales = MutableStateFlow(0.0)
-    val ingresosTotales: StateFlow<Double> = _ingresosTotales.asStateFlow()
+    private var _resumenFinanciero = MutableStateFlow(ResumenFinancieroResponseDomain(0.0, 0.0, 0.0))
+    val resumenFinanciero: StateFlow<ResumenFinancieroResponseDomain> = _resumenFinanciero
 
-    private val _egresosTotales = MutableStateFlow(0.0)
-    val egresosTotales: StateFlow<Double> = _egresosTotales.asStateFlow()
+    private var _resumenEgresos = MutableStateFlow(ResumenEgresosResponseDomain(0.0,0.0,0.0))
+    val resumenEgresos: StateFlow<ResumenEgresosResponseDomain> = _resumenEgresos
 
-    private val _diferencia = MutableStateFlow(0.0)
-    val diferencia: StateFlow<Double> = _diferencia.asStateFlow()
-
-    private val _presupuesto = MutableStateFlow(0.0)
-    val presupuesto: StateFlow<Double> = _presupuesto.asStateFlow()
-
-    private val _consumo = MutableStateFlow(0.0)
-    val consumo: StateFlow<Double> = _consumo.asStateFlow()
-
-    private val _variacion = MutableStateFlow(0.0)
-    val variacion: StateFlow<Double> = _variacion.asStateFlow()
-
-    private val _metaMensual = MutableStateFlow<Double?>(null)
-    val metaMensual: StateFlow<Double?> = _metaMensual.asStateFlow()
-
-    private val _ahorroMes = MutableStateFlow<Double?>(null)
-    val ahorroMes: StateFlow<Double?> = _ahorroMes.asStateFlow()
-
-    private val _ahorroAcumulado = MutableStateFlow<Double?>(null)
-    val ahorroAcumulado: StateFlow<Double?> = _ahorroAcumulado.asStateFlow()
+    private var _resumenAhorros = MutableStateFlow(ResumenAhorrosResponseDomain(0.0, 0.0, 0.0))
+    val resumenAhorros = _resumenAhorros
 
     fun getRole(finanzaId: Int) {
         viewModelScope.launch {
@@ -76,22 +61,9 @@ class FinanzasViewModel(
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
-                            val resumen = resource.data
-                            _metaMensual.value = resumen.resumen_ahorros?.meta ?: 0.0
-                            _ahorroMes.value = resumen.resumen_ahorros?.progreso_porcentaje ?: 0.0
-                            _ahorroAcumulado.value = resumen.resumen_ahorros?.acumulado ?: 0.0
-
-                            _ingresosTotales.value = resumen.resumen_financiero?.ingresos_totales ?: 0.0
-                            _egresosTotales.value = resumen.resumen_financiero?.egresos_totales ?: 0.0
-                            _diferencia.value = resumen.resumen_financiero?.diferencia ?: 0.0
-
-                            _presupuesto.value = resumen.resumen_egresos?.presupuesto_mensual ?: 0.0
-                            _consumo.value = resumen.resumen_egresos?.consumo_mensual ?: 0.0
-                            _variacion.value = resumen.resumen_egresos?.variacion_mensual ?: 0.0
-
-
-
-
+                            _resumenFinanciero.value = resource.data.resumen_financiero
+                            _resumenEgresos.value = resource.data.resumen_egresos
+                            _resumenAhorros.value = resource.data.resumen_ahorros
                         }
                         is Resource.Error -> {
                             //Manejen el "error"

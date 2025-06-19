@@ -15,18 +15,15 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.tuapp.myapplication.data.models.financeModels.response.ResumenAhorrosResponseDomain
+import com.tuapp.myapplication.data.models.financeModels.response.ResumenEgresosResponseDomain
+import com.tuapp.myapplication.data.models.financeModels.response.ResumenFinancieroResponseDomain
 
 @Composable
 fun ResumenAnalisisView(
-    ahorroMes: Double,
-    ahorroAcumulado: Double,
-    metaMensual: Double,
-    ingresos: Double,
-    egresos: Double,
-    diferencia: Double,
-    presupuesto: Double,
-    consumo: Double,
-    variacion: Double
+    resumenFinanciero: ResumenFinancieroResponseDomain,
+    resumenEgresos: ResumenEgresosResponseDomain,
+    resumenAhorro: ResumenAhorrosResponseDomain
 ) {
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -39,11 +36,11 @@ fun ResumenAnalisisView(
         ) {
             Column(horizontalAlignment = Alignment.Start) {
                 Text("Ingresos Totales", fontWeight = FontWeight.Bold)
-                Text("L. %.2f".format(ingresos), color = Color(0xFF6A1B9A))
+                Text("L. %.2f".format(resumenFinanciero.ingresos_totales), color = Color(0xFF6A1B9A))
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text("Egresos Totales", fontWeight = FontWeight.Bold)
-                Text("L. %.2f".format(egresos), color = Color(0xFF1A237E))
+                Text("L. %.2f".format(resumenFinanciero.egresos_totales), color = Color(0xFF1A237E))
             }
         }
 
@@ -51,7 +48,7 @@ fun ResumenAnalisisView(
 
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
             Text("Diferencia", fontWeight = FontWeight.Bold)
-            Text("L. %.2f".format(diferencia), color = Color(0xFF2E7D32))
+            Text("L. %.2f".format(resumenFinanciero.diferencia), color = if(resumenFinanciero.diferencia >= 0 ) Color(0xFF2E7D32) else Color(0xFFD25557))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -66,15 +63,15 @@ fun ResumenAnalisisView(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Presupuesto", fontWeight = FontWeight.Bold)
-                Text("L. %.2f".format(presupuesto), color = Color(0xFF6A1B9A))
+                Text("L. %.2f".format(resumenEgresos.presupuesto_mensual), color = Color(0xFF6A1B9A))
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Consumo", fontWeight = FontWeight.Bold)
-                Text("L. %.2f".format(consumo), color = Color(0xFF6A1B9A))
+                Text("L. %.2f".format(resumenEgresos.consumo_mensual), color = Color(0xFF6A1B9A))
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Variación", fontWeight = FontWeight.Bold)
-                Text("L. %.2f".format(variacion), color = Color(0xFF2E7D32))
+                Text("L. %.2f".format(resumenEgresos.variacion_mensual), color = if(resumenEgresos.variacion_mensual >= 0 )Color(0xFF2E7D32) else Color(0xFFD25557))
             }
         }
 
@@ -88,12 +85,12 @@ fun ResumenAnalisisView(
         ) {
             Column {
                 Text("Ahorro", fontWeight = FontWeight.Medium)
-                Text("L. %.2f".format(metaMensual), color = Color(0xFF6A1B9A))
+                Text("L. %.2f".format(resumenAhorro.meta), color = Color(0xFF6A1B9A))
 
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text("Ahorro Acum.", fontWeight = FontWeight.Medium)
-                Text("L. %.2f".format(ahorroAcumulado), color = Color(0xFF6A1B9A))
+                Text("L. %.2f".format(resumenAhorro.acumulado), color = Color(0xFF6A1B9A))
             }
 
             Box(
@@ -114,14 +111,14 @@ fun ResumenAnalisisView(
                     drawArc(
                         color = Color(0xFF2E7D32),
                         startAngle = -90f,
-                        sweepAngle = (ahorroMes * 360f / 100).toFloat(),
+                        sweepAngle = (resumenAhorro.progreso_porcentaje * 360f / 100).toFloat(),
                         useCenter = false,
                         style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                     )
                 }
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("${ahorroMes.toInt()}%", color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)
+                    Text("${resumenAhorro.progreso_porcentaje.toInt()}%", color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)
                     Text("Progreso")
                 }
             }
