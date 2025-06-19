@@ -15,7 +15,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.tuapp.myapplication.ui.navigation.Routes
+import com.tuapp.myapplication.ui.navigation.BDHomeScreen
+import com.tuapp.myapplication.ui.navigation.FinanzaIndividualScreen
+import com.tuapp.myapplication.ui.navigation.TransaccionesScreen
 
 @Composable
 fun TabSelector(
@@ -37,27 +39,42 @@ fun TabSelector(
     ) {
         tabs.forEach { label ->
             val isSelected = label == selectedTab
+
+            val destination = when (label) {
+                "Analisis" -> FinanzaIndividualScreen
+                "Transacciones" -> TransaccionesScreen
+                "BD" -> BDHomeScreen
+                else -> null
+            }
+
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 4.dp)
-                    .background(
-                        if (isSelected) selectedColor else Color.Transparent,
-                        RoundedCornerShape(50)
-                    )
                     .clickable {
-                        onTabSelected(label)
-                        when (label) {
-                            "BD" -> navController.navigate(Routes.BD_HOME)
-                            "Transacciones" -> navController.navigate(Routes.TRANSACCIONES)
+                        if (!isSelected && destination != null) {
+                            onTabSelected(label)
+                            navController.navigate(destination)
+                        } else {
+                            onTabSelected(label)
                         }
                     }
+                    .background(
+                        if (isSelected) selectedColor else Color.Transparent,
+                        shape = RoundedCornerShape(50)
+                    )
                     .padding(vertical = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(label, color = Color.Black, fontWeight = FontWeight.SemiBold)
+                Text(
+                    text = label,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isSelected) Color.White else borderColor
+                )
             }
         }
     }
 }
+
+
 

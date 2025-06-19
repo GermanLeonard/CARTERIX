@@ -1,5 +1,7 @@
 package com.tuapp.myapplication.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,6 +31,7 @@ import com.tuapp.myapplication.ui.transacciones.DetalleTransaccionScreen
 import com.tuapp.myapplication.ui.transacciones.RegistrarTransaccionScreen
 import com.tuapp.myapplication.ui.transacciones.TransaccionesScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation(
     navController: NavHostController,

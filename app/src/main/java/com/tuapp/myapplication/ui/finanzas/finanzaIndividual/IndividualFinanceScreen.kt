@@ -99,14 +99,7 @@ fun IndividualFinanceScreen(
 
             TabSelector(
                 selectedTab = selectedTab,
-                onTabSelected = {
-                    selectedTab = it
-                    if (it == "Transacciones") {
-                        navController.navigate(Routes.TRANSACCIONES)
-                    } else if (it == "BD") {
-                        navController.navigate(Routes.BD_HOME)
-                    }
-                },
+                onTabSelected = { selectedTab = it },
                 navController = navController
             )
 
