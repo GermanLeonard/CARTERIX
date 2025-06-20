@@ -1,5 +1,6 @@
 package com.tuapp.myapplication.profile
 
+import android.util.Patterns
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,6 +32,11 @@ fun EditProfileScreen(
     var nuevaContrasena by remember { mutableStateOf("") }
     var confirmarContrasena by remember { mutableStateOf("") }
 
+    // VALIDACIONES
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var nuevaContrasenaError by remember { mutableStateOf<String?>(null) }
+    var confirmarContrasenaError by remember { mutableStateOf<String?>(null) }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             Box(
@@ -51,11 +57,28 @@ fun EditProfileScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text("Información de perfil", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+
                 CustomField("Nombre completo", nombre) { nombre = it }
-                CustomField("Email", email) { email = it }
+
+                CustomField("Email", email) {
+                    email = it
+                    emailError = null
+                }
+
+                // MOSTRAR ERROR DE EMAIL
+                if (emailError != null) {
+                    Text(emailError!!, color = Color.Red, fontSize = 12.sp)
+                }
 
                 Button(
                     onClick = {
+                        // VALIDACION de email
+                        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                            emailError = "Correo inválido"
+                        } else {
+                            emailError = null
+                            // Aqui iria la logica real de actualizacion de datos
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = verde),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
@@ -67,11 +90,46 @@ fun EditProfileScreen(
                 Text("Actualizar contraseña", fontWeight = FontWeight.Bold, fontSize = 18.sp)
 
                 CustomField("Contraseña actual", contrasenaActual) { contrasenaActual = it }
-                CustomField("Nueva contraseña", nuevaContrasena) { nuevaContrasena = it }
-                CustomField("Confirmar contraseña", confirmarContrasena) { confirmarContrasena = it }
+
+                CustomField("Nueva contraseña", nuevaContrasena) {
+                    nuevaContrasena = it
+                    nuevaContrasenaError = null
+                }
+
+                // MOSTRAR ERROR DE NUEVA CONTRASEÑA
+                if (nuevaContrasenaError != null) {
+                    Text(nuevaContrasenaError!!, color = Color.Red, fontSize = 12.sp)
+                }
+
+                CustomField("Confirmar contraseña", confirmarContrasena) {
+                    confirmarContrasena = it
+                    confirmarContrasenaError = null
+                }
+
+                // MOSTRAR ERROR DE CONFIRMACION
+                if (confirmarContrasenaError != null) {
+                    Text(confirmarContrasenaError!!, color = Color.Red, fontSize = 12.sp)
+                }
 
                 Button(
                     onClick = {
+                        val regexContrasena = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[\\d\\W]).{8,}$")
+                        var valido = true
+
+                        if (!regexContrasena.matches(nuevaContrasena)) {
+                            nuevaContrasenaError = "Debe tener al menos 8 caracteres, mayúscula, minúscula y número o símbolo"
+                            valido = false
+                        }
+
+                        if (nuevaContrasena != confirmarContrasena) {
+                            confirmarContrasenaError = "Las contraseñas no coinciden"
+                            valido = false
+                        }
+
+                        if (valido) {
+                            // Aqui iria la logica real de actualizacióon de contraseña
+
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = verde),
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
@@ -103,3 +161,4 @@ fun CustomField(placeholder: String, value: String, onValueChange: (String) -> U
         )
     )
 }
+

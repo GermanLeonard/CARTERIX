@@ -29,6 +29,10 @@ fun RegisterScreen(
     var correo by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
 
+    // Mensajes de error
+    var correoError by remember { mutableStateOf<String?>(null) }
+    var contrasenaError by remember { mutableStateOf<String?>(null) }
+
     val verde = Color(0xFF2E7D32)
     val verdeClaro = Color(0xFF66BB6A)
 
@@ -105,7 +109,10 @@ fun RegisterScreen(
             // Campo Correo
             OutlinedTextField(
                 value = correo,
-                onValueChange = { correo = it },
+                onValueChange = {
+                    correo = it
+                    correoError = null
+                },
                 placeholder = { Text("Correo electronico") },
                 leadingIcon = {
                     Icon(Icons.Default.Email, contentDescription = null, tint = Color.Gray)
@@ -114,20 +121,28 @@ fun RegisterScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
+                isError = correoError != null,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = verde,
                     unfocusedBorderColor = Color.LightGray,
-                    cursorColor = verde
+                    cursorColor = verde,
+                    errorBorderColor = Color.Red
                 ),
                 textStyle = LocalTextStyle.current.copy(fontSize = 16.sp)
             )
+            if (correoError != null) {
+                Text(correoError ?: "", color = Color.Red, fontSize = 12.sp)
+            }
 
             Spacer(modifier = Modifier.height(4.dp))
 
             // Campo Contraseña
             OutlinedTextField(
                 value = contrasena,
-                onValueChange = { contrasena = it },
+                onValueChange = {
+                    contrasena = it
+                    contrasenaError = null
+                },
                 placeholder = { Text("Contraseña") },
                 leadingIcon = {
                     Icon(Icons.Default.Lock, contentDescription = null, tint = Color.Gray)
@@ -137,20 +152,42 @@ fun RegisterScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
+                isError = contrasenaError != null,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = verde,
                     unfocusedBorderColor = Color.LightGray,
-                    cursorColor = verde
+                    cursorColor = verde,
+                    errorBorderColor = Color.Red
                 ),
                 textStyle = LocalTextStyle.current.copy(fontSize = 16.sp)
             )
+            if (contrasenaError != null) {
+                Text(contrasenaError ?: "", color = Color.Red, fontSize = 12.sp)
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Button(
                 onClick = {
-                    //APLIQUEN VALIDACION DE CORREO Y DE CONTRASEÑA POR FAVOR
-                    userViewModel.registerUser(nombre, correo, contrasena)
+                    // APLIQUEN VALIDACION DE CORREO Y DE CONTRASEÑA POR FAVOR
+                    val correoRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")
+                    val contrasenaRegex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[\\d\\W]).{8,}$")
+
+                    var valido = true
+
+                    if (!correo.matches(correoRegex)) {
+                        correoError = "Correo invalido"
+                        valido = false
+                    }
+                    if (!contrasena.matches(contrasenaRegex)) {
+                        contrasenaError =
+                            "Contraseña debe tener al menos 8 caracteres, mayuscula, minuscula y número o simbolo"
+                        valido = false
+                    }
+
+                    if (valido) {
+                        userViewModel.registerUser(nombre, correo, contrasena)
+                    }
                 },
                 shape = RoundedCornerShape(50),
                 modifier = Modifier
