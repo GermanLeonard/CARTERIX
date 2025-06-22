@@ -7,12 +7,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.auth.UserViewModel
@@ -26,16 +28,23 @@ fun EditProfileScreen(
 ) {
     val verde = Color(0xFF2E7D32)
 
-    var nombre by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var contrasenaActual by remember { mutableStateOf("") }
-    var nuevaContrasena by remember { mutableStateOf("") }
-    var confirmarContrasena by remember { mutableStateOf("") }
+    val userCredentials by userViewModel.userCredential.collectAsStateWithLifecycle()
+
+    var nombre by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
+    var contrasenaActual by rememberSaveable { mutableStateOf("") }
+    var nuevaContrasena by rememberSaveable { mutableStateOf("") }
+    var confirmarContrasena by rememberSaveable { mutableStateOf("") }
+
+    LaunchedEffect(userCredentials) {
+        if(nombre.isBlank()) nombre = userCredentials.nombre
+        if(email.isBlank()) email = userCredentials.correo
+    }
 
     // VALIDACIONES
-    var emailError by remember { mutableStateOf<String?>(null) }
-    var nuevaContrasenaError by remember { mutableStateOf<String?>(null) }
-    var confirmarContrasenaError by remember { mutableStateOf<String?>(null) }
+    var emailError by rememberSaveable { mutableStateOf<String?>(null) }
+    var nuevaContrasenaError by rememberSaveable { mutableStateOf<String?>(null) }
+    var confirmarContrasenaError by rememberSaveable { mutableStateOf<String?>(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -78,6 +87,8 @@ fun EditProfileScreen(
                         } else {
                             emailError = null
                             // Aqui iria la logica real de actualizacion de datos
+                            //manejen errores y success porfavor
+                            userViewModel.changeProfile(nombre, email)
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = verde),
@@ -128,7 +139,7 @@ fun EditProfileScreen(
 
                         if (valido) {
                             // Aqui iria la logica real de actualizacióon de contraseña
-
+                            userViewModel.changePassword(contrasenaActual, nuevaContrasena, confirmarContrasena)
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = verde),

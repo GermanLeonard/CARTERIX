@@ -39,8 +39,12 @@ class UserRepositoryImpl(
     }
 
     override suspend fun checkUserAndDeleteToken() {
-        val user = userDao.getUserOnce()
-        if(user == null) {
+        try{
+            val user = userDao.getUserOnce()
+            if(user == null) {
+                sensitiveInfoRepository.clearToken()
+            }
+        } catch (e: Exception) {
             sensitiveInfoRepository.clearToken()
         }
     }

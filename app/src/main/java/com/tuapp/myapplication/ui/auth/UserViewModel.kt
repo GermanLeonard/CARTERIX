@@ -43,8 +43,8 @@ class UserViewModel(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = UserDataDomain(
-            id = 1,
-            finanzaId = 1,
+            id = 0,
+            finanzaId = 0,
             nombre = "",
             correo = "",
         )
@@ -142,13 +142,15 @@ class UserViewModel(
         }
     }
 
-    val token: StateFlow<TokenState> = sensitiveInfoRepository.authenticationToken.map { TokenState.Loaded(it) as TokenState }
+    private val _token: StateFlow<TokenState> = sensitiveInfoRepository.authenticationToken.map { TokenState.Loaded(it) as TokenState }
         .onStart { emit(TokenState.Loading) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = TokenState.Loading,
         )
+
+    val token: StateFlow<TokenState> = _token
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
