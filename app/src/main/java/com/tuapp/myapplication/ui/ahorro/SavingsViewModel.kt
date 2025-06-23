@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.ui.ahorro
+package com.tuapp.myapplication.ui.savings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -8,53 +8,64 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tuapp.myapplication.CarterixApplication
 import com.tuapp.myapplication.data.models.savingsModels.request.CreateOrUpdateSavingDomain
+import com.tuapp.myapplication.data.models.savingsModels.response.SavingsDataDomain
 import com.tuapp.myapplication.data.repository.savings.SavingsRepository
 import com.tuapp.myapplication.helpers.Resource
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SavingsViewModel(
     private val savingsRepository: SavingsRepository
 ): ViewModel() {
 
-    fun getSavingsData(anio: Int, finanzaId: Int? = null) {
+    private val _savingsList = MutableStateFlow<List<SavingsDataDomain>>(emptyList())
+    val savingsList: StateFlow<List<SavingsDataDomain>> = _savingsList
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
+
+    fun getSavingsData(finanzaId: Int?, anio: Int) {
         viewModelScope.launch {
-            savingsRepository.getSavingsData(finanzaId, anio)
-                .collect{ resource ->
-                    when(resource){
-                        is Resource.Loading -> {
-                            //Manejen el "cargando"
-                        }
-                        is Resource.Success -> {
-                            //Manejen el "success"
-                            //LISTA DE LOS DATOS DE LOS AHORROS
-                            resource.data
-                        }
-                        is Resource.Error -> {
-                            //Manejen el "error"
-                        }
+            savingsRepository.getSavingsData(finanzaId, anio).collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        _isLoading.value = true
+                        _errorMessage.value = null
+                    }
+                    is Resource.Success -> {
+                        _savingsList.value = resource.data
+                        _isLoading.value = false
+                    }
+                    is Resource.Error -> {
+                        _isLoading.value = false
+                        _errorMessage.value = resource.message
                     }
                 }
+            }
         }
     }
 
-    fun createSavingGoal(monto: Double, mes: Int, anio: Int, finanzaId: Int? = null) {
+    fun createOrUpdateSaving(finanzaId: Int?, data: CreateOrUpdateSavingDomain) {
         viewModelScope.launch {
-            savingsRepository.createOrUpdateSavings(finanzaId, CreateOrUpdateSavingDomain(monto, mes, anio))
-                .collect{ resource ->
-                    when(resource){
-                        is Resource.Loading -> {
-                            //Manejen el "cargando"
-                        }
-                        is Resource.Success -> {
-                            //Manejen el "success"
-                            //RESPUESTA DE LA CREACION DE UNA META DE AHORRO
-                            resource.data.message
-                        }
-                        is Resource.Error -> {
-                            //Manejen el "error"
-                        }
+            savingsRepository.createOrUpdateSavings(finanzaId, data).collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        _isLoading.value = true
+                        _errorMessage.value = null
+                    }
+                    is Resource.Success -> {
+                        _isLoading.value = false
+                    }
+                    is Resource.Error -> {
+                        _isLoading.value = false
+                        _errorMessage.value = resource.message
                     }
                 }
+            }
         }
     }
 
@@ -63,7 +74,7 @@ class SavingsViewModel(
             initializer {
                 val application = this[APPLICATION_KEY] as CarterixApplication
                 SavingsViewModel(
-                    application.appProvider.provideSavingRepository(),
+                    application.appProvider.provideSavingRepository()
                 )
             }
         }

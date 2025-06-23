@@ -24,8 +24,11 @@ import com.tuapp.myapplication.ui.auth.UserViewModel
 import com.tuapp.myapplication.ui.finanzas.finanzaGrupal.GrupalFinanceScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.BDHomeScreen
 import com.tuapp.myapplication.ui.categorias.CategoriasEgresoScreen
+import com.tuapp.myapplication.ui.finanzas.FinanzasViewModel
 import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.IndividualFinanceScreen
 import com.tuapp.myapplication.ui.ingresos.IngresosScreen
+import com.tuapp.myapplication.ui.savings.AhorroScreen
+import com.tuapp.myapplication.ui.savings.SavingsViewModel
 import com.tuapp.myapplication.ui.subCategorias.RegistrarSubcategoriaScreen
 import com.tuapp.myapplication.ui.subCategorias.SubcategoriasScreen
 import com.tuapp.myapplication.ui.transacciones.DetalleTransaccionScreen
@@ -38,6 +41,7 @@ fun AppNavigation(
     navController: NavHostController,
     userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
 ) {
+    val finanzasViewModel: FinanzasViewModel = viewModel(factory = FinanzasViewModel.Factory)
 
     val tokenState by userViewModel.token.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
@@ -54,6 +58,8 @@ fun AppNavigation(
         is TokenState.Loaded -> {
 
             val token = (tokenState as TokenState.Loaded).token
+            // val token = "hola"
+
 
             NavHost(
                 navController = navController,
@@ -73,9 +79,8 @@ fun AppNavigation(
                 }
 
                 composable<FinanzaGrupalScreen> {
-                    GrupalFinanceScreen(navController)
+                    GrupalFinanceScreen(navController = navController, viewModel = finanzasViewModel)
                 }
-
                 composable<PerfilScreen> {
                     ProfileScreen(navController)
                 }
@@ -106,6 +111,13 @@ fun AppNavigation(
                 }
                 composable<SubCategoriaScreen> {
                     SubcategoriasScreen(navController)
+                }
+
+                composable<AhorroScreen> {
+                    AhorroScreen(
+                        navController = navController,
+                        viewModel = viewModel(factory = SavingsViewModel.Factory)
+                    )
                 }
 
                 composable<RegistrarSubCategoriaScreen> {

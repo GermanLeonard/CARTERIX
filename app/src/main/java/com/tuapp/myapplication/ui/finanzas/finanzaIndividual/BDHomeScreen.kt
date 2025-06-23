@@ -19,6 +19,8 @@ import com.tuapp.myapplication.ui.navigation.CategoriaEgresoScreen
 import com.tuapp.myapplication.ui.navigation.IngresosScreen
 import com.tuapp.myapplication.ui.navigation.Routes
 import com.tuapp.myapplication.ui.navigation.SubCategoriaScreen
+import com.tuapp.myapplication.ui.navigation.AhorroScreen
+
 
 @Composable
 fun BDHomeScreen(navController: NavController) {
@@ -82,7 +84,7 @@ fun BDHomeScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     BDCard("Ingresos") { navController.navigate(IngresosScreen) }
-                    BDCard("Ahorro") { /* futura navegación */ }
+                    BDCard("Ahorro") { navController.navigate(AhorroScreen) }
                 }
             }
         }

@@ -44,6 +44,9 @@ data class DetalleTransaccionScreen(val id: Int)
 @Serializable
 object TransaccionesScreen
 
+@Serializable
+object AhorroScreen
+
 object Routes {
     const val LOGIN = "login"
     const val REGISTER = "register"
@@ -59,6 +62,6 @@ object Routes {
     const val REGISTRAR_TRANSACCION = "registrar_transaccion"
     const val DETALLE_TRANSACCION = "detalle_transaccion/{id}"
     const val TRANSACCIONES = "transacciones"
-
+    const val AHORRO = "ahorro"
 
 }

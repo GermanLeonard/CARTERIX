@@ -9,6 +9,9 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tuapp.myapplication.CarterixApplication
 import com.tuapp.myapplication.data.models.financeModels.request.CreateFinanceRequestDomain
 import com.tuapp.myapplication.data.models.financeModels.request.JoinFinanceRequestDomain
+import com.tuapp.myapplication.data.models.financeModels.response.CategorieResponseDomain
+import com.tuapp.myapplication.data.models.financeModels.response.DatoAnalisisDomain
+import com.tuapp.myapplication.data.models.financeModels.response.FinancesListResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.ResumenAhorrosResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.ResumenEgresosResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.ResumenFinancieroResponseDomain
@@ -36,6 +39,13 @@ class FinanzasViewModel(
 
     private var _resumenAhorros = MutableStateFlow(ResumenAhorrosResponseDomain(0.0, 0.0, 0.0))
     val resumenAhorros = _resumenAhorros
+
+    private val _listaDatosAnalisis = MutableStateFlow<List<DatoAnalisisDomain>>(emptyList())
+    val listaDatosAnalisis: StateFlow<List<DatoAnalisisDomain>> = _listaDatosAnalisis
+
+    private val _listaGrupos = MutableStateFlow<List<FinancesListResponseDomain>>(emptyList())
+    val listaGrupos: StateFlow<List<FinancesListResponseDomain>> = _listaGrupos
+
 
     fun getRole(finanzaId: Int) {
         viewModelScope.launch {
@@ -81,14 +91,19 @@ class FinanzasViewModel(
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            // manejar cargando si querés
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            resource.data
+                            _listaDatosAnalisis.value = resource.data.map {
+                                DatoAnalisisDomain(
+                                    categoria = it.categoria_nombre,
+                                    presupuesto = it.total_presupuesto,
+                                    gasto = it.gasto
+                                )
+                            }
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            // mostrar error si querés
                         }
                     }
                 }
@@ -115,21 +130,19 @@ class FinanzasViewModel(
         }
     }
 
-    fun getFinancesList(){
+    fun getFinancesList() {
         viewModelScope.launch {
             finanzaRepository.getFinancesList()
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            // Opcional: Puedes manejar estado de carga si deseas
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            //LISTA DE FINANZAS
-                            resource.data
+                            _listaGrupos.value = resource.data
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            // Opcional: Mostrar error o log
                         }
                     }
                 }

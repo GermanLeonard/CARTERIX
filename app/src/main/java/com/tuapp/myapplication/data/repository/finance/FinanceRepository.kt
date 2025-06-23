@@ -5,6 +5,7 @@ import com.tuapp.myapplication.data.models.financeModels.request.CreateFinanceRe
 import com.tuapp.myapplication.data.models.financeModels.request.JoinFinanceRequestDomain
 import com.tuapp.myapplication.data.models.financeModels.response.CategorieResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.CreateInviteResponseDomain
+import com.tuapp.myapplication.data.models.financeModels.response.DatoAnalisisDomain
 import com.tuapp.myapplication.data.models.financeModels.response.FinanceDetailsResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.FinancesListResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.PrincipalFinanceResponseDomain

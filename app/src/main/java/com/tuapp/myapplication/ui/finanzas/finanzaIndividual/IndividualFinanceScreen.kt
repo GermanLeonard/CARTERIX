@@ -28,6 +28,8 @@ import com.tuapp.myapplication.ui.navigation.Routes
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.*
+import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.DatosAnalisisView
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -172,8 +174,8 @@ fun IndividualFinanceScreen(
                     resumenEgresos,
                     resumenAhorros
                 )
-            } else {
-                Text("Vista de Datos aún no implementada.")
+            }  else {
+                DatosAnalisisView(finanzaViewModel)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
