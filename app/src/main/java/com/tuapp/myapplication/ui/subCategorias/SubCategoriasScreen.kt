@@ -34,6 +34,9 @@ fun SubcategoriasScreen(
     val subCategoriasList by subCategoryViewModel.subCategoriesList.collectAsStateWithLifecycle()
     val categories by categoriasViewModel.categoriesOptions.collectAsStateWithLifecycle()
 
+    val isLoading by subCategoryViewModel.isLoading.collectAsStateWithLifecycle()
+    val mensajeError by subCategoryViewModel.mensajeError.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
         //ESTO ES DE PRUEBA
         categoriasViewModel.getCategoriesOptions()
@@ -107,20 +110,35 @@ fun SubcategoriasScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(subCategoriasList.filter {
-                        selectedCategoria.isEmpty() || it.categoria_nombre == selectedCategoria
-                    }) { sub ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 6.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
-                        ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
-                                Text(sub.categoria_nombre, color = Color.Black, fontWeight = FontWeight.Bold)
-                                Text("${sub.sub_categoria_nombre} - ${sub.tipo_gasto}")
-                               Text("Presupuesto: $${sub.presupuesto}", color = verde)
+                // Mostrar mensaje de error
+                if (mensajeError != null) {
+                    Text(
+                        text = mensajeError ?: "",
+                        color = Color.Red,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+
+                // Mostrar lista o mensaje de carga
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                } else {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(subCategoriasList.filter {
+                            selectedCategoria.isEmpty() || it.categoria_nombre == selectedCategoria
+                        }) { sub ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 6.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+                            ) {
+                                Column(modifier = Modifier.padding(12.dp)) {
+                                    Text(sub.categoria_nombre, color = Color.Black, fontWeight = FontWeight.Bold)
+                                    Text("${sub.sub_categoria_nombre} - ${sub.tipo_gasto}")
+                                    Text("Presupuesto: $${sub.presupuesto}", color = verde)
+                                }
                             }
                         }
                     }
@@ -143,4 +161,5 @@ fun SubcategoriasScreen(
         }
     }
 }
+
 

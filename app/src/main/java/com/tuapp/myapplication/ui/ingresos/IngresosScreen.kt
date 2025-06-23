@@ -25,6 +25,9 @@ fun IngresosScreen(
     incomeViewModel: IngresosViewModel = viewModel(factory = IngresosViewModel.Factory)
 ) {
     val ingresos by incomeViewModel.incomeList.collectAsStateWithLifecycle()
+    val isLoading by incomeViewModel.isLoading.collectAsStateWithLifecycle()
+    val mensajeError by incomeViewModel.mensajeError.collectAsStateWithLifecycle()
+
 
     var showDialog by remember { mutableStateOf(false) }
     var nombre by remember { mutableStateOf("") }
@@ -54,6 +57,19 @@ fun IngresosScreen(
                     .padding(16.dp)
                     .padding(bottom = 70.dp)
             ) {
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                mensajeError?.let {
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+
                 ingresos.forEach {
                     Card(
                         modifier = Modifier

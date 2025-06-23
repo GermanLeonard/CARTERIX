@@ -19,6 +19,13 @@ class SubCategoriesViewModel(
     private val subCategoryRepository: SubCategoryRepository
 ): ViewModel(){
 
+    // Estados para manejar cargando y errores
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _mensajeError = MutableStateFlow<String?>(null)
+    val mensajeError: StateFlow<String?> = _mensajeError
+
     private var _subCategoriesList = MutableStateFlow<List<ListaSubCategoriasDomain>>(emptyList())
     val subCategoriesList: StateFlow<List<ListaSubCategoriasDomain>> = _subCategoriesList
 
@@ -29,14 +36,19 @@ class SubCategoriesViewModel(
                     when(resource){
                         is Resource.Loading -> {
                             //Manejen el "cargando"
+                            _isLoading.value = true
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
+                            _isLoading.value = false
+                            _mensajeError.value = null
                             //LISTA DE SUB CATEGORIAS
                             _subCategoriesList.value = resource.data
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
+                            _isLoading.value = false
+                            _mensajeError.value = resource.message ?: "Error al obtener subcategorias"
                         }
                     }
                 }
@@ -50,14 +62,19 @@ class SubCategoriesViewModel(
                     when(resource){
                         is Resource.Loading -> {
                             //Manejen el "cargando"
+                            _isLoading.value = true
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
+                            _isLoading.value = false
+                            _mensajeError.value = null
                             //DETALLES DE UNA SUB CATEGORIA
                             resource.data
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
+                            _isLoading.value = false
+                            _mensajeError.value = resource.message ?: "Error al obtener detalles"
                         }
                     }
                 }
@@ -71,14 +88,19 @@ class SubCategoriesViewModel(
                     when(resource){
                         is Resource.Loading -> {
                             //Manejen el "cargando"
+                            _isLoading.value = true
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
+                            _isLoading.value = false
+                            _mensajeError.value = null
                             //OPCIONES DE LOS TIPOS DE GASTOS PARA LOS SELECT DE LOS FORMULARIOS
                             resource.data
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
+                            _isLoading.value = false
+                            _mensajeError.value = resource.message ?: "Error al obtener tipos de gasto"
                         }
                     }
                 }
@@ -105,14 +127,20 @@ class SubCategoriesViewModel(
                 when(resource){
                     is Resource.Loading -> {
                         //Manejen el "cargando"
+                        _isLoading.value = true
                     }
                     is Resource.Success -> {
                         //Manejen el "success"
+                        _isLoading.value = false
+                        _mensajeError.value = null
                         //OPCIONES DE LOS TIPOS DE GASTOS PARA LOS SELECT DE LOS FORMULARIOS
                         resource.data
                     }
                     is Resource.Error -> {
                         //Manejen el "error"
+                        _isLoading.value = false
+                        _mensajeError.value = resource.message ?: "Error al crear subcategoria"
+
                     }
                 }
             }
@@ -139,14 +167,19 @@ class SubCategoriesViewModel(
                 when(resource){
                     is Resource.Loading -> {
                         //Manejen el "cargando"
+                        _isLoading.value = true
                     }
                     is Resource.Success -> {
                         //Manejen el "success"
+                        _isLoading.value = false
+                        _mensajeError.value = null
                         //OPCIONES DE LOS TIPOS DE GASTOS PARA LOS SELECT DE LOS FORMULARIOS
                         resource.data
                     }
                     is Resource.Error -> {
                         //Manejen el "error"
+                        _isLoading.value = false
+                        _mensajeError.value = resource.message ?: "Error al actualizar subcategoria"
                     }
                 }
             }

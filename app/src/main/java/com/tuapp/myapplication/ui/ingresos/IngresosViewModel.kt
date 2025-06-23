@@ -22,6 +22,12 @@ class IngresosViewModel(
     private val _incomeList = MutableStateFlow<List<IngresoResponseDomain>>(emptyList())
     val incomeList: StateFlow<List<IngresoResponseDomain>> = _incomeList
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _mensajeError = MutableStateFlow<String?>(null)
+    val mensajeError: StateFlow<String?> = _mensajeError
+
     fun getIncomesList(finanzaId: Int? = null){
         viewModelScope.launch {
             incomesRepository.getIncomesList(finanzaId)
@@ -29,14 +35,19 @@ class IngresosViewModel(
                     when(resource){
                         is Resource.Loading -> {
                             //Manejen el "cargando"
+                            _isLoading.value = true
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
+                            _isLoading.value = false
+                            _mensajeError.value = null
                             //LISTA DE INGRESOS
                             _incomeList.value = resource.data
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
+                            _isLoading.value = false
+                            _mensajeError.value = resource.message ?: "Error al obtener ingresos"
                         }
                     }
                 }
@@ -50,14 +61,19 @@ class IngresosViewModel(
                     when(resource){
                         is Resource.Loading -> {
                             //Manejen el "cargando"
+                            _isLoading.value = true
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
+                            _isLoading.value = false
+                            _mensajeError.value = null
                             //DETALLES INGRESO
                             resource.data
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
+                            _isLoading.value = false
+                            _mensajeError.value = resource.message ?: "Error al obtener detalles del ingreso"
                         }
                     }
                 }
@@ -69,29 +85,31 @@ class IngresosViewModel(
         descripcionIngreso: String,
         montoIngreso: Double,
         finanzaId: Int? = null,
-        ){
+    ){
         viewModelScope.launch {
-            incomesRepository.createIncome(finanzaId, CreateOrUpdateIncomeRequestDomain(
-                nombreIngreso,
-                descripcionIngreso,
-                montoIngreso)
-            )
-                .collect { resource ->
-                    when(resource){
-                        is Resource.Loading -> {
-                            //Manejen el "cargando"
-                        }
-                        is Resource.Success -> {
-                            //Manejen el "success"
-                            //RESPUESTA DE CREACION
-                            resource.data
-                        }
-                        is Resource.Error -> {
-                            //Manejen el "error"
-                        }
+            incomesRepository.createIncome(
+                finanzaId,
+                CreateOrUpdateIncomeRequestDomain(nombreIngreso, descripcionIngreso, montoIngreso)
+            ).collect { resource ->
+                when(resource){
+                    is Resource.Loading -> {
+                        //Manejen el "cargando"
+                        _isLoading.value = true
+                    }
+                    is Resource.Success -> {
+                        //Manejen el "success"
+                        _isLoading.value = false
+                        _mensajeError.value = null
+                        //RESPUESTA DE CREACION
+                        resource.data
+                    }
+                    is Resource.Error -> {
+                        //Manejen el "error"
+                        _isLoading.value = false
+                        _mensajeError.value = resource.message ?: "Error al crear ingreso"
                     }
                 }
-
+            }
         }
     }
 
@@ -102,27 +120,29 @@ class IngresosViewModel(
         incomeId: Int
     ){
         viewModelScope.launch {
-            incomesRepository.updateIncome(incomeId, CreateOrUpdateIncomeRequestDomain(
-                nombreIngreso,
-                descripcionIngreso,
-                montoIngreso)
-            )
-                .collect { resource ->
-                    when(resource){
-                        is Resource.Loading -> {
-                            //Manejen el "cargando"
-                        }
-                        is Resource.Success -> {
-                            //Manejen el "success"
-                            //RESPUESTA DE ACTUALIZACION
-                            resource.data
-                        }
-                        is Resource.Error -> {
-                            //Manejen el "error"
-                        }
+            incomesRepository.updateIncome(
+                incomeId,
+                CreateOrUpdateIncomeRequestDomain(nombreIngreso, descripcionIngreso, montoIngreso)
+            ).collect { resource ->
+                when(resource){
+                    is Resource.Loading -> {
+                        //Manejen el "cargando"
+                        _isLoading.value = true
+                    }
+                    is Resource.Success -> {
+                        //Manejen el "success"
+                        _isLoading.value = false
+                        _mensajeError.value = null
+                        //RESPUESTA DE ACTUALIZACION
+                        resource.data
+                    }
+                    is Resource.Error -> {
+                        //Manejen el "error"
+                        _isLoading.value = false
+                        _mensajeError.value = resource.message ?: "Error al actualizar ingreso"
                     }
                 }
-
+            }
         }
     }
 
