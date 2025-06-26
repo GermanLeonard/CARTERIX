@@ -36,7 +36,7 @@ data class RegistrarSubCategoriaScreen(val id: Int)
 data class IngresosScreen(val id: Int)
 
 @Serializable
-object RegistrarTransaccionScreen
+data class RegistrarTransaccionScreen(val id: Int)
 
 @Serializable
 data class DetalleTransaccionScreen(val id: Int)

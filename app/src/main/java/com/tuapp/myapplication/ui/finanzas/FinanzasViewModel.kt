@@ -40,8 +40,8 @@ class FinanzasViewModel(
     private var _resumenAhorros = MutableStateFlow(ResumenAhorrosResponseDomain(0.0, 0.0, 0.0))
     val resumenAhorros = _resumenAhorros
 
-    private val _listaDatosAnalisis = MutableStateFlow<List<DatoAnalisisDomain>>(emptyList())
-    val listaDatosAnalisis: StateFlow<List<DatoAnalisisDomain>> = _listaDatosAnalisis
+    private val _listaDatosAnalisis = MutableStateFlow<List<CategorieResponseDomain>>(emptyList())
+    val listaDatosAnalisis: StateFlow<List<CategorieResponseDomain>> = _listaDatosAnalisis
 
     private val _listaGrupos = MutableStateFlow<List<FinancesListResponseDomain>>(emptyList())
     val listaGrupos: StateFlow<List<FinancesListResponseDomain>> = _listaGrupos
@@ -61,22 +61,28 @@ class FinanzasViewModel(
     //PONER EL ID DE LA FINANZA EN CASO DE SER CONJUNTA
     //ESTO ES LO QUE SE MOSTRARA EN LA PANTALLA PRINCIPAL
     //ESTO SE MOSTRARA EN LA PANTALLA DE LA FINANZA EN EL APARTADO "ANALISIS" "RESUMEN"
+
+    private var _loadingResumen = MutableStateFlow(false)
+    val loadingResumen: StateFlow<Boolean> = _loadingResumen
+
     fun financeSummary(mes: Int, anio: Int, finanza_id: Int? = null) {
         viewModelScope.launch {
             finanzaRepository.getSummary(mes, anio, finanza_id)
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingResumen.value = true
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
                             _resumenFinanciero.value = resource.data.resumen_financiero
                             _resumenEgresos.value = resource.data.resumen_egresos
                             _resumenAhorros.value = resource.data.resumen_ahorros
+                            _loadingResumen.value = false
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
+                            _loadingResumen.value = true
                         }
                     }
                 }
@@ -85,6 +91,10 @@ class FinanzasViewModel(
 
     //PONER EL ID DE LA FINANZA EN CASO DE SER CONJUNTA
     //ESTO SE MOSTRARA EN LA PANTALLA DE LA FINANZA EN EL APARTADO "ANALISIS" "DATOS"
+
+    private var _loadingDatos = MutableStateFlow(false)
+    val loadingDatos: StateFlow<Boolean> = _loadingDatos
+
     fun financeData(mes: Int, anio: Int, finanza_id: Int? = null){
         viewModelScope.launch {
             finanzaRepository.getData(mes, anio, finanza_id)
@@ -92,18 +102,15 @@ class FinanzasViewModel(
                     when(resource){
                         is Resource.Loading -> {
                             // manejar cargando si querés
+                            _loadingDatos.value = true
                         }
                         is Resource.Success -> {
-                            _listaDatosAnalisis.value = resource.data.map {
-                                DatoAnalisisDomain(
-                                    categoria = it.categoria_nombre,
-                                    presupuesto = it.total_presupuesto,
-                                    gasto = it.gasto
-                                )
-                            }
+                            _listaDatosAnalisis.value = resource.data
+                            _loadingDatos.value = false
                         }
                         is Resource.Error -> {
                             // mostrar error si querés
+                            _loadingDatos.value = false
                         }
                     }
                 }

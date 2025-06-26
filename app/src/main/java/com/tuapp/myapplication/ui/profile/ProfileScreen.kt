@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -65,7 +65,9 @@ fun ProfileScreen(
                         .offset(y = (-40).dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text(datosUsuario.value.nombre, fontSize = 30.sp, fontWeight = FontWeight.Bold, color = verde)
+                        val letraInicial = datosUsuario.value.nombre.firstOrNull()?.toString() ?: "?"
+
+                        Text(letraInicial, fontSize = 30.sp, fontWeight = FontWeight.Bold, color = verde)
                     }
                 }
 
@@ -77,7 +79,7 @@ fun ProfileScreen(
                     navController.navigate(EditProfile)
                 }
 
-                ProfileOption(icon = Icons.Default.ExitToApp, text = "Cerrar Sesión", color = Color.Red) {
+                ProfileOption(icon = Icons.AutoMirrored.Filled.ExitToApp, text = "Cerrar Sesión", color = Color.Red) {
                     showLogoutDialog = true
                 }
             }

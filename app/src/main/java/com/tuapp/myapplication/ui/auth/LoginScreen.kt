@@ -3,16 +3,19 @@ package com.tuapp.myapplication.ui.auth
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,8 +30,8 @@ fun LoginScreen(
     navController: NavController,
     userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory),
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
 
     val isLoggedIn by userViewModel.isLoggedIn.collectAsState()
 
@@ -113,7 +116,9 @@ fun LoginScreen(
                     unfocusedBorderColor = Color.LightGray,
                     cursorColor = verde
                 ),
-                textStyle = LocalTextStyle.current.copy(fontSize = 16.sp)
+                textStyle = LocalTextStyle.current.copy(fontSize = 16.sp),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
 
             Spacer(modifier = Modifier.height(2.dp))

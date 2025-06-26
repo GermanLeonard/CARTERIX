@@ -3,16 +3,19 @@ package com.tuapp.myapplication.ui.auth
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,13 +28,13 @@ fun RegisterScreen(
     navController: NavController,
     userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
 ) {
-    var nombre by remember { mutableStateOf("") }
-    var correo by remember { mutableStateOf("") }
-    var contrasena by remember { mutableStateOf("") }
+    var nombre by rememberSaveable { mutableStateOf("") }
+    var correo by rememberSaveable { mutableStateOf("") }
+    var contrasena by rememberSaveable { mutableStateOf("") }
 
     // Mensajes de error
-    var correoError by remember { mutableStateOf<String?>(null) }
-    var contrasenaError by remember { mutableStateOf<String?>(null) }
+    var correoError by rememberSaveable { mutableStateOf<String?>(null) }
+    var contrasenaError by rememberSaveable { mutableStateOf<String?>(null) }
 
     val verde = Color(0xFF2E7D32)
     val verdeClaro = Color(0xFF66BB6A)
@@ -128,7 +131,9 @@ fun RegisterScreen(
                     cursorColor = verde,
                     errorBorderColor = Color.Red
                 ),
-                textStyle = LocalTextStyle.current.copy(fontSize = 16.sp)
+                textStyle = LocalTextStyle.current.copy(fontSize = 16.sp),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
             if (correoError != null) {
                 Text(correoError ?: "", color = Color.Red, fontSize = 12.sp)

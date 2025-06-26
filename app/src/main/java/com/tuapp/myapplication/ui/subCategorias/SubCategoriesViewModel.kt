@@ -44,15 +44,15 @@ class SubCategoriesViewModel(
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
-                            _isLoading.value = false
                             _mensajeError.value = null
                             //LISTA DE SUB CATEGORIAS
                             _subCategoriesList.value = resource.data
+                            _isLoading.value = false
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
-                            _isLoading.value = false
                             _mensajeError.value = resource.message ?: "Error al obtener subcategorias"
+                            _isLoading.value = false
                         }
                     }
                 }
@@ -70,15 +70,15 @@ class SubCategoriesViewModel(
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
-                            _isLoading.value = false
                             _mensajeError.value = null
                             //DETALLES DE UNA SUB CATEGORIA
                             resource.data
+                            _isLoading.value = false
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
-                            _isLoading.value = false
                             _mensajeError.value = resource.message ?: "Error al obtener detalles"
+                            _isLoading.value = false
                         }
                     }
                 }
@@ -96,15 +96,15 @@ class SubCategoriesViewModel(
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
-                            _isLoading.value = false
                             _mensajeError.value = null
                             //OPCIONES DE LOS TIPOS DE GASTOS PARA LOS SELECT DE LOS FORMULARIOS
                             _categoriesExpenses.value = resource.data
+                            _isLoading.value = false
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
-                            _isLoading.value = false
                             _mensajeError.value = resource.message ?: "Error al obtener tipos de gasto"
+                            _isLoading.value = false
                         }
                     }
                 }
@@ -135,16 +135,15 @@ class SubCategoriesViewModel(
                     }
                     is Resource.Success -> {
                         //Manejen el "success"
-                        _isLoading.value = false
                         _mensajeError.value = null
                         //OPCIONES DE LOS TIPOS DE GASTOS PARA LOS SELECT DE LOS FORMULARIOS
                         resource.data
+                        _isLoading.value = false
                     }
                     is Resource.Error -> {
                         //Manejen el "error"
-                        _isLoading.value = false
                         _mensajeError.value = resource.message ?: "Error al crear subcategoria"
-
+                        _isLoading.value = false
                     }
                 }
             }
@@ -175,15 +174,15 @@ class SubCategoriesViewModel(
                     }
                     is Resource.Success -> {
                         //Manejen el "success"
-                        _isLoading.value = false
                         _mensajeError.value = null
                         //OPCIONES DE LOS TIPOS DE GASTOS PARA LOS SELECT DE LOS FORMULARIOS
                         resource.data
+                        _isLoading.value = false
                     }
                     is Resource.Error -> {
                         //Manejen el "error"
-                        _isLoading.value = false
                         _mensajeError.value = resource.message ?: "Error al actualizar subcategoria"
+                        _isLoading.value = false
                     }
                 }
             }

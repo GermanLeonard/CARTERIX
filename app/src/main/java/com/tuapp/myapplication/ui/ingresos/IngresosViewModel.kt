@@ -39,15 +39,15 @@ class IngresosViewModel(
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
-                            _isLoading.value = false
                             _mensajeError.value = null
                             //LISTA DE INGRESOS
                             _incomeList.value = resource.data
+                            _isLoading.value = false
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
-                            _isLoading.value = false
                             _mensajeError.value = resource.message ?: "Error al obtener ingresos"
+                            _isLoading.value = false
                         }
                     }
                 }
@@ -65,15 +65,15 @@ class IngresosViewModel(
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
-                            _isLoading.value = false
                             _mensajeError.value = null
                             //DETALLES INGRESO
                             resource.data
+                            _isLoading.value = false
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
-                            _isLoading.value = false
                             _mensajeError.value = resource.message ?: "Error al obtener detalles del ingreso"
+                            _isLoading.value = false
                         }
                     }
                 }
@@ -98,15 +98,15 @@ class IngresosViewModel(
                     }
                     is Resource.Success -> {
                         //Manejen el "success"
-                        _isLoading.value = false
                         _mensajeError.value = null
                         //RESPUESTA DE CREACION
                         resource.data
+                        _isLoading.value = false
                     }
                     is Resource.Error -> {
                         //Manejen el "error"
-                        _isLoading.value = false
                         _mensajeError.value = resource.message ?: "Error al crear ingreso"
+                        _isLoading.value = false
                     }
                 }
             }
@@ -131,15 +131,15 @@ class IngresosViewModel(
                     }
                     is Resource.Success -> {
                         //Manejen el "success"
-                        _isLoading.value = false
                         _mensajeError.value = null
                         //RESPUESTA DE ACTUALIZACION
                         resource.data
+                        _isLoading.value = false
                     }
                     is Resource.Error -> {
                         //Manejen el "error"
-                        _isLoading.value = false
                         _mensajeError.value = resource.message ?: "Error al actualizar ingreso"
+                        _isLoading.value = false
                     }
                 }
             }

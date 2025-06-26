@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.ui.savings
+package com.tuapp.myapplication.ui.ahorro
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -6,10 +6,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,14 +19,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.tuapp.myapplication.data.models.savingsModels.request.CreateOrUpdateSavingDomain
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.ui.navigation.Routes
+import com.tuapp.myapplication.ui.savings.SavingsViewModel
 import com.tuapp.myapplication.ui.savings.components.NuevaMetaDialog
 import java.util.*
 
 @Composable
-fun AhorroScreen(
+fun AhorrosScreen(
     navController: NavHostController,
     finanzaId: Int?,
     viewModel: SavingsViewModel = viewModel(factory = SavingsViewModel.Factory)
@@ -33,7 +34,7 @@ fun AhorroScreen(
     val ahorroList by viewModel.savingsList.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.errorMessage.collectAsState()
-    var showDialog by remember { mutableStateOf(false) }
+    var showDialog by rememberSaveable { mutableStateOf(false) }
 
     val calendar = Calendar.getInstance()
     val anio = calendar.get(Calendar.YEAR)
@@ -78,7 +79,7 @@ fun AhorroScreen(
                         onClick = { navController.popBackStack() },
                         modifier = Modifier.align(Alignment.CenterStart)
                     ) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Regresar", tint = Color.Black)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Regresar", tint = Color.Black)
                     }
                 }
 
@@ -93,6 +94,12 @@ fun AhorroScreen(
                         .padding(16.dp)
                 ) {
                     Column {
+
+                        if (isLoading) {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                                CircularProgressIndicator()
+                            }
+                        }
                         Text(
                             text = "Meta de ahorro",
                             fontSize = 18.sp,
@@ -102,10 +109,7 @@ fun AhorroScreen(
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
-
-                        if (isLoading) {
-                            CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
-                        } else if (ahorroList.isEmpty()) {
+                        if (ahorroList.isEmpty()) {
                             Text("No hay metas registradas", Modifier.align(Alignment.CenterHorizontally))
                         } else {
                             LazyColumn(

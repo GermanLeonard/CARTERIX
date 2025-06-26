@@ -10,6 +10,7 @@ import com.tuapp.myapplication.CarterixApplication
 import com.tuapp.myapplication.data.models.transactionsModels.request.CreateTransactionDomain
 import com.tuapp.myapplication.data.models.transactionsModels.response.TransactionListResponseDomain
 import com.tuapp.myapplication.data.models.transactionsModels.response.TransactionsDetailsDomain
+import com.tuapp.myapplication.data.models.transactionsModels.response.TransactionsOptionsDomain
 import com.tuapp.myapplication.data.repository.transactions.TransactionsRepository
 import com.tuapp.myapplication.helpers.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +21,9 @@ class TransaccionesViewModel(
     private val transaccionRepository: TransactionsRepository
 ): ViewModel() {
 
+    private var _loadingTransactions = MutableStateFlow(false)
+    val loadingTransactions: StateFlow<Boolean> = _loadingTransactions
+
     private var _transactionsList = MutableStateFlow< List<TransactionListResponseDomain>>(emptyList())
     val transactionsList: StateFlow<List<TransactionListResponseDomain>> = _transactionsList
 
@@ -28,26 +32,31 @@ class TransaccionesViewModel(
     )
     val transactionDetails: StateFlow<TransactionsDetailsDomain> = _transactionDetails
 
+    private var _loadingDetailsTransaction = MutableStateFlow(false)
+    val loadingDetailsTransaction: StateFlow<Boolean> = _loadingDetailsTransaction
+
     fun getTransactionsList(mes: Int, anio: Int, finanzaId: Int? = null){
         viewModelScope.launch {
             transaccionRepository.getTransactionsList(mes, anio, finanzaId)
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingTransactions.value = true
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            //LISTA DE TRANSACCIONES
                             _transactionsList.value = resource.data
+                            _loadingTransactions.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _loadingTransactions.value = false
                         }
                     }
                 }
         }
     }
+
+    private var _transactionOptions = MutableStateFlow<List<TransactionsOptionsDomain>>(emptyList())
+    val transactionOptions: StateFlow<List<TransactionsOptionsDomain>> = _transactionOptions
 
     fun getTransactionsOptions(finanzaId: Int? = null){
         viewModelScope.launch {
@@ -60,7 +69,7 @@ class TransaccionesViewModel(
                         is Resource.Success -> {
                             //Manejen el "success"
                             //OPCIONES PARA LA CREACION DE TRANSACCIONES
-                            resource.data
+                            _transactionOptions.value = resource.data
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
@@ -76,15 +85,16 @@ class TransaccionesViewModel(
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingDetailsTransaction.value = true
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
-                            //DETALLES DE UNA TRANSACCION
                             _transactionDetails.value = resource.data
+                            _loadingDetailsTransaction.value = false
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
+                            _loadingDetailsTransaction.value = false
                         }
                     }
                 }

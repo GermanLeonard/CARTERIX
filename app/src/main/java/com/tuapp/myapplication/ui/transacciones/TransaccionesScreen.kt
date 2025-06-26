@@ -30,18 +30,19 @@ fun TransaccionesScreen(
     transaccionViewModel: TransaccionesViewModel = viewModel(factory = TransaccionesViewModel.Factory),
     finanzaId: Int?
 ) {
-    val transactions by transaccionViewModel.transactionsList.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        //CAMBIEN ESTO
-        transaccionViewModel.getTransactionsList(6, 2025, finanzaId)
-    }
+    val loadingTransactions by transaccionViewModel.loadingTransactions.collectAsStateWithLifecycle()
+    val transactions by transaccionViewModel.transactionsList.collectAsStateWithLifecycle()
 
     val verde = Color(0xFF2E7D32)
     val verdePastel = Color(0xFFE6F4EA)
     val currentRoute = Routes.INDIVIDUAL
     var selectedTab by remember { mutableStateOf("Transacciones") }
 
+    //AGREGUEN OPCION PARA FILTRAR POR MES Y AÑO
+    LaunchedEffect(Unit) {
+        transaccionViewModel.getTransactionsList(6, 2025, finanzaId)
+    }
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             Box(
@@ -57,6 +58,13 @@ fun TransaccionesScreen(
                     color = Color.White,
                     modifier = Modifier.padding(top = 32.dp)
                 )
+            }
+
+
+            if(loadingTransactions){
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                    CircularProgressIndicator()
+                }
             }
 
             Column(
@@ -105,7 +113,7 @@ fun TransaccionesScreen(
         }
 
         FloatingActionButton(
-            onClick = { navController.navigate(RegistrarTransaccionScreen) },
+            onClick = { navController.navigate(RegistrarTransaccionScreen(finanzaId ?: 0)) },
             containerColor = verde,
             modifier = Modifier
                 .align(Alignment.BottomEnd)

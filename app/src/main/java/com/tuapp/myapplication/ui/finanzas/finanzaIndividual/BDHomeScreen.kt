@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,7 +31,7 @@ fun BDHomeScreen(
     val verde = Color(0xFF2E7D32)
     val verdePastel = Color(0xFFE6F4EA)
     val currentRoute = Routes.BD_HOME
-    var selectedTab by remember { mutableStateOf("BD") }
+    var selectedTab by rememberSaveable { mutableStateOf("BD") }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Box(

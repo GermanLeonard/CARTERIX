@@ -3,6 +3,7 @@ package com.tuapp.myapplication.ui.ingresos
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -11,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,7 +30,6 @@ fun IngresosScreen(
     val ingresos by incomeViewModel.incomeList.collectAsStateWithLifecycle()
     val isLoading by incomeViewModel.isLoading.collectAsStateWithLifecycle()
     val mensajeError by incomeViewModel.mensajeError.collectAsStateWithLifecycle()
-
 
     var showDialog by remember { mutableStateOf(false) }
     var nombre by remember { mutableStateOf("") }
@@ -59,8 +60,9 @@ fun IngresosScreen(
                     .padding(bottom = 70.dp)
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        CircularProgressIndicator()
+                    }
                 }
                 mensajeError?.let {
                     Text(
@@ -126,13 +128,16 @@ fun IngresosScreen(
                         OutlinedTextField(
                             value = nombre,
                             onValueChange = { nombre = it },
-                            label = { Text("Nombre Ingreso") }
+                            label = { Text("Nombre Ingreso") },
+                            singleLine = true,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
                             value = monto,
                             onValueChange = { monto = it },
-                            label = { Text("Monto") }
+                            label = { Text("Monto") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
                     }
                 }

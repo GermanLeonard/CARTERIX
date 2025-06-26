@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import com.tuapp.myapplication.helpers.TokenState
 import com.tuapp.myapplication.profile.EditProfileScreen
 import com.tuapp.myapplication.profile.ProfileScreen
+import com.tuapp.myapplication.ui.ahorro.AhorrosScreen
 import com.tuapp.myapplication.ui.auth.LoginScreen
 import com.tuapp.myapplication.ui.auth.RegisterScreen
 import com.tuapp.myapplication.ui.auth.UserViewModel
@@ -26,11 +27,10 @@ import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.BDHomeScreen
 import com.tuapp.myapplication.ui.categorias.CategoriasEgresoScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.IndividualFinanceScreen
 import com.tuapp.myapplication.ui.ingresos.IngresosScreen
-import com.tuapp.myapplication.ui.savings.AhorroScreen
 import com.tuapp.myapplication.ui.subCategorias.RegistrarSubcategoriaScreen
 import com.tuapp.myapplication.ui.subCategorias.SubcategoriasScreen
 import com.tuapp.myapplication.ui.transacciones.DetallesTransaccionScreen
-import com.tuapp.myapplication.ui.transacciones.RegistrarTransaccionScreen
+import com.tuapp.myapplication.ui.transacciones.RegistrarTransaccionesScreen
 import com.tuapp.myapplication.ui.transacciones.TransaccionesScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -94,8 +94,12 @@ fun AppNavigation(
                     TransaccionesScreen(navController, finanzaId = finanzaId)
                 }
 
-                composable<RegistrarTransaccionScreen> {
-                    RegistrarTransaccionScreen(navController)
+                composable<RegistrarTransaccionScreen> { backStackEntry ->
+
+                    val id = backStackEntry.arguments?.getInt("id") ?: return@composable
+                    val finanzaId: Int? = if(id == 0) null else id
+
+                    RegistrarTransaccionesScreen(navController, finanzaId)
                 }
 
                 composable<DetalleTransaccionScreen> { backStackEntry ->
@@ -122,7 +126,7 @@ fun AppNavigation(
                 composable<AhorroScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
                     val finanzaId = if(id == 0) null else id
-                    AhorroScreen(navController, finanzaId)
+                    AhorrosScreen(navController, finanzaId)
                 }
 
                 composable<RegistrarSubCategoriaScreen> { backStackEntry ->

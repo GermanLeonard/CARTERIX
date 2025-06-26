@@ -25,6 +25,9 @@ class CategoriesViewModel(
 
     private var _categoriesOptions = MutableStateFlow<List<CategoriesOptionsDomain>>(emptyList())
     val categoriesOptions: StateFlow<List<CategoriesOptionsDomain>> = _categoriesOptions
+
+    private var _loadingCategories = MutableStateFlow(false)
+    val loadingCategories: StateFlow<Boolean> = _loadingCategories
     //CREEN USTEDES LOS ESTADOS QUE SERAN NECESARIOS A MOSTRAR EN LA VISTA
     // (lista de categorias, estados de cargando, mensajes de error, etc.)
 
@@ -59,15 +62,15 @@ class CategoriesViewModel(
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingCategories.value = true
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            //LISTA DE SUB CATEGORIAS
                             _categoriesList.value = resource.data
+                            _loadingCategories.value = false
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
+                            _loadingCategories.value = false
                         }
                     }
                 }

@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,9 +30,10 @@ fun CategoriasEgresoScreen(
     val currentRoute = Routes.INDIVIDUAL
 
     val categorias by categoryViewModel.categoriesList.collectAsStateWithLifecycle()
+    val loadingCategories by categoryViewModel.loadingCategories.collectAsStateWithLifecycle()
 
-    var showDialog by remember { mutableStateOf(false) }
-    var nuevaCategoria by remember { mutableStateOf("") }
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var nuevaCategoria by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         categoryViewModel.getCategoriesList(finanzaId)
@@ -59,6 +61,15 @@ fun CategoriasEgresoScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            if(loadingCategories) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
 
             if (categorias.isEmpty()) {
                 Box(

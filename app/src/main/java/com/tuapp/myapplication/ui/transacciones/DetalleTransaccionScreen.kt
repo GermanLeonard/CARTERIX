@@ -25,6 +25,7 @@ fun DetallesTransaccionScreen(
 ) {
     val verde = Color(0xFF2E7D32)
 
+    val loadingDetails by transaccionesViewModel.loadingDetailsTransaction.collectAsStateWithLifecycle()
     val transaccion by transaccionesViewModel.transactionDetails.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -41,6 +42,12 @@ fun DetallesTransaccionScreen(
                 contentAlignment = Alignment.TopCenter
             ) {
                 Text("Detalle de Transacción", color = Color.White, fontSize = 22.sp, modifier = Modifier.padding(top = 32.dp))
+            }
+
+            if(loadingDetails){
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                    CircularProgressIndicator()
+                }
             }
 
             transaccion.let { t ->

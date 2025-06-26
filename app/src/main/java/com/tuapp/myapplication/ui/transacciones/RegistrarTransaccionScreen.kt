@@ -3,38 +3,59 @@ package com.tuapp.myapplication.ui.transacciones
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
-fun RegistrarTransaccionScreen(
+fun RegistrarTransaccionesScreen(
     navController: NavController,
+    finanzaId: Int?,
     transaccionesViewModel: TransaccionesViewModel = viewModel(factory = TransaccionesViewModel.Factory)
 ) {
     val verde = Color(0xFF2E7D32)
 
-    val tipos = listOf("Ingreso", "Egreso")
-    val categorias = listOf("Salario", "Comida", "Transporte")
+    val opcionesTransaccion by transaccionesViewModel.transactionOptions.collectAsStateWithLifecycle()
 
+    //id tipo para guardar en la API
+    var idTipo by rememberSaveable {mutableIntStateOf(0)}
     var tipo by remember { mutableStateOf("") }
+
+    //id categoria para guardar en API
+    var idCategoria by rememberSaveable { mutableIntStateOf(0) }
     var categoria by remember { mutableStateOf("") }
+
     var monto by remember { mutableStateOf("") }
+
+    var presupuesto by remember { mutableDoubleStateOf(0.0) }
+
     var descripcion by remember { mutableStateOf("") }
 
     var showTipoMenu by remember { mutableStateOf(false) }
     var showCategoriaMenu by remember { mutableStateOf(false) }
+
+    //AGREGUEN UN CAMPO QUE EL USUARIO PUEDA ELEGIR DE FECHA PARA EL REGISTRO,
+    // PUES SE TIENE QUE REGISTRAR LA FECHA DE LA TRANSACCION
+
+    LaunchedEffect(Unit) {
+        transaccionesViewModel.getTransactionsOptions(finanzaId)
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -66,11 +87,12 @@ fun RegistrarTransaccionScreen(
                     }
                 }
                 DropdownMenu(expanded = showTipoMenu, onDismissRequest = { showTipoMenu = false }) {
-                    tipos.forEach {
+                    opcionesTransaccion.forEach {
                         DropdownMenuItem(
-                            text = { Text(it) },
+                            text = { Text(it.tipo_registro_nombre) },
                             onClick = {
-                                tipo = it
+                                tipo = it.tipo_registro_nombre
+                                idTipo = it.tipo_registro_id
                                 showTipoMenu = false
                             }
                         )
@@ -91,11 +113,15 @@ fun RegistrarTransaccionScreen(
                     }
                 }
                 DropdownMenu(expanded = showCategoriaMenu, onDismissRequest = { showCategoriaMenu = false }) {
-                    categorias.forEach {
+                    val tipoRegistro = opcionesTransaccion.find { it.tipo_registro_id == idTipo}
+
+                    tipoRegistro?.opciones?.forEach {
                         DropdownMenuItem(
-                            text = { Text(it) },
+                            text = { Text(it.nombre_opcion) },
                             onClick = {
-                                categoria = it
+                                categoria = it.nombre_opcion
+                                idCategoria = it.id_opcion
+                                presupuesto = it.presupuesto_opcion
                                 showCategoriaMenu = false
                             }
                         )
@@ -103,13 +129,28 @@ fun RegistrarTransaccionScreen(
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    OutlinedTextField(
+                        value = monto,
+                        onValueChange = { monto = it },
+                        label = { Text("Monto") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
 
-                OutlinedTextField(
-                    value = monto,
-                    onValueChange = { monto = it },
-                    label = { Text("Monto") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    OutlinedTextField(
+                        value = presupuesto.toString(),
+                        onValueChange = {},
+                        label = { Text("Presupuesto") },
+                        singleLine = true,
+                        enabled = false
+                    )
+                }
+
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -124,9 +165,9 @@ fun RegistrarTransaccionScreen(
 
                 Button(
                     onClick = {
-                        if (tipo.isNotBlank() && categoria.isNotBlank() && monto.isNotBlank()) {
+                        if (idTipo != 0 && idCategoria != 0 && monto.isNotBlank()) {
                             //AQUI TIENEN QUE PASAR SOLO LAS PARAMETROS QUE SE TE PIDAN
-                            //transaccionesViewModel.createTransaction()
+                            //transaccionesViewModel.createTransaction(idTipo, idCategoria, monto.toDouble(), descripcion, fechaRegistro, finanzaId )
                             navController.popBackStack()
                         }
                     },

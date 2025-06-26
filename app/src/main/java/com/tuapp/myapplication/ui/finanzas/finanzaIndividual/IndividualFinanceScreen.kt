@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,7 +29,6 @@ import com.tuapp.myapplication.ui.navigation.Routes
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.*
-import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.DatosAnalisisView
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -42,27 +42,35 @@ fun IndividualFinanceScreen(
     val verdeClaro = Color(0xFF66BB6A)
     val verdePastel = Color(0xFFE6F4EA)
 
-    val currentDate = remember { LocalDate.now() }
-    val currentMonth = remember {
+    val currentDate = rememberSaveable { LocalDate.now() }
+    val currentMonth = rememberSaveable {
         currentDate.month.getDisplayName(TextStyle.FULL, Locale("es")).replaceFirstChar { it.uppercase() }
     }
-    val currentYear = remember { currentDate.year }
+    val currentYear = rememberSaveable { currentDate.year }
 
-    var selectedMonth by remember { mutableStateOf(currentMonth) }
-    var selectedYear by remember { mutableStateOf(currentYear) }
-    var showMonthMenu by remember { mutableStateOf(false) }
-    var selectedTab by remember { mutableStateOf("Analisis") }
-    var selectedView by remember { mutableStateOf("Resumen") }
+    var selectedMonth by rememberSaveable { mutableStateOf(currentMonth) }
+    var selectedYear by rememberSaveable { mutableIntStateOf(currentYear) }
+    var showMonthMenu by rememberSaveable { mutableStateOf(false) }
+    var selectedTab by rememberSaveable { mutableStateOf("Analisis") }
+    var selectedView by rememberSaveable { mutableStateOf("Resumen") }
 
     val months = listOf("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
 
     val resumenFinanciero by finanzaViewModel.resumenFinanciero.collectAsStateWithLifecycle()
     val resumenEgresos by finanzaViewModel.resumenEgresos.collectAsStateWithLifecycle()
     val resumenAhorros by finanzaViewModel.resumenAhorros.collectAsStateWithLifecycle()
+    val loadingResumen by finanzaViewModel.loadingResumen.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        val mes = months.indexOf(currentMonth) + 1
-        finanzaViewModel.financeSummary(mes, currentYear, finanzaId)
+    val datosFinanza by finanzaViewModel.listaDatosAnalisis.collectAsStateWithLifecycle()
+    val loadingDatos by finanzaViewModel.loadingDatos.collectAsStateWithLifecycle()
+
+
+
+    LaunchedEffect(selectedMonth) {
+        val mes = months.indexOf(selectedMonth) + 1
+
+        finanzaViewModel.financeSummary(mes, selectedYear, finanzaId)
+        finanzaViewModel.financeData(mes, selectedYear, finanzaId)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -171,20 +179,30 @@ fun IndividualFinanceScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             if (selectedView == "Resumen") {
+                if(loadingResumen){
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        CircularProgressIndicator()
+                    }
+                }
                 ResumenAnalisisView(
                     resumenFinanciero,
                     resumenEgresos,
                     resumenAhorros
                 )
             }  else {
-                DatosAnalisisView(finanzaViewModel, finanzaId)
+                if(loadingDatos){
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        CircularProgressIndicator()
+                    }
+                }
+                DatosAnalisisView(datosFinanza, finanzaId)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
         }
 
         Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-            BottomNavBar(navController = navController, currentRoute = Routes.INDIVIDUAL)
+            BottomNavBar(navController = navController, currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL)
         }
     }
 }

@@ -122,7 +122,9 @@ fun SubcategoriasScreen(
 
                 // Mostrar lista o mensaje de carga
                 if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        CircularProgressIndicator()
+                    }
                 } else {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(subCategoriasList.filter {
