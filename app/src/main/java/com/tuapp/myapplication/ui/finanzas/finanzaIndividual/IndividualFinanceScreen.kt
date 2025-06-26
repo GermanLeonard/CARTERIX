@@ -35,7 +35,8 @@ import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.DatosAnalisisView
 @Composable
 fun IndividualFinanceScreen(
     navController: NavController,
-    finanzaViewModel: FinanzasViewModel = viewModel(factory = FinanzasViewModel.Factory)
+    finanzaViewModel: FinanzasViewModel = viewModel(factory = FinanzasViewModel.Factory),
+    finanzaId: Int? = null,
 ) {
     val verde = Color(0xFF2E7D32)
     val verdeClaro = Color(0xFF66BB6A)
@@ -61,7 +62,7 @@ fun IndividualFinanceScreen(
 
     LaunchedEffect(Unit) {
         val mes = months.indexOf(currentMonth) + 1
-        finanzaViewModel.financeSummary(mes, currentYear)
+        finanzaViewModel.financeSummary(mes, currentYear, finanzaId)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -96,7 +97,8 @@ fun IndividualFinanceScreen(
             TabSelector(
                 selectedTab = selectedTab,
                 onTabSelected = { selectedTab = it },
-                navController = navController
+                navController = navController,
+                finanzaId = finanzaId ?: 0,
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -175,7 +177,7 @@ fun IndividualFinanceScreen(
                     resumenAhorros
                 )
             }  else {
-                DatosAnalisisView(finanzaViewModel)
+                DatosAnalisisView(finanzaViewModel, finanzaId)
             }
 
             Spacer(modifier = Modifier.height(24.dp))

@@ -27,13 +27,14 @@ import com.tuapp.myapplication.ui.navigation.*
 @Composable
 fun TransaccionesScreen(
     navController: NavController,
-    transaccionViewModel: TransaccionesViewModel = viewModel(factory = TransaccionesViewModel.Factory)
+    transaccionViewModel: TransaccionesViewModel = viewModel(factory = TransaccionesViewModel.Factory),
+    finanzaId: Int?
 ) {
     val transactions by transaccionViewModel.transactionsList.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         //CAMBIEN ESTO
-        transaccionViewModel.getTransactionsList(6, 2025)
+        transaccionViewModel.getTransactionsList(6, 2025, finanzaId)
     }
 
     val verde = Color(0xFF2E7D32)
@@ -67,7 +68,8 @@ fun TransaccionesScreen(
                 TabSelector(
                     selectedTab = selectedTab,
                     onTabSelected = { selectedTab = it },
-                    navController = navController
+                    navController = navController,
+                    finanzaId = finanzaId ?: 0
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

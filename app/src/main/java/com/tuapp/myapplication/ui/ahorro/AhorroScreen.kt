@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.tuapp.myapplication.data.models.savingsModels.request.CreateOrUpdateSavingDomain
 import com.tuapp.myapplication.ui.components.BottomNavBar
@@ -26,7 +27,8 @@ import java.util.*
 @Composable
 fun AhorroScreen(
     navController: NavHostController,
-    viewModel: SavingsViewModel
+    finanzaId: Int?,
+    viewModel: SavingsViewModel = viewModel(factory = SavingsViewModel.Factory)
 ) {
     val ahorroList by viewModel.savingsList.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -34,11 +36,9 @@ fun AhorroScreen(
     var showDialog by remember { mutableStateOf(false) }
 
     val calendar = Calendar.getInstance()
-    val mes = calendar.get(Calendar.MONTH) + 1
     val anio = calendar.get(Calendar.YEAR)
-    val finanzaId: Int? = null
 
-    LaunchedEffect(true) {
+    LaunchedEffect(Unit) {
         viewModel.getSavingsData(finanzaId, anio)
     }
 

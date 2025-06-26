@@ -24,6 +24,7 @@ fun TabSelector(
     selectedTab: String,
     onTabSelected: (String) -> Unit,
     navController: NavController,
+    finanzaId: Int,
     tabs: List<String> = listOf("Analisis", "Transacciones", "BD"),
     backgroundColor: Color = Color(0xFFE6F4EA),
     borderColor: Color = Color(0xFF2E7D32),
@@ -40,10 +41,10 @@ fun TabSelector(
         tabs.forEach { label ->
             val isSelected = label == selectedTab
 
-            val destination = when (label) {
-                "Analisis" -> FinanzaIndividualScreen
-                "Transacciones" -> TransaccionesScreen
-                "BD" -> BDHomeScreen
+            val destination: Any? = when (label) {
+                "Analisis" -> FinanzaIndividualScreen(finanzaId)
+                "Transacciones" -> TransaccionesScreen(finanzaId)
+                "BD" -> BDHomeScreen(finanzaId)
                 else -> null
             }
 

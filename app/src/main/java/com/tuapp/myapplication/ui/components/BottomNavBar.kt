@@ -35,7 +35,8 @@ fun BottomNavBar(navController: NavController, currentRoute: String) {
     ) {
         IconButton(onClick = {
             if (currentRoute != Routes.INDIVIDUAL) {
-                navController.navigate(FinanzaIndividualScreen)
+                //al ser individual no es necesario pasarle Id
+                navController.navigate(FinanzaIndividualScreen(0))
             }
         }) {
             Icon(

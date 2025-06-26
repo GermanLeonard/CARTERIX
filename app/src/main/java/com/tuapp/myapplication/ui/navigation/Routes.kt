@@ -9,7 +9,7 @@ object LoginScreen
 object RegisterScreen
 
 @Serializable
-object FinanzaIndividualScreen
+data class FinanzaIndividualScreen(val id: Int)
 
 @Serializable
 object FinanzaGrupalScreen
@@ -21,19 +21,19 @@ object PerfilScreen
 object EditProfile
 
 @Serializable
-object BDHomeScreen
+data class BDHomeScreen(val id: Int)
 
 @Serializable
-object CategoriaEgresoScreen
+data class CategoriaEgresoScreen(val id: Int)
 
 @Serializable
-object SubCategoriaScreen
+data class SubCategoriaScreen(val id: Int)
 
 @Serializable
-object RegistrarSubCategoriaScreen
+data class RegistrarSubCategoriaScreen(val id: Int)
 
 @Serializable
-object IngresosScreen
+data class IngresosScreen(val id: Int)
 
 @Serializable
 object RegistrarTransaccionScreen
@@ -42,10 +42,10 @@ object RegistrarTransaccionScreen
 data class DetalleTransaccionScreen(val id: Int)
 
 @Serializable
-object TransaccionesScreen
+data class TransaccionesScreen(val id: Int)
 
 @Serializable
-object AhorroScreen
+data class AhorroScreen(val id: Int)
 
 object Routes {
     const val LOGIN = "login"

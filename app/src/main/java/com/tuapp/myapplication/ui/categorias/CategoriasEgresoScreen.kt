@@ -23,6 +23,7 @@ import com.tuapp.myapplication.ui.navigation.Routes
 @Composable
 fun CategoriasEgresoScreen(
     navController: NavController,
+    finanzaId: Int?,
     categoryViewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory)
 ) {
     val currentRoute = Routes.INDIVIDUAL
@@ -33,9 +34,7 @@ fun CategoriasEgresoScreen(
     var nuevaCategoria by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        //AQUI TIENEN QUE HACER LA LLAMADA DEL VIEWMODEL PARA TENER LAS CATEGORIAS
-        //ESTO ES PARA PROBAR
-        categoryViewModel.getCategoriesList()
+        categoryViewModel.getCategoriesList(finanzaId)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

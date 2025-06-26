@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tuapp.myapplication.CarterixApplication
 import com.tuapp.myapplication.data.models.subCategoryModels.request.CreateOrUpdateSubCategoryDomain
 import com.tuapp.myapplication.data.models.subCategoryModels.response.ListaSubCategoriasDomain
+import com.tuapp.myapplication.data.models.subCategoryModels.response.OptionsDomain
 import com.tuapp.myapplication.data.repository.subCategories.SubCategoryRepository
 import com.tuapp.myapplication.helpers.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,9 @@ class SubCategoriesViewModel(
 
     private var _subCategoriesList = MutableStateFlow<List<ListaSubCategoriasDomain>>(emptyList())
     val subCategoriesList: StateFlow<List<ListaSubCategoriasDomain>> = _subCategoriesList
+
+    private var _categoriesExpenses = MutableStateFlow<List<OptionsDomain>>(emptyList())
+    val categoriesExpenses: StateFlow<List<OptionsDomain>> = _categoriesExpenses
 
     fun getSubCategoriesList(finanzaId: Int? = null){
         viewModelScope.launch {
@@ -95,7 +99,7 @@ class SubCategoriesViewModel(
                             _isLoading.value = false
                             _mensajeError.value = null
                             //OPCIONES DE LOS TIPOS DE GASTOS PARA LOS SELECT DE LOS FORMULARIOS
-                            resource.data
+                            _categoriesExpenses.value = resource.data
                         }
                         is Resource.Error -> {
                             //Manejen el "error"

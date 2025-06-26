@@ -22,6 +22,7 @@ import com.tuapp.myapplication.ui.navigation.Routes
 @Composable
 fun IngresosScreen(
     navController: NavController,
+    finanzaId: Int?,
     incomeViewModel: IngresosViewModel = viewModel(factory = IngresosViewModel.Factory)
 ) {
     val ingresos by incomeViewModel.incomeList.collectAsStateWithLifecycle()
@@ -35,7 +36,7 @@ fun IngresosScreen(
     val verde = Color(0xFF2E7D32)
 
     LaunchedEffect(Unit) {
-        incomeViewModel.getIncomesList()
+        incomeViewModel.getIncomesList(finanzaId)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

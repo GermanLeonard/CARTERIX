@@ -24,14 +24,12 @@ import com.tuapp.myapplication.ui.auth.UserViewModel
 import com.tuapp.myapplication.ui.finanzas.finanzaGrupal.GrupalFinanceScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.BDHomeScreen
 import com.tuapp.myapplication.ui.categorias.CategoriasEgresoScreen
-import com.tuapp.myapplication.ui.finanzas.FinanzasViewModel
 import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.IndividualFinanceScreen
 import com.tuapp.myapplication.ui.ingresos.IngresosScreen
 import com.tuapp.myapplication.ui.savings.AhorroScreen
-import com.tuapp.myapplication.ui.savings.SavingsViewModel
 import com.tuapp.myapplication.ui.subCategorias.RegistrarSubcategoriaScreen
 import com.tuapp.myapplication.ui.subCategorias.SubcategoriasScreen
-import com.tuapp.myapplication.ui.transacciones.DetalleTransaccionScreen
+import com.tuapp.myapplication.ui.transacciones.DetallesTransaccionScreen
 import com.tuapp.myapplication.ui.transacciones.RegistrarTransaccionScreen
 import com.tuapp.myapplication.ui.transacciones.TransaccionesScreen
 
@@ -41,8 +39,6 @@ fun AppNavigation(
     navController: NavHostController,
     userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
 ) {
-    val finanzasViewModel: FinanzasViewModel = viewModel(factory = FinanzasViewModel.Factory)
-
     val tokenState by userViewModel.token.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         userViewModel.checkUser()
@@ -63,7 +59,7 @@ fun AppNavigation(
 
             NavHost(
                 navController = navController,
-                startDestination = if(token != null) FinanzaIndividualScreen else LoginScreen
+                startDestination = if(token != null) FinanzaIndividualScreen(0) else LoginScreen
             ) {
 
                 composable <LoginScreen> {
@@ -74,12 +70,15 @@ fun AppNavigation(
                     RegisterScreen(navController)
                 }
 
-                composable<FinanzaIndividualScreen> {
-                    IndividualFinanceScreen(navController)
+                composable<FinanzaIndividualScreen> { backStackEntry ->
+                    val id = backStackEntry.arguments?.getInt("id") ?: return@composable
+                    val finanzaId: Int? = if(id == 0) null else id
+
+                    IndividualFinanceScreen(navController, finanzaId = finanzaId)
                 }
 
                 composable<FinanzaGrupalScreen> {
-                    GrupalFinanceScreen(navController = navController, viewModel = finanzasViewModel)
+                    GrupalFinanceScreen(navController = navController)
                 }
                 composable<PerfilScreen> {
                     ProfileScreen(navController)
@@ -89,8 +88,10 @@ fun AppNavigation(
                     EditProfileScreen(navController)
                 }
 
-                composable<TransaccionesScreen> {
-                    TransaccionesScreen(navController)
+                composable<TransaccionesScreen> { backStackEntry ->
+                    val id = backStackEntry.arguments?.getInt("id") ?: return@composable
+                    val finanzaId: Int? = if(id == 0) null else id
+                    TransaccionesScreen(navController, finanzaId = finanzaId)
                 }
 
                 composable<RegistrarTransaccionScreen> {
@@ -99,33 +100,41 @@ fun AppNavigation(
 
                 composable<DetalleTransaccionScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
-                    DetalleTransaccionScreen(id)
+                    DetallesTransaccionScreen(navController, id)
                 }
 
-                composable<BDHomeScreen> {
-                    BDHomeScreen(navController)
+                composable<BDHomeScreen> { backStackEntry ->
+                    val id = backStackEntry.arguments?.getInt("id") ?: return@composable
+                    BDHomeScreen(navController, finanzaId = id)
                 }
 
-                composable<CategoriaEgresoScreen> {
-                    CategoriasEgresoScreen(navController)
+                composable<CategoriaEgresoScreen> { backStackEntry ->
+                    val id = backStackEntry.arguments?.getInt("id") ?: return@composable
+                    val finanzaId = if(id == 0) null else id
+                    CategoriasEgresoScreen(navController, finanzaId)
                 }
-                composable<SubCategoriaScreen> {
-                    SubcategoriasScreen(navController)
-                }
-
-                composable<AhorroScreen> {
-                    AhorroScreen(
-                        navController = navController,
-                        viewModel = viewModel(factory = SavingsViewModel.Factory)
-                    )
+                composable<SubCategoriaScreen> { backStackEntry ->
+                    val id = backStackEntry.arguments?.getInt("id") ?: return@composable
+                    val finanzaId = if(id == 0) null else id
+                    SubcategoriasScreen(navController, finanzaId)
                 }
 
-                composable<RegistrarSubCategoriaScreen> {
-                    RegistrarSubcategoriaScreen(navController)
+                composable<AhorroScreen> { backStackEntry ->
+                    val id = backStackEntry.arguments?.getInt("id") ?: return@composable
+                    val finanzaId = if(id == 0) null else id
+                    AhorroScreen(navController, finanzaId)
                 }
 
-                composable<IngresosScreen> {
-                    IngresosScreen(navController)
+                composable<RegistrarSubCategoriaScreen> { backStackEntry ->
+                    val id = backStackEntry.arguments?.getInt("id") ?: return@composable
+                    val finanzaId = if(id == 0) null else id
+                    RegistrarSubcategoriaScreen(navController, finanzaId)
+                }
+
+                composable<IngresosScreen> { backStackEntry ->
+                    val id = backStackEntry.arguments?.getInt("id") ?: return@composable
+                    val finanzaId = if(id == 0) null else id
+                    IngresosScreen(navController, finanzaId)
                 }
             }
         }

@@ -1,0 +1,86 @@
+Index: app/src/main/java/com/tuapp/myapplication/data/remote/responses/subCategoriesResponse/ExpensesTypeResponse.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tuapp.myapplication.data.remote.responses.subCategoriesResponse\r\n\r\nimport com.google.gson.annotations.SerializedName\r\n\r\ndata class ExpensesTypeResponse (\r\n    @SerializedName(\"opciones\")\r\n    val opciones: List<Options>\r\n)\r\n\r\ndata class Options(\r\n    @SerializedName(\"tipo_id\")\r\n    val tipo_id: Int,\r\n    @SerializedName(\"tipo_nombre\")\r\n    val tipo_nombre: String\r\n)
+===================================================================
+diff --git a/app/src/main/java/com/tuapp/myapplication/data/remote/responses/subCategoriesResponse/ExpensesTypeResponse.kt b/app/src/main/java/com/tuapp/myapplication/data/remote/responses/subCategoriesResponse/ExpensesTypeResponse.kt
+--- a/app/src/main/java/com/tuapp/myapplication/data/remote/responses/subCategoriesResponse/ExpensesTypeResponse.kt	(revision 2909b82c2f246669575fd4699890e0008f2765f4)
++++ b/app/src/main/java/com/tuapp/myapplication/data/remote/responses/subCategoriesResponse/ExpensesTypeResponse.kt	(date 1750029840125)
+@@ -1,6 +1,8 @@
+ package com.tuapp.myapplication.data.remote.responses.subCategoriesResponse
+ 
+ import com.google.gson.annotations.SerializedName
++import com.tuapp.myapplication.data.database.entities.subCategory.ExpensesTypesEntity
++import com.tuapp.myapplication.data.models.subCategoryModels.response.OptionsDomain
+ 
+ data class ExpensesTypeResponse (
+     @SerializedName("opciones")
+@@ -12,4 +14,26 @@
+     val tipo_id: Int,
+     @SerializedName("tipo_nombre")
+     val tipo_nombre: String
+-)
+\ No newline at end of file
++)
++
++fun Options.toEntity(): ExpensesTypesEntity {
++    return ExpensesTypesEntity(
++        tipo_id,
++        tipo_nombre
++    )
++}
++
++fun ExpensesTypeResponse.toEntity(): List<ExpensesTypesEntity> {
++    return opciones.map { it.toEntity() }
++}
++
++fun Options.toDomain(): OptionsDomain {
++    return OptionsDomain(
++        tipo_id,
++        tipo_nombre
++    )
++}
++
++fun ExpensesTypeResponse.toDomain(): List<OptionsDomain> {
++    return opciones.map { it.toDomain() }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/tuapp/myapplication/data/repository/subCategories/SubCategoryRepositoryImpl.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tuapp.myapplication.data.repository.subCategories\r\n\r\nimport android.util.Log\r\nimport com.google.gson.Gson\r\nimport com.tuapp.myapplication.data.database.dao.subCategory.ExpensesTypeDao\r\nimport com.tuapp.myapplication.data.database.dao.subCategory.SubCategoryDao\r\nimport com.tuapp.myapplication.data.database.dao.user.UserDao\r\nimport com.tuapp.myapplication.data.database.entities.subCategory.toDomain\r\nimport com.tuapp.myapplication.data.models.CommonResponseDomain\r\nimport com.tuapp.myapplication.data.models.subCategoryModels.response.ListaSubCategoriasDomain\r\nimport com.tuapp.myapplication.data.models.subCategoryModels.response.OptionsDomain\r\nimport com.tuapp.myapplication.data.models.subCategoryModels.response.SubCategoriaDomain\r\nimport com.tuapp.myapplication.data.remote.responses.CommonResponse\r\nimport com.tuapp.myapplication.data.remote.responses.subCategoriesResponse.toDomain\r\nimport com.tuapp.myapplication.data.remote.responses.subCategoriesResponse.toEntity\r\nimport com.tuapp.myapplication.data.remote.subCategories.SubCategoriesService\r\nimport com.tuapp.myapplication.helpers.Resource\r\nimport com.tuapp.myapplication.helpers.getFinanceId\r\nimport kotlinx.coroutines.Dispatchers\r\nimport kotlinx.coroutines.flow.Flow\r\nimport kotlinx.coroutines.flow.distinctUntilChanged\r\nimport kotlinx.coroutines.flow.emitAll\r\nimport kotlinx.coroutines.flow.flow\r\nimport kotlinx.coroutines.flow.flowOn\r\nimport kotlinx.coroutines.flow.map\r\nimport retrofit2.HttpException\r\n\r\nclass SubCategoryRepositoryImpl(\r\n    private val subCategoryService: SubCategoriesService,\r\n    private val subCategoryDao: SubCategoryDao,\r\n    private val expensesTypesDao: ExpensesTypeDao,\r\n    private val userDao: UserDao,\r\n): SubCategoryRepository{\r\n\r\n    override suspend fun getSubCategoriesList(finanzaId: Int?): Flow<Resource<List<ListaSubCategoriasDomain>>> = flow {\r\n        emit(Resource.Loading)\r\n        try {\r\n            val subCategoriesListResponse = subCategoryService.getSubCategoriesList(finanzaId)\r\n\r\n            if(subCategoriesListResponse.lista_sub_categorias.isNotEmpty()){\r\n                subCategoryDao.clearSubCategories(\r\n                    finanzaId ?: getFinanceId(userDao)\r\n                )\r\n                subCategoryDao.insertSubCategories(subCategoriesListResponse.toEntity())\r\n            } else {\r\n                emit(Resource.Success(emptyList<ListaSubCategoriasDomain>()))\r\n            }\r\n        } catch (e: HttpException) {\r\n            val errorBody = e.response()?.errorBody()?.string()\r\n            val gson = Gson()\r\n\r\n            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)\r\n            val msg = errorResponse.message\r\n\r\n            emit(Resource.Error(message = msg))\r\n            return@flow\r\n        } catch(e: Exception) {\r\n            Log.d(\"SubCategoryRepository\", \"Error al hacer la petición: ${e.message}\")\r\n            emit(Resource.Error(message = \"Error inesperado: ${e.localizedMessage ?: \"Desconocido\"}\"))\r\n            return@flow\r\n        }\r\n\r\n        val subCategoriesList = subCategoryDao.getSubCategories(\r\n            finanzaId ?: getFinanceId(userDao)\r\n        ).map { entities ->\r\n            val subCategories = entities.map { it.toDomain() }\r\n\r\n            Resource.Success(subCategories)\r\n        }.distinctUntilChanged()\r\n\r\n        emitAll(subCategoriesList)\r\n    }.flowOn(Dispatchers.IO)\r\n\r\n    override suspend fun getSubCategoryDetails(subCategoryId: Int): Flow<Resource<SubCategoriaDomain>> = flow {\r\n        emit(Resource.Loading)\r\n        try {\r\n            val subCategoryDetails = subCategoryService.getSubCategoryDetails(subCategoryId)\r\n\r\n            emit(Resource.Success(subCategoryDetails.toDomain()))\r\n        } catch (e: HttpException) {\r\n            //OJO\r\n            //EN EL FRONT\r\n            //MANEJEN LOS ERRORES,404: NOT FOUND, 500: SERVER ERROR\r\n            val errorBody = e.response()?.errorBody()?.string()\r\n            val gson = Gson()\r\n\r\n            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)\r\n            val msg = errorResponse.message\r\n            emit(Resource.Error(httpCode = e.code(), message = msg))\r\n        } catch(e: Exception) {\r\n            Log.d(\"SubCategoryRepository\", \"Error al hacer la petición: ${e.message}\")\r\n            emit(Resource.Error(message = \"Error inesperado: ${e.localizedMessage ?: \"Desconocido\"}\"))\r\n        }\r\n    }.flowOn(Dispatchers.IO)\r\n\r\n    override suspend fun getExpensesOptions(): Flow<Resource<List<OptionsDomain>>> = flow {\r\n        emit(Resource.Loading)\r\n        try {\r\n            val expensesTypes = expensesTypesDao.getExpensesTypes().map { entities ->\r\n                val types = entities.map { it.toDomain() }\r\n\r\n                types\r\n            }\r\n        } catch (e: HttpException) {\r\n            val errorBody = e.response()?.errorBody()?.string()\r\n            val gson = Gson()\r\n\r\n            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)\r\n            val msg = errorResponse.message\r\n\r\n            emit(Resource.Error(message = msg))\r\n        } catch(e: Exception) {\r\n            Log.d(\"SubCategoryRepository\", \"Error al hacer la petición: ${e.message}\")\r\n            emit(Resource.Error(message = \"Error inesperado: ${e.localizedMessage ?: \"Desconocido\"}\"))\r\n        }\r\n    }.flowOn(Dispatchers.IO)\r\n\r\n    override suspend fun createSubCategory(finanzaId: Int?): Flow<Resource<CommonResponseDomain>> = flow {\r\n        emit(Resource.Loading)\r\n        try {\r\n\r\n        } catch (e: HttpException) {\r\n            //ERRORES\r\n            //400: BAD REQUEST, 500: ERROR DEL SERVER\r\n            val errorBody = e.response()?.errorBody()?.string()\r\n            val gson = Gson()\r\n\r\n            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)\r\n            val msg = errorResponse.message\r\n\r\n            emit(Resource.Error(httpCode = e.code(), message = msg))\r\n        } catch(e: Exception) {\r\n            Log.d(\"SubCategoryRepository\", \"Error al hacer la petición: ${e.message}\")\r\n            emit(Resource.Error(message = \"Error inesperado: ${e.localizedMessage ?: \"Desconocido\"}\"))\r\n        }\r\n    }.flowOn(Dispatchers.IO)\r\n\r\n    override suspend fun updateSubCategory(subCategoryId: Int): Flow<Resource<CommonResponseDomain>> = flow {\r\n        emit(Resource.Loading)\r\n        try {\r\n\r\n        } catch (e: HttpException) {\r\n            //ERRORES\r\n            //400: BAD REQUEST, 404: NOT FOUND, 500: ERROR DEL SERVER\r\n            val errorBody = e.response()?.errorBody()?.string()\r\n            val gson = Gson()\r\n\r\n            val errorResponse = gson.fromJson(errorBody, CommonResponse::class.java)\r\n            val msg = errorResponse.message\r\n\r\n            emit(Resource.Error(httpCode = e.code(), message = msg))\r\n        } catch(e: Exception) {\r\n            Log.d(\"SubCategoryRepository\", \"Error al hacer la petición: ${e.message}\")\r\n            emit(Resource.Error(message = \"Error inesperado: ${e.localizedMessage ?: \"Desconocido\"}\"))\r\n        }\r\n    }.flowOn(Dispatchers.IO)\r\n}
+===================================================================
+diff --git a/app/src/main/java/com/tuapp/myapplication/data/repository/subCategories/SubCategoryRepositoryImpl.kt b/app/src/main/java/com/tuapp/myapplication/data/repository/subCategories/SubCategoryRepositoryImpl.kt
+--- a/app/src/main/java/com/tuapp/myapplication/data/repository/subCategories/SubCategoryRepositoryImpl.kt	(revision 2909b82c2f246669575fd4699890e0008f2765f4)
++++ b/app/src/main/java/com/tuapp/myapplication/data/repository/subCategories/SubCategoryRepositoryImpl.kt	(date 1750029775846)
+@@ -43,7 +43,7 @@
+                 )
+                 subCategoryDao.insertSubCategories(subCategoriesListResponse.toEntity())
+             } else {
+-                emit(Resource.Success(emptyList<ListaSubCategoriasDomain>()))
++                emit(Resource.Success(emptyList()))
+             }
+         } catch (e: HttpException) {
+             val errorBody = e.response()?.errorBody()?.string()
+@@ -97,10 +97,18 @@
+         emit(Resource.Loading)
+         try {
+             val expensesTypes = expensesTypesDao.getExpensesTypes().map { entities ->
+-                val types = entities.map { it.toDomain() }
++                var types = entities.map { it.toDomain() }
++                if(types.isEmpty()){
++                    val expensesResponse = subCategoryService.getExpensesOptions()
++                    types = expensesResponse.toDomain()
+ 
+-                types
+-            }
++                    expensesTypesDao.insertTypes(expensesResponse.toEntity())
++                }
++
++                Resource.Success(types)
++            }.distinctUntilChanged()
++
++            emitAll(expensesTypes)
+         } catch (e: HttpException) {
+             val errorBody = e.response()?.errorBody()?.string()
+             val gson = Gson()

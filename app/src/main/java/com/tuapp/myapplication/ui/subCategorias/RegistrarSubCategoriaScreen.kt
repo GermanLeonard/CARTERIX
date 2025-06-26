@@ -24,15 +24,24 @@ import com.tuapp.myapplication.ui.navigation.Routes
 @Composable
 fun RegistrarSubcategoriaScreen(
     navController: NavController,
-    categoriasViewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory)
+    finanzaId: Int?,
+    categoriasViewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory),
+    subCategoriaViewModel: SubCategoriesViewModel = viewModel(factory = SubCategoriesViewModel.Factory),
 ) {
 
     val categoriesOptions by categoriasViewModel.categoriesOptions.collectAsStateWithLifecycle()
-    val tiposGasto = listOf("Gasto Fijo", "Gasto Variable")
+    val gastoOpciones by subCategoriaViewModel.categoriesExpenses.collectAsStateWithLifecycle()
 
     var categoriaPadre by remember { mutableStateOf("") }
+    //id de la categoria que se usara para la peticion
+    var categoriaId by remember { mutableIntStateOf(0) }
+
     var nombre by remember { mutableStateOf("") }
+
     var tipoGasto by remember { mutableStateOf("") }
+    //id del tipo de gasto que se usara para la peticion
+    var gastoId by remember { mutableIntStateOf(0) }
+
     var presupuesto by remember { mutableStateOf("") }
 
     var showCategoriaMenu by remember { mutableStateOf(false) }
@@ -42,7 +51,8 @@ fun RegistrarSubcategoriaScreen(
     val currentRoute = Routes.BD_HOME
 
     LaunchedEffect(Unit) {
-        categoriasViewModel.getCategoriesOptions()
+        categoriasViewModel.getCategoriesOptions(finanzaId)
+        subCategoriaViewModel.getExpensesOptions()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -81,7 +91,7 @@ fun RegistrarSubcategoriaScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = if (categoriaPadre.isNotEmpty()) categoriaPadre else "Selecciona la categoria Padre")
+                        Text(text = categoriaPadre.ifEmpty { "Selecciona la categoria Padre" })
                         Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                     }
                 }
@@ -100,6 +110,7 @@ fun RegistrarSubcategoriaScreen(
                                     .fillMaxWidth()
                                     .clickable {
                                         categoriaPadre = it.categoria_nombre
+                                        categoriaId = it.categoria_id
                                         showCategoriaMenu = false
                                     }
                                     .padding(12.dp)
@@ -130,7 +141,7 @@ fun RegistrarSubcategoriaScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = if (tipoGasto.isNotEmpty()) tipoGasto else "Selecciona el tipo de gasto")
+                        Text(text = tipoGasto.ifEmpty { "Selecciona el tipo de gasto" })
                         Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                     }
                 }
@@ -142,13 +153,14 @@ fun RegistrarSubcategoriaScreen(
                             .background(Color.White)
                             .padding(4.dp)
                     ) {
-                        tiposGasto.forEach {
+                        gastoOpciones.forEach {
                             Text(
-                                text = it,
+                                text = it.tipo_nombre,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        tipoGasto = it
+                                        tipoGasto = it.tipo_nombre
+                                        gastoId = it.tipo_id
                                         showTipoMenu = false
                                     }
                                     .padding(12.dp)
@@ -172,14 +184,13 @@ fun RegistrarSubcategoriaScreen(
                 Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
                     Button(
                         onClick = {
-                            //subcategoriaViewModel.agregar(
-                            //Subcategoria(
-                            //       categoriaPadre = categoriaPadre,
-                            //        nombre = nombre,
-                            //        tipo = tipoGasto,
-                            //        presupuesto = presupuesto.toDoubleOrNull() ?: 0.0
-                            //    )
-                            //)
+                            subCategoriaViewModel.createSubCategory(
+                                idCategoria = categoriaId,
+                                nombreSubCategoria = nombre,
+                                presupuestoMensual = presupuesto.toDouble(),
+                                tipoGastoId = gastoId,
+                                finanzaId = finanzaId
+                            )
                             navController.popBackStack()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = verde)

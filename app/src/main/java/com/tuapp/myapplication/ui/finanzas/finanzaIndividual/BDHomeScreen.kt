@@ -23,7 +23,10 @@ import com.tuapp.myapplication.ui.navigation.AhorroScreen
 
 
 @Composable
-fun BDHomeScreen(navController: NavController) {
+fun BDHomeScreen(
+    navController: NavController,
+    finanzaId: Int
+) {
     val verde = Color(0xFF2E7D32)
     val verdePastel = Color(0xFFE6F4EA)
     val currentRoute = Routes.BD_HOME
@@ -62,7 +65,8 @@ fun BDHomeScreen(navController: NavController) {
             TabSelector(
                 selectedTab = selectedTab,
                 onTabSelected = { selectedTab = it },
-                navController = navController
+                navController = navController,
+                finanzaId = finanzaId ?: 0
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -75,16 +79,16 @@ fun BDHomeScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    BDCard("Categorias Egreso") { navController.navigate(CategoriaEgresoScreen) }
-                    BDCard("SubCategorias") { navController.navigate(SubCategoriaScreen) }
+                    BDCard("Categorias Egreso") { navController.navigate(CategoriaEgresoScreen(finanzaId)) }
+                    BDCard("SubCategorias") { navController.navigate(SubCategoriaScreen(finanzaId)) }
                 }
 
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    BDCard("Ingresos") { navController.navigate(IngresosScreen) }
-                    BDCard("Ahorro") { navController.navigate(AhorroScreen) }
+                    BDCard("Ingresos") { navController.navigate(IngresosScreen(finanzaId)) }
+                    BDCard("Ahorro") { navController.navigate(AhorroScreen(finanzaId)) }
                 }
             }
         }

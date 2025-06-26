@@ -28,6 +28,7 @@ import com.tuapp.myapplication.ui.navigation.Routes
 @Composable
 fun SubcategoriasScreen(
     navController: NavController,
+    finanzaId: Int?,
     categoriasViewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory),
     subCategoryViewModel: SubCategoriesViewModel = viewModel(factory = SubCategoriesViewModel.Factory)
 ) {
@@ -38,9 +39,8 @@ fun SubcategoriasScreen(
     val mensajeError by subCategoryViewModel.mensajeError.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        //ESTO ES DE PRUEBA
-        categoriasViewModel.getCategoriesOptions()
-        subCategoryViewModel.getSubCategoriesList()
+        categoriasViewModel.getCategoriesOptions(finanzaId)
+        subCategoryViewModel.getSubCategoriesList(finanzaId)
     }
 
     var selectedCategoria by remember { mutableStateOf("") }
@@ -147,7 +147,7 @@ fun SubcategoriasScreen(
         }
 
         FloatingActionButton(
-            onClick = { navController.navigate(RegistrarSubCategoriaScreen) },
+            onClick = { navController.navigate(RegistrarSubCategoriaScreen(finanzaId ?: 0)) },
             containerColor = verde,
             modifier = Modifier
                 .align(Alignment.BottomEnd)

@@ -18,7 +18,7 @@ import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
-fun DetalleTransaccionScreen(
+fun DetallesTransaccionScreen(
     navController: NavController,
     transaccionId: Int,
     transaccionesViewModel: TransaccionesViewModel = viewModel(factory = TransaccionesViewModel.Factory)

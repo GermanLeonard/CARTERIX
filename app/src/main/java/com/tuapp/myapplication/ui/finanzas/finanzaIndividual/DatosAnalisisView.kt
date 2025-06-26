@@ -25,11 +25,14 @@ import com.tuapp.myapplication.ui.finanzas.FinanzasViewModel
 import kotlin.math.max
 
 @Composable
-fun DatosAnalisisView(finanzasViewModel: FinanzasViewModel) {
+fun DatosAnalisisView(
+    finanzasViewModel: FinanzasViewModel,
+    finanzaId: Int?
+) {
     // Llamada para cargar los datos
     LaunchedEffect(Unit) {
         // Ajusta mes, año y finanza_id según tu lógica
-        finanzasViewModel.financeData(mes = 6, anio = 2025, finanza_id = null)
+        finanzasViewModel.financeData(mes = 6, anio = 2025, finanzaId)
     }
 
     val datos by finanzasViewModel.listaDatosAnalisis.collectAsStateWithLifecycle()
