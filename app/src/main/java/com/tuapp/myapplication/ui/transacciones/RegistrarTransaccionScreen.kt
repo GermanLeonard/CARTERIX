@@ -1,5 +1,7 @@
 package com.tuapp.myapplication.ui.transacciones
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -22,7 +25,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.ui.navigation.Routes
+import java.time.Instant
+import java.time.format.DateTimeFormatter
+import java.util.Date
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrarTransaccionesScreen(
     navController: NavController,
@@ -35,20 +43,24 @@ fun RegistrarTransaccionesScreen(
 
     //id tipo para guardar en la API
     var idTipo by rememberSaveable {mutableIntStateOf(0)}
-    var tipo by remember { mutableStateOf("") }
+    var tipo by rememberSaveable { mutableStateOf("") }
 
     //id categoria para guardar en API
     var idCategoria by rememberSaveable { mutableIntStateOf(0) }
-    var categoria by remember { mutableStateOf("") }
+    var categoria by rememberSaveable { mutableStateOf("") }
 
-    var monto by remember { mutableStateOf("") }
+    var openDateDialog by rememberSaveable { mutableStateOf(false) }
 
-    var presupuesto by remember { mutableDoubleStateOf(0.0) }
+    var monto by rememberSaveable { mutableStateOf("") }
 
-    var descripcion by remember { mutableStateOf("") }
+    var presupuesto by rememberSaveable { mutableDoubleStateOf(0.0) }
 
-    var showTipoMenu by remember { mutableStateOf(false) }
-    var showCategoriaMenu by remember { mutableStateOf(false) }
+    var descripcion by rememberSaveable { mutableStateOf("") }
+
+    var showTipoMenu by rememberSaveable { mutableStateOf(false) }
+    var showCategoriaMenu by rememberSaveable { mutableStateOf(false) }
+
+    var fechaTransaccion by rememberSaveable { mutableStateOf("") }
 
     //AGREGUEN UN CAMPO QUE EL USUARIO PUEDA ELEGIR DE FECHA PARA EL REGISTRO,
     // PUES SE TIENE QUE REGISTRAR LA FECHA DE LA TRANSACCION
@@ -163,11 +175,55 @@ fun RegistrarTransaccionesScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                OutlinedTextField(
+                    value = fechaTransaccion,
+                    onValueChange = {},
+                    enabled = false,
+                    label = { Text("Fecha Transaccion") },
+                    modifier = Modifier.fillMaxWidth().clickable{
+                        openDateDialog = true
+                    },
+                    readOnly = true,
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Seleccionar fecha"
+                        )
+                    },
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                if(openDateDialog){
+                    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = Date().time)
+
+                    DatePickerDialog(
+                        onDismissRequest = {
+                            openDateDialog = false
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    openDateDialog = false
+                                    fechaTransaccion = datePickerState.selectedDateMillis?.let { millis ->
+                                        val instant = Instant.ofEpochMilli(millis)
+                                        val formatter = DateTimeFormatter.ISO_INSTANT
+                                        formatter.format(instant)
+                                    } ?: ""
+                                }
+                            ) {
+                                Text("Confirmar fecha")
+                            }
+                        },
+                    ) {
+                        DatePicker(datePickerState)
+                    }
+                }
+
                 Button(
                     onClick = {
                         if (idTipo != 0 && idCategoria != 0 && monto.isNotBlank()) {
-                            //AQUI TIENEN QUE PASAR SOLO LAS PARAMETROS QUE SE TE PIDAN
-                            //transaccionesViewModel.createTransaction(idTipo, idCategoria, monto.toDouble(), descripcion, fechaRegistro, finanzaId )
+                            transaccionesViewModel.createTransaction(idTipo, idCategoria, monto.toDouble(), descripcion, fechaTransaccion, finanzaId )
                             navController.popBackStack()
                         }
                     },

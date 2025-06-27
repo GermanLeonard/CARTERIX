@@ -23,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.components.MonthSelector
 import com.tuapp.myapplication.ui.components.TabSelector
 import com.tuapp.myapplication.ui.finanzas.FinanzasViewModel
 import com.tuapp.myapplication.ui.navigation.Routes
@@ -43,18 +44,19 @@ fun IndividualFinanceScreen(
     val verdePastel = Color(0xFFE6F4EA)
 
     val currentDate = rememberSaveable { LocalDate.now() }
+
     val currentMonth = rememberSaveable {
         currentDate.month.getDisplayName(TextStyle.FULL, Locale("es")).replaceFirstChar { it.uppercase() }
     }
-    val currentYear = rememberSaveable { currentDate.year }
 
     var selectedMonth by rememberSaveable { mutableStateOf(currentMonth) }
-    var selectedYear by rememberSaveable { mutableIntStateOf(currentYear) }
-    var showMonthMenu by rememberSaveable { mutableStateOf(false) }
+    var selectedYear by rememberSaveable { mutableIntStateOf(currentDate.year) }
+
     var selectedTab by rememberSaveable { mutableStateOf("Analisis") }
     var selectedView by rememberSaveable { mutableStateOf("Resumen") }
 
     val months = listOf("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+    val mes = months.indexOf(selectedMonth) + 1
 
     val resumenFinanciero by finanzaViewModel.resumenFinanciero.collectAsStateWithLifecycle()
     val resumenEgresos by finanzaViewModel.resumenEgresos.collectAsStateWithLifecycle()
@@ -65,10 +67,7 @@ fun IndividualFinanceScreen(
     val loadingDatos by finanzaViewModel.loadingDatos.collectAsStateWithLifecycle()
 
 
-
     LaunchedEffect(selectedMonth) {
-        val mes = months.indexOf(selectedMonth) + 1
-
         finanzaViewModel.financeSummary(mes, selectedYear, finanzaId)
         finanzaViewModel.financeData(mes, selectedYear, finanzaId)
     }
@@ -111,41 +110,14 @@ fun IndividualFinanceScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "$selectedMonth $selectedYear", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Box {
-                    IconButton(onClick = { showMonthMenu = true }) {
-                        Icon(
-                            imageVector = Icons.Default.CalendarToday,
-                            contentDescription = "Seleccionar mes",
-                            tint = Color.Black
-                        )
-                    }
-
-                    DropdownMenu(
-                        expanded = showMonthMenu,
-                        onDismissRequest = { showMonthMenu = false }
-                    ) {
-                        months.forEachIndexed { index, month ->
-                            DropdownMenuItem(
-                                text = { Text(month) },
-                                onClick = {
-                                    selectedMonth = month
-                                    val mes = index + 1
-                                    selectedYear = LocalDate.now().year
-                                    finanzaViewModel.financeSummary(mes, selectedYear)
-                                    showMonthMenu = false
-                                }
-                            )
-                        }
-                    }
+            MonthSelector(
+                selectedMonth = selectedMonth,
+                selectedYear = selectedYear,
+                onMonthSelected = { mesSeleccionado, anioSeleccionado ->
+                    selectedMonth = months[mesSeleccionado - 1]
+                    selectedYear = anioSeleccionado
                 }
-            }
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -176,27 +148,23 @@ fun IndividualFinanceScreen(
                 }
             }
 
+            if(loadingResumen || loadingDatos){
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                    CircularProgressIndicator()
+                }
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
-            if (selectedView == "Resumen") {
-                if(loadingResumen){
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                        CircularProgressIndicator()
-                    }
+                if (selectedView == "Resumen") {
+                        ResumenAnalisisView(
+                            resumenFinanciero,
+                            resumenEgresos,
+                            resumenAhorros
+                        )
+                }  else {
+                    DatosAnalisisView(datosFinanza)
                 }
-                ResumenAnalisisView(
-                    resumenFinanciero,
-                    resumenEgresos,
-                    resumenAhorros
-                )
-            }  else {
-                if(loadingDatos){
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                        CircularProgressIndicator()
-                    }
-                }
-                DatosAnalisisView(datosFinanza, finanzaId)
-            }
 
             Spacer(modifier = Modifier.height(24.dp))
         }

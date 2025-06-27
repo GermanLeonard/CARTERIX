@@ -3,6 +3,7 @@ package com.tuapp.myapplication.ui.finanzas.finanzaIndividual
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,8 +30,7 @@ fun BDHomeScreen(
     finanzaId: Int
 ) {
     val verde = Color(0xFF2E7D32)
-    val verdePastel = Color(0xFFE6F4EA)
-    val currentRoute = Routes.BD_HOME
+    val currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL
     var selectedTab by rememberSaveable { mutableStateOf("BD") }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -73,8 +73,9 @@ fun BDHomeScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,

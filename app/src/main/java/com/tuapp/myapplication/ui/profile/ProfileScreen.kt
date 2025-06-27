@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,9 +33,7 @@ fun ProfileScreen(
     userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
 ) {
     val verde = Color(0xFF2E7D32)
-    var showLogoutDialog by remember { mutableStateOf(false) }
-
-    // Reemplazar esta línea en backend
+    var showLogoutDialog by rememberSaveable { mutableStateOf(false) }
 
     val datosUsuario = userViewModel.userCredential.collectAsStateWithLifecycle()
 

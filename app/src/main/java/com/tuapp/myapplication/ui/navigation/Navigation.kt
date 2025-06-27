@@ -104,7 +104,8 @@ fun AppNavigation(
 
                 composable<DetalleTransaccionScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
-                    DetallesTransaccionScreen(navController, id)
+                    val finanzaId = backStackEntry.arguments?.getInt("finanzaId") ?: return@composable
+                    DetallesTransaccionScreen(navController, id, if(finanzaId == 0) null else finanzaId )
                 }
 
                 composable<BDHomeScreen> { backStackEntry ->

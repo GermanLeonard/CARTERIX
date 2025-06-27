@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tuapp.myapplication.CarterixApplication
+import com.tuapp.myapplication.data.models.Ingreso
 import com.tuapp.myapplication.data.models.incomesModels.request.CreateOrUpdateIncomeRequestDomain
+import com.tuapp.myapplication.data.models.incomesModels.response.IngresoDetailsResponseDomain
 import com.tuapp.myapplication.data.models.incomesModels.response.IngresoResponseDomain
 import com.tuapp.myapplication.data.repository.incomes.IncomesRepository
 import com.tuapp.myapplication.helpers.Resource
@@ -54,6 +56,9 @@ class IngresosViewModel(
         }
     }
 
+    private var _ingresoDetails = MutableStateFlow(IngresoDetailsResponseDomain("", 0, 0.0, ""))
+    val ingresoDetails: StateFlow<IngresoDetailsResponseDomain> = _ingresoDetails
+
     fun getIncomeDetails(incomeId: Int){
         viewModelScope.launch {
             incomesRepository.getIncomeDetails(incomeId)
@@ -61,19 +66,16 @@ class IngresosViewModel(
                     when(resource){
                         is Resource.Loading -> {
                             //Manejen el "cargando"
-                            _isLoading.value = true
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
                             _mensajeError.value = null
                             //DETALLES INGRESO
-                            resource.data
-                            _isLoading.value = false
+                            _ingresoDetails.value = resource.data
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
                             _mensajeError.value = resource.message ?: "Error al obtener detalles del ingreso"
-                            _isLoading.value = false
                         }
                     }
                 }

@@ -21,6 +21,9 @@ class TransaccionesViewModel(
     private val transaccionRepository: TransactionsRepository
 ): ViewModel() {
 
+    private var _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+
     private var _loadingTransactions = MutableStateFlow(false)
     val loadingTransactions: StateFlow<Boolean> = _loadingTransactions
 
@@ -35,20 +38,26 @@ class TransaccionesViewModel(
     private var _loadingDetailsTransaction = MutableStateFlow(false)
     val loadingDetailsTransaction: StateFlow<Boolean> = _loadingDetailsTransaction
 
-    fun getTransactionsList(mes: Int, anio: Int, finanzaId: Int? = null){
+    fun getTransactionsList(mes: Int, anio: Int, finanzaId: Int? = null, isRefreshing: Boolean = false){
         viewModelScope.launch {
             transaccionRepository.getTransactionsList(mes, anio, finanzaId)
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            _loadingTransactions.value = true
+                            if(isRefreshing){
+                               _isRefreshing.value = true
+                            }else {
+                                _loadingTransactions.value = true
+                            }
                         }
                         is Resource.Success -> {
                             _transactionsList.value = resource.data
                             _loadingTransactions.value = false
+                            _isRefreshing.value = false
                         }
                         is Resource.Error -> {
                             _loadingTransactions.value = false
+                            _isRefreshing.value = false
                         }
                     }
                 }

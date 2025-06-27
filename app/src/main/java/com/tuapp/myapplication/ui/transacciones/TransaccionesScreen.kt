@@ -1,6 +1,8 @@
 // reemplaza la vista anterior
 package com.tuapp.myapplication.ui.transacciones
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,7 +12,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,9 +26,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.components.MonthSelector
 import com.tuapp.myapplication.ui.components.TabSelector
 import com.tuapp.myapplication.ui.navigation.*
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransaccionesScreen(
     navController: NavController,
@@ -31,17 +42,31 @@ fun TransaccionesScreen(
     finanzaId: Int?
 ) {
 
+    val currentDate = rememberSaveable { LocalDate.now() }
+
+    val currentMonth = rememberSaveable {
+        currentDate.month.getDisplayName(TextStyle.FULL, Locale("es")).replaceFirstChar { it.uppercase() }
+    }
+
+    var selectedMonth by rememberSaveable { mutableStateOf(currentMonth) }
+    var selectedYear by rememberSaveable { mutableIntStateOf(currentDate.year) }
+
+    val months = listOf("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+    val mes = months.indexOf(selectedMonth) + 1
+
     val loadingTransactions by transaccionViewModel.loadingTransactions.collectAsStateWithLifecycle()
     val transactions by transaccionViewModel.transactionsList.collectAsStateWithLifecycle()
 
     val verde = Color(0xFF2E7D32)
-    val verdePastel = Color(0xFFE6F4EA)
-    val currentRoute = Routes.INDIVIDUAL
-    var selectedTab by remember { mutableStateOf("Transacciones") }
+    val currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL
+    var selectedTab by rememberSaveable { mutableStateOf("Transacciones") }
+
+    val pullToRefreshState = rememberPullToRefreshState()
+    val isRefreshing by transaccionViewModel.isRefreshing.collectAsStateWithLifecycle()
 
     //AGREGUEN OPCION PARA FILTRAR POR MES Y AÑO
-    LaunchedEffect(Unit) {
-        transaccionViewModel.getTransactionsList(6, 2025, finanzaId)
+    LaunchedEffect(selectedMonth) {
+        transaccionViewModel.getTransactionsList(mes, selectedYear, finanzaId)
     }
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -60,13 +85,6 @@ fun TransaccionesScreen(
                 )
             }
 
-
-            if(loadingTransactions){
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                    CircularProgressIndicator()
-                }
-            }
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -80,30 +98,55 @@ fun TransaccionesScreen(
                     finanzaId = finanzaId ?: 0
                 )
 
+                Spacer(modifier = Modifier.height(12.dp))
+
+                MonthSelector(
+                    selectedMonth = selectedMonth,
+                    selectedYear = selectedYear,
+                    onMonthSelected = { mesSeleccionado, anioSeleccionado ->
+                        selectedMonth = months[mesSeleccionado - 1]
+                        selectedYear = anioSeleccionado
+                    }
+                )
+
+                if(loadingTransactions){
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        CircularProgressIndicator()
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (transactions.isEmpty()) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No hay transacciones registradas.", color = Color.Gray)
+                PullToRefreshBox(
+                    state = pullToRefreshState,
+                    isRefreshing = isRefreshing,
+                    onRefresh = {
+                        transaccionViewModel.getTransactionsList(mes, selectedYear, finanzaId, true)
                     }
-                } else {
-                    LazyColumn {
-                        items(transactions) { t ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 6.dp)
-                                    .clickable {
-                                        navController.navigate(DetalleTransaccionScreen(t.transaccion_id))
-                                    },
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
-                            ) {
-                                Column(modifier = Modifier.padding(12.dp)) {
-                                    Text("${t.tipo_movimiento_nombre} - ${t.nombre_categoria}", fontWeight = FontWeight.Bold)
-                                    Text(
-                                        "$${t.monto_transaccion}",
-                                        color = if (t.tipo_movimiento_nombre == "Ingreso") verde else Color.Red
-                                    )
+                ) {
+                    if (transactions.isEmpty()) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("No hay transacciones registradas.", color = Color.Gray)
+                        }
+                    } else {
+                        LazyColumn {
+                            items(transactions) { t ->
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 6.dp)
+                                        .clickable {
+                                            navController.navigate(DetalleTransaccionScreen(t.transaccion_id, finanzaId ?: 0))
+                                        },
+                                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+                                ) {
+                                    Column(modifier = Modifier.padding(12.dp)) {
+                                        Text("${t.tipo_movimiento_nombre} - ${t.nombre_categoria}", fontWeight = FontWeight.Bold)
+                                        Text(
+                                            "$${t.monto_transaccion}",
+                                            color = if (t.tipo_movimiento_nombre == "Ingreso") verde else Color.Red
+                                        )
+                                    }
                                 }
                             }
                         }

@@ -39,7 +39,7 @@ data class IngresosScreen(val id: Int)
 data class RegistrarTransaccionScreen(val id: Int)
 
 @Serializable
-data class DetalleTransaccionScreen(val id: Int)
+data class DetalleTransaccionScreen(val id: Int, val finanzaId: Int)
 
 @Serializable
 data class TransaccionesScreen(val id: Int)

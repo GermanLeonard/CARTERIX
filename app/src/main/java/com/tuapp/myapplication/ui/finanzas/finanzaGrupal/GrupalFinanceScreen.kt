@@ -192,7 +192,7 @@ fun GrupoItem(grupo: FinancesListResponseDomain, navController: NavHostControlle
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                                 contentDescription = null,
-                                tint = Color(0xFF039be5)
+                                tint = Color(0xFF3D4B4E)
                             )
                         }
                     }

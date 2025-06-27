@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,20 +35,20 @@ fun RegistrarSubcategoriaScreen(
     val categoriesOptions by categoriasViewModel.categoriesOptions.collectAsStateWithLifecycle()
     val gastoOpciones by subCategoriaViewModel.categoriesExpenses.collectAsStateWithLifecycle()
 
-    var categoriaPadre by remember { mutableStateOf("") }
+    var categoriaPadre by rememberSaveable { mutableStateOf("") }
     //id de la categoria que se usara para la peticion
-    var categoriaId by remember { mutableIntStateOf(0) }
+    var categoriaId by rememberSaveable { mutableIntStateOf(0) }
 
-    var nombre by remember { mutableStateOf("") }
+    var nombre by rememberSaveable { mutableStateOf("") }
 
-    var tipoGasto by remember { mutableStateOf("") }
+    var tipoGasto by rememberSaveable { mutableStateOf("") }
     //id del tipo de gasto que se usara para la peticion
-    var gastoId by remember { mutableIntStateOf(0) }
+    var gastoId by rememberSaveable { mutableIntStateOf(0) }
 
-    var presupuesto by remember { mutableStateOf("") }
+    var presupuesto by rememberSaveable { mutableStateOf("") }
 
-    var showCategoriaMenu by remember { mutableStateOf(false) }
-    var showTipoMenu by remember { mutableStateOf(false) }
+    var showCategoriaMenu by rememberSaveable { mutableStateOf(false) }
+    var showTipoMenu by rememberSaveable { mutableStateOf(false) }
 
     val verde = Color(0xFF2E7D32)
     val currentRoute = Routes.BD_HOME

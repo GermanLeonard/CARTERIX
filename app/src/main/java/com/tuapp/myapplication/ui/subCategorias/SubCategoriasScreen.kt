@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,8 +44,8 @@ fun SubcategoriasScreen(
         subCategoryViewModel.getSubCategoriesList(finanzaId)
     }
 
-    var selectedCategoria by remember { mutableStateOf("") }
-    var showMenu by remember { mutableStateOf(false) }
+    var selectedCategoria by rememberSaveable { mutableStateOf("") }
+    var showMenu by rememberSaveable { mutableStateOf(false) }
 
     val currentRoute = Routes.SUBCATEGORIAS
     val verde = Color(0xFF2E7D32)
@@ -91,6 +92,16 @@ fun SubcategoriasScreen(
                             .background(Color.White)
                             .padding(4.dp)
                     ) {
+                        Text(
+                            text = "Seleccionar todos",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedCategoria = ""
+                                    showMenu = false
+                                }
+                                .padding(12.dp)
+                        )
                         categories.forEach {
                             //UNA VEZ ELEGIDO TIENE QUE SER FILTRADO EN LA LISTA QUE REGRESA EL VIEWMODEL
                             //POR MEDIO DEL NOMBRE CATEGORIA

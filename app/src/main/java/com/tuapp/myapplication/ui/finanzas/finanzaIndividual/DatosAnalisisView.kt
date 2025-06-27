@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,34 +19,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.tuapp.myapplication.data.models.financeModels.response.CategorieResponseDomain
-import com.tuapp.myapplication.data.models.financeModels.response.DatoAnalisisDomain
 import kotlin.math.max
 
 @Composable
 fun DatosAnalisisView(
     datosFinanza: List<CategorieResponseDomain>,
-    finanzaId: Int?
 ) {
 
     Column(modifier = Modifier.fillMaxSize()) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Encabezado de tabla
+        // Cabecera
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(horizontal = 12.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.Start
         ) {
-            Text("Categoría", fontWeight = FontWeight.Bold)
-            Text("Presupuesto", fontWeight = FontWeight.Bold)
-            Text("Gasto", fontWeight = FontWeight.Bold)
-            Text("Diferencia", fontWeight = FontWeight.Bold)
+            Text("Categoría", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text("Presupuesto", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text("Gasto", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text("Diferencia", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
         }
 
-        Divider(color = Color.LightGray, thickness = 1.dp)
+        HorizontalDivider(modifier = Modifier.padding(horizontal = 12.dp), thickness = 1.dp, color = Color.LightGray)
 
+// Cuerpo
         LazyColumn(modifier = Modifier.padding(horizontal = 12.dp)) {
             items(datosFinanza) { categoria ->
                 val colorDiferencia = when {
@@ -58,13 +58,21 @@ fun DatosAnalisisView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 6.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.Start
                 ) {
                     Text(categoria.categoria_nombre, modifier = Modifier.weight(1f))
-                    Text("L. %.2f".format(categoria.total_presupuesto), color = Color(0xFF7B1FA2), modifier = Modifier.weight(1f))
-                    Text("L. %.2f".format(categoria.gasto), color = Color(0xFF7B1FA2), modifier = Modifier.weight(1f))
                     Text(
-                        "L. %.2f".format(categoria.diferencia),
+                        "%.2f".format(categoria.total_presupuesto),
+                        color = Color(0xFF7B1FA2),
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        "%.2f".format(categoria.gasto),
+                        color = Color(0xFF7B1FA2),
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        "%.2f".format(categoria.diferencia),
                         color = colorDiferencia,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f)

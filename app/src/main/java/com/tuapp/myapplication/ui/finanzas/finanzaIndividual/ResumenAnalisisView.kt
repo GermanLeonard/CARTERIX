@@ -36,11 +36,11 @@ fun ResumenAnalisisView(
         ) {
             Column(horizontalAlignment = Alignment.Start) {
                 Text("Ingresos Totales", fontWeight = FontWeight.Bold)
-                Text("L. %.2f".format(resumenFinanciero.ingresos_totales), color = Color(0xFF6A1B9A))
+                Text("%.2f".format(resumenFinanciero.ingresos_totales), color = Color(0xFF6A1B9A))
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text("Egresos Totales", fontWeight = FontWeight.Bold)
-                Text("L. %.2f".format(resumenFinanciero.egresos_totales), color = Color(0xFF1A237E))
+                Text("%.2f".format(resumenFinanciero.egresos_totales), color = Color(0xFF1A237E))
             }
         }
 
@@ -48,7 +48,7 @@ fun ResumenAnalisisView(
 
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
             Text("Diferencia", fontWeight = FontWeight.Bold)
-            Text("L. %.2f".format(resumenFinanciero.diferencia), color = if(resumenFinanciero.diferencia >= 0 ) Color(0xFF2E7D32) else Color(0xFFD25557))
+            Text("%.2f".format(resumenFinanciero.diferencia), color = if(resumenFinanciero.diferencia >= 0 ) Color(0xFF2E7D32) else Color(0xFFD25557))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -63,15 +63,15 @@ fun ResumenAnalisisView(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Presupuesto", fontWeight = FontWeight.Bold)
-                Text("L. %.2f".format(resumenEgresos.presupuesto_mensual), color = Color(0xFF6A1B9A))
+                Text("%.2f".format(resumenEgresos.presupuesto_mensual), color = Color(0xFF6A1B9A))
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Consumo", fontWeight = FontWeight.Bold)
-                Text("L. %.2f".format(resumenEgresos.consumo_mensual), color = Color(0xFF6A1B9A))
+                Text("%.2f".format(resumenEgresos.consumo_mensual), color = Color(0xFF6A1B9A))
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Variación", fontWeight = FontWeight.Bold)
-                Text("L. %.2f".format(resumenEgresos.variacion_mensual), color = if(resumenEgresos.variacion_mensual >= 0 )Color(0xFF2E7D32) else Color(0xFFD25557))
+                Text("%.2f".format(resumenEgresos.variacion_mensual), color = if(resumenEgresos.variacion_mensual >= 0 )Color(0xFF2E7D32) else Color(0xFFD25557))
             }
         }
 
@@ -85,12 +85,12 @@ fun ResumenAnalisisView(
         ) {
             Column {
                 Text("Ahorro", fontWeight = FontWeight.Medium)
-                Text("L. %.2f".format(resumenAhorro.meta), color = Color(0xFF6A1B9A))
+                Text("%.2f".format(resumenAhorro.meta), color = Color(0xFF6A1B9A))
 
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text("Ahorro Acum.", fontWeight = FontWeight.Medium)
-                Text("L. %.2f".format(resumenAhorro.acumulado), color = Color(0xFF6A1B9A))
+                Text("%.2f".format(resumenAhorro.acumulado), color = Color(0xFF6A1B9A))
             }
 
             Box(

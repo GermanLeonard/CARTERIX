@@ -107,14 +107,17 @@ class CategoriesViewModel(
                     when(resource){
                         is Resource.Loading -> {
                             //Manejen el "cargando"
+                            _loadingCategories.value = true
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
                             //RESPUESTA DE LA CREACION DE LA CATEGORIA
                             resource.data
+                            _loadingCategories.value = false
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
+                            _loadingCategories.value = false
                         }
                     }
                 }
@@ -130,14 +133,17 @@ class CategoriesViewModel(
                     when(resource){
                         is Resource.Loading -> {
                             //Manejen el "cargando"
+                            _loadingCategories.value = true
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
                             //RESPUESTA DE LA ACTUALIZACION DE LA CATEGORIA
                             resource.data
+                            _loadingCategories.value = false
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
+                            _loadingCategories.value = false
                         }
                     }
                 }
