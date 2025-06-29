@@ -28,21 +28,30 @@ class SavingsViewModel(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
-    fun getSavingsData(finanzaId: Int?, anio: Int) {
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+
+    fun getSavingsData(finanzaId: Int?, anio: Int, isRefreshing: Boolean = false) {
         viewModelScope.launch {
             savingsRepository.getSavingsData(finanzaId, anio).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        _isLoading.value = true
-                        _errorMessage.value = null
+                        if(isRefreshing){
+                            _isRefreshing.value = true
+                        } else {
+                            _isLoading.value = true
+                            _errorMessage.value = null
+                        }
                     }
                     is Resource.Success -> {
                         _savingsList.value = resource.data
                         _isLoading.value = false
+                        _isRefreshing.value = false
                     }
                     is Resource.Error -> {
-                        _isLoading.value = false
                         _errorMessage.value = resource.message
+                        _isLoading.value = false
+                        _isRefreshing.value = false
                     }
                 }
             }

@@ -24,19 +24,18 @@ import com.tuapp.myapplication.ui.navigation.Routes
 fun BottomNavBar(navController: NavController, currentRoute: String) {
     val green = Color(0xFF2E7D32)
     val highlight = Color.White
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
-            .background(green, RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
+            .height(70.dp)
+            .background(green, RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = {
             if (currentRoute != Routes.INDIVIDUAL) {
                 //al ser individual no es necesario pasarle Id
-                navController.navigate(FinanzaIndividualScreen(0))
+                navController.navigate(FinanzaIndividualScreen(0, ""))
             }
         }) {
             Icon(

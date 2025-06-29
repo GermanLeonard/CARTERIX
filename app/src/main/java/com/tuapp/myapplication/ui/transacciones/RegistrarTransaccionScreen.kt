@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.components.CustomTopBar
 import com.tuapp.myapplication.ui.navigation.Routes
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -69,172 +70,176 @@ fun RegistrarTransaccionesScreen(
         transaccionesViewModel.getTransactionsOptions(finanzaId)
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .background(verde),
-                contentAlignment = Alignment.TopCenter
-            ) {
-                Text("Registrar Transacción", color = Color.White, fontSize = 22.sp, modifier = Modifier.padding(top = 32.dp))
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White, RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp))
-                    .padding(20.dp)
-            ) {
-                Text("Tipo")
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFE8EAF6), RoundedCornerShape(8.dp))
-                    .clickable { showTipoMenu = true }
-                    .padding(16.dp)) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(if (tipo.isNotEmpty()) tipo else "Selecciona el tipo")
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                    }
-                }
-                DropdownMenu(expanded = showTipoMenu, onDismissRequest = { showTipoMenu = false }) {
-                    opcionesTransaccion.forEach {
-                        DropdownMenuItem(
-                            text = { Text(it.tipo_registro_nombre) },
-                            onClick = {
-                                tipo = it.tipo_registro_nombre
-                                idTipo = it.tipo_registro_id
-                                showTipoMenu = false
-                            }
+    Scaffold(
+        topBar = {
+            CustomTopBar(Routes.REGISTRAR_TRANSACCION, navController, true)
+        },
+        bottomBar = {
+            BottomNavBar(navController = navController, currentRoute = Routes.BD_HOME)
+        },
+        contentColor = Color.Black,
+        containerColor = verde
+    ) { innerPadding ->
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(vertical = 8.dp)
+                        .background(
+                            color = Color.White,
+                            shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
                         )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text("Categoría")
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFE8EAF6), RoundedCornerShape(8.dp))
-                    .clickable { showCategoriaMenu = true }
-                    .padding(16.dp)) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(if (categoria.isNotEmpty()) categoria else "Selecciona categoría")
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                    }
-                }
-                DropdownMenu(expanded = showCategoriaMenu, onDismissRequest = { showCategoriaMenu = false }) {
-                    val tipoRegistro = opcionesTransaccion.find { it.tipo_registro_id == idTipo}
-
-                    tipoRegistro?.opciones?.forEach {
-                        DropdownMenuItem(
-                            text = { Text(it.nombre_opcion) },
-                            onClick = {
-                                categoria = it.nombre_opcion
-                                idCategoria = it.id_opcion
-                                presupuesto = it.presupuesto_opcion
-                                showCategoriaMenu = false
-                            }
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceAround
+                        .padding(horizontal = 25.dp)
                 ) {
-                    OutlinedTextField(
-                        value = monto,
-                        onValueChange = { monto = it },
-                        label = { Text("Monto") },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
 
-                    OutlinedTextField(
-                        value = presupuesto.toString(),
-                        onValueChange = {},
-                        label = { Text("Presupuesto") },
-                        singleLine = true,
-                        enabled = false
-                    )
-                }
+                    Spacer(modifier = Modifier.height(20.dp))
 
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                OutlinedTextField(
-                    value = descripcion,
-                    onValueChange = { descripcion = it },
-                    label = { Text("Descripción") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                OutlinedTextField(
-                    value = fechaTransaccion,
-                    onValueChange = {},
-                    enabled = false,
-                    label = { Text("Fecha Transaccion") },
-                    modifier = Modifier.fillMaxWidth().clickable{
-                        openDateDialog = true
-                    },
-                    readOnly = true,
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = "Seleccionar fecha"
-                        )
-                    },
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                if(openDateDialog){
-                    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = Date().time)
-
-                    DatePickerDialog(
-                        onDismissRequest = {
-                            openDateDialog = false
-                        },
-                        confirmButton = {
-                            Button(
-                                onClick = {
-                                    openDateDialog = false
-                                    fechaTransaccion = datePickerState.selectedDateMillis?.let { millis ->
-                                        val instant = Instant.ofEpochMilli(millis)
-                                        val formatter = DateTimeFormatter.ISO_INSTANT
-                                        formatter.format(instant)
-                                    } ?: ""
-                                }
-                            ) {
-                                Text("Confirmar fecha")
-                            }
-                        },
-                    ) {
-                        DatePicker(datePickerState)
-                    }
-                }
-
-                Button(
-                    onClick = {
-                        if (idTipo != 0 && idCategoria != 0 && monto.isNotBlank()) {
-                            transaccionesViewModel.createTransaction(idTipo, idCategoria, monto.toDouble(), descripcion, fechaTransaccion, finanzaId )
-                            navController.popBackStack()
+                    Text("Tipo")
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFE8EAF6), RoundedCornerShape(8.dp))
+                        .clickable { showTipoMenu = true }
+                        .padding(16.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(if (tipo.isNotEmpty()) tipo else "Selecciona el tipo")
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                         }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = verde),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Guardar")
-                }
-            }
-        }
+                    }
+                    DropdownMenu(expanded = showTipoMenu, onDismissRequest = { showTipoMenu = false }) {
+                        opcionesTransaccion.forEach {
+                            DropdownMenuItem(
+                                text = { Text(it.tipo_registro_nombre) },
+                                onClick = {
+                                    tipo = it.tipo_registro_nombre
+                                    idTipo = it.tipo_registro_id
+                                    showTipoMenu = false
+                                }
+                            )
+                        }
+                    }
 
-        BottomNavBar(navController = navController, currentRoute = Routes.BD_HOME)
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text("Categoría")
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFE8EAF6), RoundedCornerShape(8.dp))
+                        .clickable { showCategoriaMenu = true }
+                        .padding(16.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(if (categoria.isNotEmpty()) categoria else "Selecciona categoría")
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                        }
+                    }
+                    DropdownMenu(expanded = showCategoriaMenu, onDismissRequest = { showCategoriaMenu = false }) {
+                        val tipoRegistro = opcionesTransaccion.find { it.tipo_registro_id == idTipo}
+
+                        tipoRegistro?.opciones?.forEach {
+                            DropdownMenuItem(
+                                text = { Text(it.nombre_opcion) },
+                                onClick = {
+                                    categoria = it.nombre_opcion
+                                    idCategoria = it.id_opcion
+                                    presupuesto = it.presupuesto_opcion
+                                    showCategoriaMenu = false
+                                }
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        OutlinedTextField(
+                            value = monto,
+                            onValueChange = { monto = it },
+                            label = { Text("Monto") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
+
+                        OutlinedTextField(
+                            value = presupuesto.toString(),
+                            onValueChange = {},
+                            label = { Text("Presupuesto") },
+                            singleLine = true,
+                            enabled = false
+                        )
+                    }
+
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedTextField(
+                        value = descripcion,
+                        onValueChange = { descripcion = it },
+                        label = { Text("Descripción") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    OutlinedTextField(
+                        value = fechaTransaccion,
+                        onValueChange = {},
+                        enabled = false,
+                        label = { Text("Fecha Transaccion") },
+                        modifier = Modifier.fillMaxWidth().clickable{
+                            openDateDialog = true
+                        },
+                        readOnly = true,
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = "Seleccionar fecha"
+                            )
+                        },
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    if(openDateDialog){
+                        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = Date().time)
+
+                        DatePickerDialog(
+                            onDismissRequest = {
+                                openDateDialog = false
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = {
+                                        openDateDialog = false
+                                        fechaTransaccion = datePickerState.selectedDateMillis?.let { millis ->
+                                            val instant = Instant.ofEpochMilli(millis)
+                                            val formatter = DateTimeFormatter.ISO_INSTANT
+                                            formatter.format(instant)
+                                        } ?: ""
+                                    }
+                                ) {
+                                    Text("Confirmar fecha")
+                                }
+                            },
+                        ) {
+                            DatePicker(datePickerState)
+                        }
+                    }
+
+                    Button(
+                        onClick = {
+                            if (idTipo != 0 && idCategoria != 0 && monto.isNotBlank()) {
+                                transaccionesViewModel.createTransaction(idTipo, idCategoria, monto.toDouble(), descripcion, fechaTransaccion, finanzaId )
+                                navController.popBackStack()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = verde),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Guardar")
+                    }
+                }
+        }
     }
 }

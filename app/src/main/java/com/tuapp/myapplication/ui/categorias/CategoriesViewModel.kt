@@ -55,22 +55,31 @@ class CategoriesViewModel(
         }
     }
 
+    private var _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+
     //ESTO TRAE LA LISTA DE CATEGORIAS PARA EL APARTADO BD CATEGORIAS EGRESO
-    fun getCategoriesList(finanzaId: Int? = null) {
+    fun getCategoriesList(finanzaId: Int? = null, isRefreshing: Boolean = false) {
         viewModelScope.launch {
             categoriesRepository.getCategoriesList(finanzaId)
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            _loadingCategories.value = true
+                            if(isRefreshing){
+                                _isRefreshing.value = true
+                            } else {
+                                _loadingCategories.value = true
+                            }
                         }
                         is Resource.Success -> {
                             _categoriesList.value = resource.data
                             _loadingCategories.value = false
+                            _isRefreshing.value = false
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
                             _loadingCategories.value = false
+                            _isRefreshing.value = false
                         }
                     }
                 }

@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -25,32 +26,32 @@ fun TabSelector(
     onTabSelected: (String) -> Unit,
     navController: NavController,
     finanzaId: Int,
+    nombreFinanza: String,
     tabs: List<String> = listOf("Analisis", "Transacciones", "BD"),
-    backgroundColor: Color = Color(0xFFE6F4EA),
-    borderColor: Color = Color(0xFF2E7D32),
-    selectedColor: Color = Color(0xFF66BB6A)
+    backgroundColor: Color = Color(0xFF66BB6A),
+    selectedColor: Color = Color(0xFF4CAF50)
 ) {
     Row(
-        Modifier
+        modifier = Modifier
             .fillMaxWidth()
             .background(backgroundColor, RoundedCornerShape(50))
-            .border(BorderStroke(2.dp, borderColor), shape = RoundedCornerShape(50))
-            .padding(top = 6.dp, start = 3.dp, end = 3.dp, bottom = 6.dp),
-        horizontalArrangement = Arrangement.Center,
+            .padding(6.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         tabs.forEach { label ->
             val isSelected = label == selectedTab
 
             val destination: Any? = when (label) {
-                "Analisis" -> FinanzaIndividualScreen(finanzaId)
-                "Transacciones" -> TransaccionesScreen(finanzaId)
-                "BD" -> BDHomeScreen(finanzaId)
+                "Analisis" -> FinanzaIndividualScreen(finanzaId, nombreFinanza)
+                "Transacciones" -> TransaccionesScreen(finanzaId, nombreFinanza)
+                "BD" -> BDHomeScreen(finanzaId, nombreFinanza)
                 else -> null
             }
 
             Box(
                 modifier = Modifier
                     .weight(1f)
+                    .clip(RoundedCornerShape(40))
                     .clickable {
                         if (!isSelected && destination != null) {
                             onTabSelected(label)
@@ -60,22 +61,18 @@ fun TabSelector(
                         }
                     }
                     .background(
-                        if (isSelected) selectedColor else Color.Transparent,
-                        shape = RoundedCornerShape(50)
+                        if (isSelected) selectedColor else Color.Transparent
                     )
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = label,
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isSelected) Color.White else borderColor
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Black
                 )
             }
         }
     }
 }
-
-
-

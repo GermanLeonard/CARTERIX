@@ -59,7 +59,7 @@ fun AppNavigation(
 
             NavHost(
                 navController = navController,
-                startDestination = if(token != null) FinanzaIndividualScreen(0) else LoginScreen
+                startDestination = if(token != null) FinanzaIndividualScreen(0, "") else LoginScreen
             ) {
 
                 composable <LoginScreen> {
@@ -72,9 +72,12 @@ fun AppNavigation(
 
                 composable<FinanzaIndividualScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
-                    val finanzaId: Int? = if(id == 0) null else id
+                    val nombreFinanza = backStackEntry.arguments?.getString("nombreFinanza") ?: return@composable
 
-                    IndividualFinanceScreen(navController, finanzaId = finanzaId)
+                    val finanzaId: Int? = if(id == 0) null else id
+                    val titulo: String = if(nombreFinanza.isBlank()) "Finanza principal" else nombreFinanza
+
+                    IndividualFinanceScreen(navController, finanzaId = finanzaId, nombreFinanza = titulo)
                 }
 
                 composable<FinanzaGrupalScreen> {
@@ -91,7 +94,11 @@ fun AppNavigation(
                 composable<TransaccionesScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
                     val finanzaId: Int? = if(id == 0) null else id
-                    TransaccionesScreen(navController, finanzaId = finanzaId)
+
+                    val nombreFinanza = backStackEntry.arguments?.getString("nombreFinanza") ?: return@composable
+                    val titulo: String = if(nombreFinanza.isBlank()) "Finanza principal" else nombreFinanza
+
+                    TransaccionesScreen(navController, finanzaId = finanzaId, nombreFinanza = titulo)
                 }
 
                 composable<RegistrarTransaccionScreen> { backStackEntry ->
@@ -110,7 +117,11 @@ fun AppNavigation(
 
                 composable<BDHomeScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
-                    BDHomeScreen(navController, finanzaId = id)
+
+                    val nombreFinanza = backStackEntry.arguments?.getString("nombreFinanza") ?: return@composable
+
+                    val titulo: String = if(nombreFinanza.isBlank()) "Finanza principal" else nombreFinanza
+                    BDHomeScreen(navController, finanzaId = id, titulo)
                 }
 
                 composable<CategoriaEgresoScreen> { backStackEntry ->

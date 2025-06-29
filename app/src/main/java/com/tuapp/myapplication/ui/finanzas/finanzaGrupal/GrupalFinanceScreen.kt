@@ -53,6 +53,14 @@ fun GrupalFinanceScreen(
     var showCreateDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showCreateDialog = true },
+                containerColor = Color(0xFF2E7D32)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Crear grupo")
+            }
+        },
         bottomBar = {
             BottomNavBar(navController = navController, currentRoute = Routes.GROUP)
         },
@@ -74,7 +82,7 @@ fun GrupalFinanceScreen(
             ) {
                 Text(
                     text = "Lista de Finanzas",
-                    color = Color.Black,
+                    color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -118,12 +126,6 @@ fun GrupalFinanceScreen(
                         ) {
                             Icon(Icons.Default.Link, contentDescription = "Unirse a grupo")
                         }
-                        FloatingActionButton(
-                            onClick = { showCreateDialog = true },
-                            containerColor = Color(0xFF2E7D32)
-                        ) {
-                            Icon(Icons.Default.Add, contentDescription = "Crear grupo")
-                        }
                     }
                 }
             }
@@ -158,7 +160,7 @@ fun GrupoItem(grupo: FinancesListResponseDomain, navController: NavHostControlle
             .fillMaxWidth()
             .padding(vertical = 6.dp)
             .clickable {
-                navController.navigate(FinanzaIndividualScreen(grupo.finanza_id))
+                navController.navigate(FinanzaIndividualScreen(grupo.finanza_id, grupo.finanza_nombre))
             },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)

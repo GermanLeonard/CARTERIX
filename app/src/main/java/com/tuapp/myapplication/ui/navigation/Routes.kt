@@ -9,7 +9,7 @@ object LoginScreen
 object RegisterScreen
 
 @Serializable
-data class FinanzaIndividualScreen(val id: Int)
+data class FinanzaIndividualScreen(val id: Int, val nombreFinanza: String)
 
 @Serializable
 object FinanzaGrupalScreen
@@ -21,7 +21,7 @@ object PerfilScreen
 object EditProfile
 
 @Serializable
-data class BDHomeScreen(val id: Int)
+data class BDHomeScreen(val id: Int, val nombreFinanza: String)
 
 @Serializable
 data class CategoriaEgresoScreen(val id: Int)
@@ -42,7 +42,7 @@ data class RegistrarTransaccionScreen(val id: Int)
 data class DetalleTransaccionScreen(val id: Int, val finanzaId: Int)
 
 @Serializable
-data class TransaccionesScreen(val id: Int)
+data class TransaccionesScreen(val id: Int, val nombreFinanza: String)
 
 @Serializable
 data class AhorroScreen(val id: Int)
@@ -52,16 +52,16 @@ object Routes {
     const val REGISTER = "register"
     const val INDIVIDUAL = "individual"
     const val GROUP = "grupal"
-    const val PROFILE = "profile"
-    const val EDIT_PROFILE = "edit_profile"
+    const val PROFILE = "Perfil"
+    const val EDIT_PROFILE = "Editar Perfil"
     const val BD_HOME = "bd_home"
-    const val CATEGORIAS_EGRESO = "categorias_egreso"
-    const val SUBCATEGORIAS = "subcategorias"
-    const val REGISTRAR_SUBCATEGORIA = "registrar_subcategoria"
-    const val INGRESOS = "ingresos"
-    const val REGISTRAR_TRANSACCION = "registrar_transaccion"
-    const val DETALLE_TRANSACCION = "detalle_transaccion/{id}"
+    const val CATEGORIAS_EGRESO = "Categorias de Egreso"
+    const val SUBCATEGORIAS = "Sub Categorias de Egreso"
+    const val REGISTRAR_SUBCATEGORIA = "Registrar Sub Categoria"
+    const val INGRESOS = "Ingresos"
+    const val REGISTRAR_TRANSACCION = "Registrar Transaccion"
+    const val DETALLE_TRANSACCION = "Detalles Transaccion"
     const val TRANSACCIONES = "transacciones"
-    const val AHORRO = "ahorro"
+    const val AHORRO = "Metas de Ahorro"
 
 }

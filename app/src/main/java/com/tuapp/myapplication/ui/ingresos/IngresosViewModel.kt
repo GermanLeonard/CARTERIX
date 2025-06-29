@@ -30,14 +30,20 @@ class IngresosViewModel(
     private val _mensajeError = MutableStateFlow<String?>(null)
     val mensajeError: StateFlow<String?> = _mensajeError
 
-    fun getIncomesList(finanzaId: Int? = null){
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+
+    fun getIncomesList(finanzaId: Int? = null, isRefreshing: Boolean = false){
         viewModelScope.launch {
             incomesRepository.getIncomesList(finanzaId)
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
-                            _isLoading.value = true
+                            if(isRefreshing){
+                                _isRefreshing.value = true
+                            } else {
+                                _isLoading.value = true
+                            }
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
@@ -45,11 +51,13 @@ class IngresosViewModel(
                             //LISTA DE INGRESOS
                             _incomeList.value = resource.data
                             _isLoading.value = false
+                            _isRefreshing.value = false
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
                             _mensajeError.value = resource.message ?: "Error al obtener ingresos"
                             _isLoading.value = false
+                            _isRefreshing.value = false
                         }
                     }
                 }

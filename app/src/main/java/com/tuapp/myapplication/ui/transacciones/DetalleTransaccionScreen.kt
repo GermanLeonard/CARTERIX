@@ -16,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.components.CustomTopBar
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
@@ -54,23 +55,32 @@ fun DetallesTransaccionScreen(
         nombreRegistro = transaccion.nombre_usuario
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Box(
+    Scaffold(
+        topBar = {
+            CustomTopBar(Routes.DETALLE_TRANSACCION, navController, true)
+        },
+        bottomBar = {
+            BottomNavBar(navController = navController, currentRoute = Routes.INDIVIDUAL)
+        },
+        containerColor = verde,
+        contentColor = Color.Black
+    ) { innerPadding ->
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .background(verde),
-                contentAlignment = Alignment.TopCenter
+                    .fillMaxSize()
+                    .padding(vertical = 8.dp)
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
+                    )
+                    .padding(horizontal = 16.dp)
             ) {
-                Text("Detalle de Transacción", color = Color.White, fontSize = 22.sp, modifier = Modifier.padding(top = 32.dp))
-            }
-
-            if(loadingDetails){
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                    CircularProgressIndicator()
+                if(loadingDetails){
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        CircularProgressIndicator()
+                    }
                 }
-            }
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -78,7 +88,7 @@ fun DetallesTransaccionScreen(
                             Color.White,
                             RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp)
                         )
-                        .padding(24.dp)
+                        .padding(24.dp),
                 ) {
                     Text("Tipo", fontWeight = FontWeight.Bold)
                     OutlinedTextField(
@@ -168,10 +178,7 @@ fun DetallesTransaccionScreen(
 
                     }
                 }
-        }
-
-        Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-            BottomNavBar(navController = navController, currentRoute = Routes.INDIVIDUAL)
+            }
         }
     }
 }

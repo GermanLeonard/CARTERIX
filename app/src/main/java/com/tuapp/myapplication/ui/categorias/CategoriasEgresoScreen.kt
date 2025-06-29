@@ -4,10 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -20,15 +23,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.components.CustomTopBar
 import com.tuapp.myapplication.ui.navigation.Routes
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoriasEgresoScreen(
     navController: NavController,
     finanzaId: Int?,
     categoryViewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory)
 ) {
-    val currentRoute = Routes.INDIVIDUAL
+    val verde = Color(0xFF2E7D32)
+    val currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL
 
     val categorias by categoryViewModel.categoriesList.collectAsStateWithLifecycle()
     val loadingCategories by categoryViewModel.loadingCategories.collectAsStateWithLifecycle()
@@ -39,11 +45,17 @@ fun CategoriasEgresoScreen(
     var selectedCategorieId by rememberSaveable { mutableIntStateOf(0) }
     var selectedCategorieName by rememberSaveable { mutableStateOf("") }
 
+    val pullToRefreshState = rememberPullToRefreshState()
+    val isRefreshing by categoryViewModel.isRefreshing.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
         categoryViewModel.getCategoriesList(finanzaId)
     }
 
     Scaffold(
+        topBar = {
+            CustomTopBar(Routes.CATEGORIAS_EGRESO, navController, true)
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -59,33 +71,24 @@ fun CategoriasEgresoScreen(
         bottomBar = {
 
             BottomNavBar(navController = navController, currentRoute = currentRoute)
-        }
+        },
+        containerColor = verde,
+        contentColor = Color.Black
     ) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding).fillMaxSize()
+            modifier = Modifier.fillMaxSize().padding(innerPadding)
         ) {
-            Box(modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(bottom = 80.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp)
-                            .background(Color(0xFF2E7D32)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            "Categorias de Egreso",
-                            fontSize = 24.sp,
+                        .padding(vertical = 8.dp)
+                        .background(
                             color = Color.White,
-                            fontWeight = FontWeight.Bold
+                            shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
                         )
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
+                        .padding(horizontal = 25.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(45.dp))
 
                     if(loadingCategories) {
                         Box(
@@ -96,46 +99,52 @@ fun CategoriasEgresoScreen(
                         }
                     }
 
-                    if (categorias.isEmpty()) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("No hay categorias ingresadas.", fontSize = 16.sp, color = Color.Gray)
-                        }
-                    } else {
-                        LazyColumn(modifier = Modifier.padding(horizontal = 16.dp)) {
-                            items(categorias) { categoria ->
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(80.dp)
-                                        .padding(vertical = 6.dp),
-                                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE6F4EA))
-                                ) {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
+                    PullToRefreshBox(
+                        state = pullToRefreshState,
+                        isRefreshing = isRefreshing,
+                        onRefresh = { categoryViewModel.getCategoriesList(finanzaId, true) }
+                    ) {
+                        if (categorias.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("No hay categorias ingresadas.", fontSize = 16.sp, color = Color.Gray)
+                            }
+                        } else {
+                            LazyColumn(modifier = Modifier.padding(horizontal = 16.dp).fillMaxSize()) {
+                                items(categorias) { categoria ->
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(80.dp)
+                                            .padding(vertical = 6.dp),
+                                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE6F4EA))
                                     ) {
-                                        Text(
-                                            categoria.categoria_nombre,
-                                            fontWeight = FontWeight.Medium,
-                                            fontSize = 18.sp
-                                        )
-
-                                        IconButton(
-                                            onClick = {
-                                                showEditDialog = true
-                                                selectedCategorieId = categoria.categoria_id
-                                                selectedCategorieName = categoria.categoria_nombre
-                                            },
-                                            modifier = Modifier.align(Alignment.TopEnd)
+                                        Box(
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentAlignment = Alignment.Center
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Edit,
-                                                contentDescription = null,
-                                                tint = Color(0xFF3D4B4E)
+                                            Text(
+                                                categoria.categoria_nombre,
+                                                fontWeight = FontWeight.Medium,
+                                                fontSize = 18.sp
                                             )
+
+                                            IconButton(
+                                                onClick = {
+                                                    showEditDialog = true
+                                                    selectedCategorieId = categoria.categoria_id
+                                                    selectedCategorieName = categoria.categoria_nombre
+                                                },
+                                                modifier = Modifier.align(Alignment.TopEnd)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Edit,
+                                                    contentDescription = null,
+                                                    tint = Color(0xFF3D4B4E)
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -150,7 +159,6 @@ fun CategoriasEgresoScreen(
                         confirmButton = {
                             TextButton(onClick = {
                                 categoryViewModel.createCategory(nuevaCategoria, finanzaId)
-                                categoryViewModel.getCategoriesList(finanzaId)
                                 showDialog = false
                             }) {
                                 Text("Agregar")
@@ -180,7 +188,6 @@ fun CategoriasEgresoScreen(
                         confirmButton = {
                             TextButton(onClick = {
                                 categoryViewModel.updateCategory(selectedCategorieName, selectedCategorieId)
-                                categoryViewModel.getCategoriesList(finanzaId)
                                 showEditDialog = false
                                 selectedCategorieId = 0
                             }) {
@@ -206,7 +213,6 @@ fun CategoriasEgresoScreen(
                         }
                     )
                 }
-            }
         }
     }
 }

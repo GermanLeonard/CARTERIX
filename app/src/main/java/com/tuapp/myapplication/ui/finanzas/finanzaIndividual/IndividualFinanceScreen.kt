@@ -8,21 +8,20 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.components.CustomTopBar
 import com.tuapp.myapplication.ui.components.MonthSelector
 import com.tuapp.myapplication.ui.components.TabSelector
 import com.tuapp.myapplication.ui.finanzas.FinanzasViewModel
@@ -38,10 +37,11 @@ fun IndividualFinanceScreen(
     navController: NavController,
     finanzaViewModel: FinanzasViewModel = viewModel(factory = FinanzasViewModel.Factory),
     finanzaId: Int? = null,
+    nombreFinanza: String
 ) {
     val verde = Color(0xFF2E7D32)
     val verdeClaro = Color(0xFF66BB6A)
-    val verdePastel = Color(0xFFE6F4EA)
+    val verdePastel = Color(0xFF4CAF50)
 
     val currentDate = rememberSaveable { LocalDate.now() }
 
@@ -66,113 +66,112 @@ fun IndividualFinanceScreen(
     val datosFinanza by finanzaViewModel.listaDatosAnalisis.collectAsStateWithLifecycle()
     val loadingDatos by finanzaViewModel.loadingDatos.collectAsStateWithLifecycle()
 
+    val currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL
 
     LaunchedEffect(selectedMonth) {
         finanzaViewModel.financeSummary(mes, selectedYear, finanzaId)
         finanzaViewModel.financeData(mes, selectedYear, finanzaId)
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(180.dp)
-                .background(verde),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            Text(
-                "Finanza principal",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.padding(top = 24.dp)
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 100.dp)
-                .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp)
-                )
-                .padding(horizontal = 16.dp, vertical = 16.dp)
-        ) {
-            Spacer(modifier = Modifier.height(12.dp))
-
-            TabSelector(
-                selectedTab = selectedTab,
-                onTabSelected = { selectedTab = it },
-                navController = navController,
-                finanzaId = finanzaId ?: 0,
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            MonthSelector(
-                selectedMonth = selectedMonth,
-                selectedYear = selectedYear,
-                onMonthSelected = { mesSeleccionado, anioSeleccionado ->
-                    selectedMonth = months[mesSeleccionado - 1]
-                    selectedYear = anioSeleccionado
-                }
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .background(verdePastel, RoundedCornerShape(50))
-                    .border(BorderStroke(2.dp, verde), RoundedCornerShape(50))
-                    .padding(6.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+    Scaffold(
+        topBar = {
+            CustomTopBar(nombreFinanza, navController)
+        },
+        bottomBar = {
+            BottomNavBar(navController = navController, currentRoute = currentRoute)
+        },
+        containerColor = verde,
+        contentColor = Color.Black
+    ) { innerPadding ->
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(16.dp)
             ) {
-                listOf("Resumen", "Datos").forEach { label ->
-                    val isSelected = label == selectedView
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 4.dp)
-                            .background(
-                                if (isSelected) verdeClaro else Color.Transparent,
-                                RoundedCornerShape(50)
+                TabSelector(
+                    selectedTab = selectedTab,
+                    onTabSelected = { selectedTab = it },
+                    navController = navController,
+                    finanzaId = finanzaId ?: 0,
+                    nombreFinanza = nombreFinanza
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 8.dp)
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
+                    )
+                    .padding(horizontal = 16.dp)
+            ) {
+                Spacer(modifier = Modifier.height(12.dp))
+
+                MonthSelector(
+                    selectedMonth = selectedMonth,
+                    selectedYear = selectedYear,
+                    onMonthSelected = { mesSeleccionado, anioSeleccionado ->
+                        selectedMonth = months[mesSeleccionado - 1]
+                        selectedYear = anioSeleccionado
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(verdePastel, RoundedCornerShape(50))
+                        .border(BorderStroke(1.dp, Color.Black), RoundedCornerShape(50))
+                        .padding(6.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    listOf("Resumen", "Datos").forEach { label ->
+                        val isSelected = label == selectedView
+
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(40))
+                                .background(
+                                    if (isSelected) verdeClaro else Color.Transparent
+                                )
+                                .clickable { selectedView = label }
+                                .padding(vertical = 10.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = label,
+                                color = Color.Black,
+                                fontWeight = FontWeight.Medium
                             )
-                            .clickable { selectedView = label }
-                            .padding(vertical = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(label, color = Color.Black, fontWeight = FontWeight.Medium)
+                        }
                     }
                 }
-            }
 
-            if(loadingResumen || loadingDatos){
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                    CircularProgressIndicator()
+                if(loadingResumen || loadingDatos){
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        CircularProgressIndicator()
+                    }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 if (selectedView == "Resumen") {
-                        ResumenAnalisisView(
-                            resumenFinanciero,
-                            resumenEgresos,
-                            resumenAhorros
-                        )
+                    ResumenAnalisisView(
+                        resumenFinanciero,
+                        resumenEgresos,
+                        resumenAhorros
+                    )
                 }  else {
                     DatosAnalisisView(datosFinanza)
                 }
 
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-
-        Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-            BottomNavBar(navController = navController, currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL)
+                Spacer(modifier = Modifier.height(24.dp))
+            }
         }
     }
+
 }
 
 

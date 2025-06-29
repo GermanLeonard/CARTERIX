@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.auth.UserViewModel
 import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.components.CustomTopBar
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
@@ -48,111 +49,115 @@ fun EditProfileScreen(
     var nuevaContrasenaError by rememberSaveable { mutableStateOf<String?>(null) }
     var confirmarContrasenaError by rememberSaveable { mutableStateOf<String?>(null) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .background(verde),
-                contentAlignment = Alignment.TopCenter
-            ) {
-                Text("Editar perfil", color = Color.White, fontSize = 22.sp, modifier = Modifier.padding(top = 32.dp))
-            }
-
+    Scaffold(
+        topBar = {
+            CustomTopBar(Routes.EDIT_PROFILE, navController, true)
+        },
+        bottomBar = {
+            BottomNavBar(navController = navController, currentRoute = Routes.PROFILE)
+        },
+        contentColor = Color.Black,
+        containerColor = verde
+    ) { innerPadding ->
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.White, RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp))
-                    .padding(20.dp),
+                    .padding(vertical = 8.dp)
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
+                    )
+                    .padding(horizontal = 25.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Información de perfil", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Spacer(modifier = Modifier.height(30.dp))
 
-                CustomField("Nombre completo", nombre) { nombre = it }
+                    Text("Información de perfil", fontWeight = FontWeight.Bold, fontSize = 25.sp)
 
-                CustomField("Email", email) {
-                    email = it
-                    emailError = null
-                }
+                    CustomField("Nombre completo", nombre) { nombre = it }
 
-                // MOSTRAR ERROR DE EMAIL
-                if (emailError != null) {
-                    Text(emailError!!, color = Color.Red, fontSize = 12.sp)
-                }
+                    CustomField("Email", email) {
+                        email = it
+                        emailError = null
+                    }
 
-                Button(
-                    onClick = {
-                        // VALIDACION de email
-                        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                            emailError = "Correo inválido"
-                        } else {
-                            emailError = null
-                            // Aqui iria la logica real de actualizacion de datos
-                            //manejen errores y success porfavor
-                            userViewModel.changeProfile(nombre, email)
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = verde),
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                ) {
-                    Text("Guardar")
-                }
+                    // MOSTRAR ERROR DE EMAIL
+                    if (emailError != null) {
+                        Text(emailError!!, color = Color.Red, fontSize = 12.sp)
+                    }
 
-                Spacer(modifier = Modifier.height(12.dp))
-                Text("Actualizar contraseña", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Button(
+                        onClick = {
+                            // VALIDACION de email
+                            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                                emailError = "Correo inválido"
+                            } else {
+                                emailError = null
+                                // Aqui iria la logica real de actualizacion de datos
+                                //manejen errores y success porfavor
+                                userViewModel.changeProfile(nombre, email)
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = verde),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text("Guardar")
+                    }
 
-                CustomField("Contraseña actual", contrasenaActual) { contrasenaActual = it }
+                Spacer(modifier = Modifier.height(30.dp))
 
-                CustomField("Nueva contraseña", nuevaContrasena) {
-                    nuevaContrasena = it
-                    nuevaContrasenaError = null
-                }
+                    Text("Actualizar contraseña", fontWeight = FontWeight.Bold, fontSize = 25.sp)
 
-                // MOSTRAR ERROR DE NUEVA CONTRASEÑA
-                if (nuevaContrasenaError != null) {
-                    Text(nuevaContrasenaError!!, color = Color.Red, fontSize = 12.sp)
-                }
+                    CustomField("Contraseña actual", contrasenaActual) { contrasenaActual = it }
 
-                CustomField("Confirmar contraseña", confirmarContrasena) {
-                    confirmarContrasena = it
-                    confirmarContrasenaError = null
-                }
+                    CustomField("Nueva contraseña", nuevaContrasena) {
+                        nuevaContrasena = it
+                        nuevaContrasenaError = null
+                    }
 
-                // MOSTRAR ERROR DE CONFIRMACION
-                if (confirmarContrasenaError != null) {
-                    Text(confirmarContrasenaError!!, color = Color.Red, fontSize = 12.sp)
-                }
+                    // MOSTRAR ERROR DE NUEVA CONTRASEÑA
+                    if (nuevaContrasenaError != null) {
+                        Text(nuevaContrasenaError!!, color = Color.Red, fontSize = 12.sp)
+                    }
 
-                Button(
-                    onClick = {
-                        val regexContrasena = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[\\d\\W]).{8,}$")
-                        var valido = true
+                    CustomField("Confirmar contraseña", confirmarContrasena) {
+                        confirmarContrasena = it
+                        confirmarContrasenaError = null
+                    }
 
-                        if (!regexContrasena.matches(nuevaContrasena)) {
-                            nuevaContrasenaError = "Debe tener al menos 8 caracteres, mayúscula, minúscula y número o símbolo"
-                            valido = false
-                        }
+                    // MOSTRAR ERROR DE CONFIRMACION
+                    if (confirmarContrasenaError != null) {
+                        Text(confirmarContrasenaError!!, color = Color.Red, fontSize = 12.sp)
+                    }
 
-                        if (nuevaContrasena != confirmarContrasena) {
-                            confirmarContrasenaError = "Las contraseñas no coinciden"
-                            valido = false
-                        }
+                    Button(
+                        onClick = {
+                            val regexContrasena = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[\\d\\W]).{8,}$")
+                            var valido = true
 
-                        if (valido) {
-                            // Aqui iria la logica real de actualizacióon de contraseña
-                            userViewModel.changePassword(contrasenaActual, nuevaContrasena, confirmarContrasena)
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = verde),
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                ) {
-                    Text("Guardar")
-                }
+                            if (!regexContrasena.matches(nuevaContrasena)) {
+                                nuevaContrasenaError = "Debe tener al menos 8 caracteres, mayúscula, minúscula y número o símbolo"
+                                valido = false
+                            }
+
+                            if (nuevaContrasena != confirmarContrasena) {
+                                confirmarContrasenaError = "Las contraseñas no coinciden"
+                                valido = false
+                            }
+
+                            if (valido) {
+                                // Aqui iria la logica real de actualizacióon de contraseña
+                                userViewModel.changePassword(contrasenaActual, nuevaContrasena, confirmarContrasena)
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = verde),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text("Guardar")
+                    }
             }
         }
-
-        BottomNavBar(navController = navController, currentRoute = Routes.PROFILE)
     }
 }
 

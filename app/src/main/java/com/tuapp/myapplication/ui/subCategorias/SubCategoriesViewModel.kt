@@ -33,14 +33,20 @@ class SubCategoriesViewModel(
     private var _categoriesExpenses = MutableStateFlow<List<OptionsDomain>>(emptyList())
     val categoriesExpenses: StateFlow<List<OptionsDomain>> = _categoriesExpenses
 
-    fun getSubCategoriesList(finanzaId: Int? = null){
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+
+    fun getSubCategoriesList(finanzaId: Int? = null, isRefreshing: Boolean = false){
         viewModelScope.launch {
             subCategoryRepository.getSubCategoriesList(finanzaId)
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
-                            _isLoading.value = true
+                            if(isRefreshing){
+                                _isRefreshing.value = true
+                            } else {
+                                _isLoading.value = true
+                            }
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
@@ -48,11 +54,13 @@ class SubCategoriesViewModel(
                             //LISTA DE SUB CATEGORIAS
                             _subCategoriesList.value = resource.data
                             _isLoading.value = false
+                            _isRefreshing.value = false
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
                             _mensajeError.value = resource.message ?: "Error al obtener subcategorias"
                             _isLoading.value = false
+                            _isRefreshing.value = false
                         }
                     }
                 }
