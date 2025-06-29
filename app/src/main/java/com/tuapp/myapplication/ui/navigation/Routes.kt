@@ -47,6 +47,9 @@ data class TransaccionesScreen(val id: Int, val nombreFinanza: String)
 @Serializable
 data class AhorroScreen(val id: Int)
 
+@Serializable
+data class GroupDetailsScreen(val finanzaId: Int)
+
 object Routes {
     const val LOGIN = "login"
     const val REGISTER = "register"

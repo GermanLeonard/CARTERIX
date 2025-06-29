@@ -175,27 +175,41 @@ fun SubcategoriasScreen(
                                         .fillMaxWidth()
                                         .padding(vertical = 6.dp),
                                     colors = CardDefaults.cardColors(
-                                        containerColor = Color(
-                                            0xFFF0F0F0
-                                        )
+                                        containerColor = Color(0xFFF0F0F0)
                                     )
                                 ) {
-                                    Column(modifier = Modifier.padding(12.dp)) {
-                                        Text(
-                                            sub.categoria_nombre,
-                                            color = Color.Black,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text("${sub.sub_categoria_nombre} - ${sub.tipo_gasto}")
-                                        Text("Presupuesto: $${sub.presupuesto}", color = verde)
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(12.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Column {
+                                            Text(
+                                                sub.categoria_nombre,
+                                                color = Color.Black,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Text("${sub.sub_categoria_nombre} - ${sub.tipo_gasto}")
+                                            Text("Presupuesto: $${sub.presupuesto}", color = verde)
+                                        }
+                                        if (finanzaId != null) {
+                                            Text(
+                                                text = sub.nombre_usuario,
+                                                modifier = Modifier.align(Alignment.CenterVertically),
+                                                fontSize = 12.sp,
+                                                color = Color.Gray
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                }
             }
         }
     }
-}
+
 
 

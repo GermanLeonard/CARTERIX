@@ -5,10 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -18,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.ui.components.CustomTopBar
+import com.tuapp.myapplication.ui.navigation.RegistrarTransaccionScreen
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,122 +31,108 @@ import com.tuapp.myapplication.ui.navigation.Routes
 fun IngresosScreen(
     navController: NavController,
     finanzaId: Int?,
-    incomeViewModel: IngresosViewModel = viewModel(factory = IngresosViewModel.Factory)
+    ingresosViewModel: IngresosViewModel = viewModel(factory = IngresosViewModel.Factory)
 ) {
-    val ingresos by incomeViewModel.incomeList.collectAsStateWithLifecycle()
-    val isLoading by incomeViewModel.isLoading.collectAsStateWithLifecycle()
-    val mensajeError by incomeViewModel.mensajeError.collectAsStateWithLifecycle()
-
-    var showDialog by rememberSaveable { mutableStateOf(false) }
-    var nombre by rememberSaveable { mutableStateOf("") }
-    var monto by rememberSaveable { mutableStateOf("") }
-    var descripcionIngreso by rememberSaveable { mutableStateOf("") }
-
-    var showEditDialog by rememberSaveable { mutableStateOf(false) }
-    var selectedIngresoId by rememberSaveable { mutableIntStateOf(0)}
-
-    val ingresoDetails by incomeViewModel.ingresoDetails.collectAsStateWithLifecycle()
-
-    val verde = Color(0xFF2E7D32)
-
-    val pullToRefreshState = rememberPullToRefreshState()
-    val isRefreshing by incomeViewModel.isRefreshing.collectAsStateWithLifecycle()
-
-    val currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL
+    val ingresosList by ingresosViewModel.incomeList.collectAsStateWithLifecycle()
+    val isLoading by ingresosViewModel.isLoading.collectAsStateWithLifecycle()
+    val mensajeError by ingresosViewModel.mensajeError.collectAsStateWithLifecycle()
+    val isRefreshing by ingresosViewModel.isRefreshing.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        incomeViewModel.getIncomesList(finanzaId)
+        ingresosViewModel.getIncomesList(finanzaId)
     }
 
-    LaunchedEffect(ingresoDetails) {
-        nombre = ingresoDetails.nombre_ingreso
-        monto = ingresoDetails.monto_ingreso.toString()
-        descripcionIngreso = ingresoDetails.descripcion_ingreso
-        selectedIngresoId = ingresoDetails.id_ingreso
-    }
+    val pullToRefreshState = rememberPullToRefreshState()
+    val currentRoute = if (finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL
+    val verde = Color(0xFF2E7D32)
 
     Scaffold(
         topBar = {
             CustomTopBar(Routes.INGRESOS, navController, true)
         },
+        bottomBar = {
+            BottomNavBar(navController = navController, currentRoute = currentRoute)
+        },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { showDialog = true },
+                onClick = { navController.navigate(RegistrarTransaccionScreen(finanzaId ?: 0)) },
                 containerColor = verde,
-                modifier = Modifier
-                    .padding(end = 24.dp, bottom = 80.dp)
+                modifier = Modifier.padding(end = 24.dp, bottom = 100.dp)
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Agregar", tint = Color.White)
             }
         },
-        bottomBar = {
-            BottomNavBar(navController = navController, currentRoute = currentRoute)
-        },
         containerColor = verde,
         contentColor = Color.Black
     ) { innerPadding ->
-        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(vertical = 8.dp)
-                        .background(
-                            color = Color.White,
-                            shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
-                        )
-                        .padding(horizontal = 25.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 8.dp)
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
+                    )
+                    .padding(horizontal = 25.dp)
+            ) {
+                Spacer(modifier = Modifier.height(25.dp))
+
+                if (mensajeError != null) {
+                    Text(
+                        text = mensajeError ?: "",
+                        color = Color.Red,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+
+                if (isLoading) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                PullToRefreshBox(
+                    state = pullToRefreshState,
+                    isRefreshing = isRefreshing,
+                    onRefresh = {
+                        ingresosViewModel.getIncomesList(finanzaId, true)
+                    }
                 ) {
-
-                    if (isLoading) {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                            CircularProgressIndicator()
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(25.dp))
-
-                    mensajeError?.let {
-                        Text(
-                            text = it,
-                            color = Color.Red,
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                    }
-                    PullToRefreshBox(
-                        state = pullToRefreshState,
-                        isRefreshing = isRefreshing,
-                        onRefresh = {
-                            incomeViewModel.getIncomesList(finanzaId, true)
-                        }
-                    ) {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            items(ingresos) { ingreso ->
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 6.dp),
-                                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
-                                ) {
-                                Box(modifier = Modifier.fillMaxWidth()) {
-                                    Column(modifier = Modifier.padding(12.dp)) {
-                                        Text(ingreso.nombre_ingreso, fontWeight = FontWeight.Bold)
-                                        Text("$${ingreso.monto_ingreso}", color = verde)
-                                    }
-                                    IconButton(
-                                        onClick = {
-                                            incomeViewModel.getIncomeDetails(ingreso.id_ingreso)
-                                            showEditDialog = true
-                                        },
-                                        modifier = Modifier.align(Alignment.TopEnd)
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(ingresosList) { ingreso ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 6.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+                            ) {
+                                Column(modifier = Modifier.padding(12.dp)) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = null,
-                                            tint = Color(0xFF3D4B4E)
-                                        )
+                                        Column {
+                                            Text(
+                                                ingreso.nombre_ingreso,
+                                                color = Color.Black,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Text("Monto: $${ingreso.monto_ingreso}")
+                                        }
+                                        if (finanzaId != null) {
+                                            Text(
+                                                ingreso.nombre_usuario,
+                                                color = Color.Gray,
+                                                fontSize = 12.sp,
+                                                modifier = Modifier.align(Alignment.Bottom)
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -158,134 +142,4 @@ fun IngresosScreen(
             }
         }
     }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showDialog = false
-                nombre = ""
-                descripcionIngreso = ""
-                monto = ""
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    if (nombre.isNotBlank() && descripcionIngreso.isNotBlank() && monto.isNotBlank()) {
-                        incomeViewModel.createIncome(nombre, descripcionIngreso, monto.toDouble(), finanzaId)
-                        incomeViewModel.getIncomesList(finanzaId)
-                        nombre = ""
-                        descripcionIngreso = ""
-                        monto = ""
-                        showDialog = false
-                    }
-                }) {
-                    Text("Registrar")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    nombre = ""
-                    descripcionIngreso = ""
-                    monto = ""
-                    showDialog = false
-                }) {
-                    Text("Cancelar")
-                }
-            },
-            title = { Text("Nuevo Ingreso") },
-            text = {
-                Column {
-                    OutlinedTextField(
-                        value = nombre,
-                        onValueChange = { nombre = it },
-                        label = { Text("Nombre Ingreso") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = descripcionIngreso,
-                        onValueChange = { descripcionIngreso = it },
-                        label = { Text("Descripcion del ingreso") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = monto,
-                        onValueChange = { monto = it },
-                        label = { Text("Monto") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
-                }
-            }
-        )
-    } else if (showEditDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showEditDialog = false
-                selectedIngresoId = 0
-                nombre = ""
-                descripcionIngreso = ""
-                monto = ""
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    if (nombre.isNotBlank() && descripcionIngreso.isNotBlank() && monto.isNotBlank()) {
-                        incomeViewModel.updateIncome(nombre, descripcionIngreso, monto.toDouble(), selectedIngresoId)
-                        incomeViewModel.getIncomesList(finanzaId)
-                        nombre = ""
-                        descripcionIngreso = ""
-                        monto = ""
-                        selectedIngresoId = 0
-                        showEditDialog = false
-                    }
-                }) {
-                    Text("Editar")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    nombre = ""
-                    descripcionIngreso = ""
-                    monto = ""
-                    selectedIngresoId = 0
-                    showEditDialog = false
-                }) {
-                    Text("Cancelar")
-                }
-            },
-            title = { Text("Editar Ingreso") },
-            text = {
-                Column {
-                    OutlinedTextField(
-                        value = nombre,
-                        onValueChange = { nombre = it },
-                        label = { Text("Nombre Ingreso") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = descripcionIngreso,
-                        onValueChange = { descripcionIngreso = it },
-                        label = { Text("Descripcion del ingreso") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = monto,
-                        onValueChange = { monto = it },
-                        label = { Text("Monto") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
-                }
-            }
-        )
-    }
 }
-

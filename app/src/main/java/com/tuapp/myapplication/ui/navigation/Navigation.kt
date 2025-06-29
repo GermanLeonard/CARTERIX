@@ -32,6 +32,8 @@ import com.tuapp.myapplication.ui.subCategorias.SubcategoriasScreen
 import com.tuapp.myapplication.ui.transacciones.DetallesTransaccionScreen
 import com.tuapp.myapplication.ui.transacciones.RegistrarTransaccionesScreen
 import com.tuapp.myapplication.ui.transacciones.TransaccionesScreen
+// Agrega este import para tu GroupDetailsScreen composable
+import com.tuapp.myapplication.ui.finanzas.finanzaGrupal.GroupDetailsScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -152,9 +154,14 @@ fun AppNavigation(
                     val finanzaId = if(id == 0) null else id
                     IngresosScreen(navController, finanzaId)
                 }
+
+                composable<GroupDetailsScreen> { backStackEntry ->
+                    val finanzaId = backStackEntry.arguments?.getInt("finanzaId") ?: return@composable
+                    GroupDetailsScreen(finanzaId = finanzaId, navController = navController)
+                }
+
             }
         }
     }
 
 }
-

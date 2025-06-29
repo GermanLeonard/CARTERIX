@@ -75,7 +75,13 @@ fun IndividualFinanceScreen(
 
     Scaffold(
         topBar = {
-            CustomTopBar(nombreFinanza, navController)
+            CustomTopBar(
+                title = nombreFinanza,
+                navController = navController,
+                showBackArrow = true,
+                showOptions = finanzaId != null,
+                finanzaId = finanzaId
+            )
         },
         bottomBar = {
             BottomNavBar(navController = navController, currentRoute = currentRoute)

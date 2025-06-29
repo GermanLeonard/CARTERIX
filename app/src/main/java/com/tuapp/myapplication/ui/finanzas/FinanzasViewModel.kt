@@ -11,6 +11,7 @@ import com.tuapp.myapplication.data.models.financeModels.request.CreateFinanceRe
 import com.tuapp.myapplication.data.models.financeModels.request.JoinFinanceRequestDomain
 import com.tuapp.myapplication.data.models.financeModels.response.CategorieResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.DatoAnalisisDomain
+import com.tuapp.myapplication.data.models.financeModels.response.FinanceDetailsResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.FinancesListResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.ResumenAhorrosResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.ResumenEgresosResponseDomain
@@ -45,6 +46,12 @@ class FinanzasViewModel(
 
     private val _listaGrupos = MutableStateFlow<List<FinancesListResponseDomain>>(emptyList())
     val listaGrupos: StateFlow<List<FinancesListResponseDomain>> = _listaGrupos
+
+    private val _financeDetails = MutableStateFlow<FinanceDetailsResponseDomain?>(null)
+    val financeDetails: StateFlow<FinanceDetailsResponseDomain?> = _financeDetails.asStateFlow()
+
+    private val _loadingDetails = MutableStateFlow(false)
+    val loadingDetails: StateFlow<Boolean> = _loadingDetails.asStateFlow()
 
 
     fun getRole(finanzaId: Int) {
@@ -162,14 +169,15 @@ class FinanzasViewModel(
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingDetails.value = true
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            resource.data
+                            _loadingDetails.value = false
+                            _financeDetails.value = resource.data // ¡Aquí guardas los datos!
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _loadingDetails.value = false
+                            // Maneja el error como necesites
                         }
                     }
                 }
