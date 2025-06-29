@@ -50,6 +50,9 @@ data class AhorroScreen(val id: Int)
 @Serializable
 data class GroupDetailsScreen(val finanzaId: Int)
 
+@Serializable
+data class FilterByCategoryScreen(val finanzaId: Int, val nombreFinanza: String)
+
 object Routes {
     const val LOGIN = "login"
     const val REGISTER = "register"
@@ -66,5 +69,5 @@ object Routes {
     const val DETALLE_TRANSACCION = "Detalles Transaccion"
     const val TRANSACCIONES = "transacciones"
     const val AHORRO = "Metas de Ahorro"
-
+    const val FILTER_BY_CATEGORY = "filter_by_category"
 }

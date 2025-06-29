@@ -47,7 +47,6 @@ fun GroupDetailsScreen(
         viewModel.getFinanceDetails(finanzaId)
     }
 
-    // Determinar si el usuario actual es admin
     val isAdmin = details?.finanza_miembros?.find {
         it.nombre_usuario == userCredentials.nombre
     }?.rol_usuario == 1
@@ -68,7 +67,7 @@ fun GroupDetailsScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Opciones futuras */ }) {
+                    IconButton(onClick = { /* Opciones futuras */a }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "Opciones", tint = Color.White)
                     }
                 },
@@ -169,7 +168,6 @@ fun GroupDetailsScreen(
                         )
                     }
 
-                    // Espacio adicional para el FAB
                     item {
                         Spacer(modifier = Modifier.height(80.dp))
                     }
@@ -178,7 +176,6 @@ fun GroupDetailsScreen(
         }
     }
 
-    // Diálogo de código de invitación
     if (showInviteDialog) {
         AlertDialog(
             onDismissRequest = { showInviteDialog = false },
@@ -209,7 +206,6 @@ fun GroupDetailsScreen(
             dismissButton = {
                 TextButton(
                     onClick = {
-                        // Aquí podrías copiar al clipboard
                         showInviteDialog = false
                     }
                 ) {
@@ -218,14 +214,10 @@ fun GroupDetailsScreen(
             }
         )
 
-        // Observar el código de invitación generado
         LaunchedEffect(Unit) {
-            // Aquí deberías observar el código generado desde el ViewModel
-            // inviteCode = viewModel.generatedInviteCode.value
         }
     }
 
-    // Diálogo de confirmación para eliminar miembro
     showDeleteConfirmation?.let { userId ->
         val miembro = details?.finanza_miembros?.find { it.id_usuario == userId }
         AlertDialog(
@@ -333,7 +325,6 @@ fun MemberCard(
                 }
             }
 
-            // Botón de eliminar solo si es admin y no es el mismo admin
             if (isCurrentUserAdmin && miembro.rol_usuario != 1) {
                 IconButton(
                     onClick = onDeleteClick,
