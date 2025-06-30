@@ -1,56 +1,84 @@
 package com.tuapp.myapplication.ui.subCategorias
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.tuapp.myapplication.ui.categorias.CategoriesViewModel
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.ui.components.CustomTopBar
 import com.tuapp.myapplication.ui.navigation.Routes
-import com.tuapp.myapplication.ui.subCategorias.SubCategoriesViewModel
 
 @Composable
 fun DetalleSubCategoriaScreen(
     navController: NavController,
     subcategoriaId: Int,
     finanzaId: Int?,
+    categoriasViewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory),
     subCategoriesViewModel: SubCategoriesViewModel = viewModel(factory = SubCategoriesViewModel.Factory)
 ) {
     val verde = Color(0xFF2E7D32)
 
-    val loadingDetails by subCategoriesViewModel.isLoading.collectAsStateWithLifecycle()
-    val subcategoria by subCategoriesViewModel.subcategoriaDetalle.collectAsStateWithLifecycle()
+    val categoriesOptions by categoriasViewModel.categoriesOptions.collectAsStateWithLifecycle()
+    val gastoOpciones by subCategoriesViewModel.categoriesExpenses.collectAsStateWithLifecycle()
+    val loadingOptions by categoriasViewModel.loadingOptions.collectAsStateWithLifecycle()
 
-    var categoriaNombre by rememberSaveable { mutableStateOf("") }
-    var subCategoriaNombre by rememberSaveable { mutableStateOf("") }
+    val loadingDetails by subCategoriesViewModel.loadingDetails.collectAsStateWithLifecycle()
+    val subcategoria by subCategoriesViewModel.subcategoriaDetalle.collectAsStateWithLifecycle()
+    val detailsError by subCategoriesViewModel.detailsError.collectAsStateWithLifecycle()
+
+    var categoriaPadre by rememberSaveable { mutableStateOf("") }
+    var categoriaId by rememberSaveable { mutableIntStateOf(0) }
+    var nombre by rememberSaveable { mutableStateOf("") }
     var tipoGasto by rememberSaveable { mutableStateOf("") }
-    var presupuesto by rememberSaveable { mutableDoubleStateOf(0.0) }
-    var nombreUsuario by rememberSaveable { mutableStateOf("") }
+    var gastoId by rememberSaveable { mutableIntStateOf(0) }
+    var presupuesto by rememberSaveable { mutableStateOf("") }
+
+    var mensajeActualizar by rememberSaveable { mutableStateOf("") }
+
+    var editingSubCategory by rememberSaveable { mutableStateOf(false) }
+    var expandedTipoGasto by rememberSaveable { mutableStateOf(false) }
+    var expandedCategoria by rememberSaveable { mutableStateOf(false) }
+
+    val loadingUpdating by subCategoriesViewModel.loadingUpdating.collectAsStateWithLifecycle()
+    val updatedCategory by subCategoriesViewModel.updatedCategory.collectAsStateWithLifecycle()
+    val updatingError by subCategoriesViewModel.updatingError.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         subCategoriesViewModel.getSubCategoryDetails(subcategoriaId)
+        categoriasViewModel.getCategoriesOptions(finanzaId)
+        subCategoriesViewModel.getExpensesOptions()
     }
 
     LaunchedEffect(subcategoria) {
-        subcategoria?.let { detalle ->
-            subCategoriaNombre = detalle.nombre_sub_categoria
-            tipoGasto = when (detalle.tipo_gasto_id) {
-                1 -> "Gasto Fijo"
-                2 -> "Gasto Variable"
-                else -> "Desconocido"
-            }
-            presupuesto = detalle.presupuesto
+        categoriaPadre = categoriesOptions.find { it.categoria_id == subcategoria.categoria_id }?.categoria_nombre
+            ?: ""
+        categoriaId = subcategoria.categoria_id
+        nombre = subcategoria.nombre_sub_categoria
+        tipoGasto = gastoOpciones.find { it.tipo_id == subcategoria.tipo_gasto_id }?.tipo_nombre ?: ""
+        gastoId = subcategoria.tipo_gasto_id
+        presupuesto = subcategoria.presupuesto.toString()
+    }
+
+    LaunchedEffect(updatedCategory) {
+        if(updatedCategory){
+            navController.popBackStack()
         }
     }
 
@@ -75,59 +103,197 @@ fun DetalleSubCategoriaScreen(
                     )
                     .padding(horizontal = 16.dp)
             ) {
-                if (loadingDetails) {
+
+                if (loadingDetails || loadingOptions || loadingUpdating) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
+                } else if(detailsError.isNotBlank()){
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(detailsError, fontSize = 15.sp, color = Color.Red)
+                    }
                 }
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(24.dp)
+                Spacer(modifier = Modifier.height(25.dp))
+
+                Text("Categoria Padre")
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        if(editingSubCategory) Color(0xFFE8EAF6) else Color(0xFFE0E0E0),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .clickable(enabled = editingSubCategory) {
+                        expandedCategoria = true
+                    }
+                    .padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = categoriaPadre.ifEmpty { "Selecciona la categoria Padre" },
+                            color = if(editingSubCategory) Color.Black else Color.Gray
+                        )
+                        Icon(
+                            Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            tint = if(editingSubCategory) Color.Black else Color.Gray
+                        )
+                    }
+                }
+
+                DropdownMenu(
+                    expanded = expandedCategoria,
+                    onDismissRequest = { expandedCategoria = false}
                 ) {
-                    Text("Categoría", fontWeight = FontWeight.Bold)
-                    OutlinedTextField(
-                        value = categoriaNombre,
-                        onValueChange = {},
-                        singleLine = true,
-                        enabled = false,
-                        modifier = Modifier.fillMaxWidth()
+                    categoriesOptions.forEach{
+                        DropdownMenuItem(
+                            text = { Text(it.categoria_nombre)},
+                            onClick = {
+                                categoriaPadre = it.categoria_nombre
+                                categoriaId = it.categoria_id
+                                expandedCategoria = false
+                            }
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text("Nombre de Subcategoria")
+                TextField(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    placeholder = { Text("Ej: Gasolina") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    enabled = editingSubCategory
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text("Tipo de Gasto")
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        if (editingSubCategory) Color(0xFFE8EAF6) else Color(0xFFE0E0E0),
+                        shape = RoundedCornerShape(8.dp)
                     )
+                    .clickable(enabled = editingSubCategory) {
+                       expandedTipoGasto = true
+                    }
+                    .padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = tipoGasto.ifEmpty { "Selecciona el tipo de gasto" },
+                            color = if(editingSubCategory) Color.Black else Color.Gray
+                        )
+                        Icon(
+                            Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            tint = if(editingSubCategory) Color.Black else Color.Gray
+                        )
+                    }
+                }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                DropdownMenu(
+                    expanded = expandedTipoGasto,
+                    onDismissRequest = {
+                        expandedTipoGasto = false
+                    }
+                ) {
+                    gastoOpciones.forEach {
+                        DropdownMenuItem(
+                            text = {Text(it.tipo_nombre)},
+                            onClick = {
+                                tipoGasto = it.tipo_nombre
+                                gastoId = it.tipo_id
+                                expandedTipoGasto = false
+                            }
+                        )
+                    }
+                }
 
-                    Text("Subcategoría", fontWeight = FontWeight.Bold)
-                    OutlinedTextField(
-                        value = subCategoriaNombre,
-                        onValueChange = {},
-                        singleLine = true,
-                        enabled = false,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Text("Presupuesto Mensual")
+                TextField(
+                    value = presupuesto,
+                    onValueChange = { presupuesto = it },
+                    placeholder = { Text("Ej: 100.0") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    enabled = editingSubCategory,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
 
-                    Text("Tipo de Gasto", fontWeight = FontWeight.Bold)
-                    OutlinedTextField(
-                        value = tipoGasto,
-                        onValueChange = {},
-                        singleLine = true,
-                        enabled = false,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    if(updatingError.isBlank()){
+                        Text(mensajeActualizar.ifBlank { "" }, fontSize = 12.sp, color = Color.Red)
+                    } else {
+                        Text(updatingError, fontSize = 12.sp, color = Color.Red)
+                    }
+                }
 
-                    Text("Presupuesto", fontWeight = FontWeight.Bold)
-                    OutlinedTextField(
-                        value = "$$presupuesto",
-                        onValueChange = {},
-                        singleLine = true,
-                        enabled = false,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                Spacer(modifier = Modifier.height(24.dp))
 
+                AnimatedContent(targetState = editingSubCategory, label = "") { isEditing ->
+                    if (isEditing) {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Button(
+                                onClick = {
+                                    if (categoriaId != 0 && nombre.isNotBlank() && presupuesto.isNotBlank() && gastoId != 0) {
+                                        subCategoriesViewModel.updateSubCategory(
+                                            subCategoriaId = subcategoriaId,
+                                            idCategoria = categoriaId,
+                                            nombreSubCategoria = nombre,
+                                            presupuestoMensual = presupuesto.toDouble(),
+                                            tipoGastoId = gastoId,
+                                        )
+                                    } else {
+                                        mensajeActualizar = "Completa todos los campos para actualizar la finanza"
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = verde)
+                            ) {
+                                Text("Actualizar")
+                            }
+
+                            OutlinedButton(onClick = { editingSubCategory = false }) {
+                                Text("Cancelar", color = verde)
+                            }
+                        }
+                    } else {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Button(
+                                onClick = {
+                                    editingSubCategory = true
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = verde)
+                            ) {
+                                Text("Editar")
+                            }
+
+                            OutlinedButton(onClick = { navController.popBackStack() }) {
+                                Text("Cancelar", color = verde)
+                            }
+                        }
+                    }
                 }
             }
         }

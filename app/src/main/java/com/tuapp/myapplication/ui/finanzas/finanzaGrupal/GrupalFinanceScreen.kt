@@ -58,6 +58,9 @@ fun GrupalFinanceScreen(
     val pullToRefreshState = rememberPullToRefreshState()
     val isRefreshing by viewModel.isRefreshingFinanceList.collectAsStateWithLifecycle()
 
+    val joinedFinance by viewModel.joinedFinance.collectAsStateWithLifecycle()
+    val joiningError by viewModel.joiningError.collectAsStateWithLifecycle()
+
     LaunchedEffect(userCredentials) {
         nombre = userCredentials.nombre
     }
@@ -71,6 +74,14 @@ fun GrupalFinanceScreen(
             viewModel.getFinancesList()
             showCreateDialog = false
             viewModel.resetCreatedState()
+        }
+    }
+
+    LaunchedEffect(joinedFinance) {
+        if(joinedFinance){
+            viewModel.getFinancesList()
+            showJoinDialog = false
+            viewModel.resetJoinedState()
         }
     }
 
@@ -161,7 +172,9 @@ fun GrupalFinanceScreen(
             onDismiss = { showJoinDialog = false },
             onJoin = { code ->
                 viewModel.joinFinance(code)
-            }
+            },
+            finanzasViewModel = viewModel,
+            errorMessage = joiningError
         )
     }
 

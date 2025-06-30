@@ -36,21 +36,23 @@ class CategoriesViewModel(
     private var _loadingDetails = MutableStateFlow(false)
     val loadingDetails: StateFlow<Boolean> = _loadingDetails
 
+    private var _loadingOptions = MutableStateFlow(false)
+    val loadingOptions: StateFlow<Boolean> = _loadingOptions
+
     fun getCategoriesOptions(finanzaId: Int? = null) {
         viewModelScope.launch {
             categoriesRepository.getCategoriesOptions(finanzaId)
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingOptions.value = true
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            //LISTA DE LAS OPCIONES DE CATEGORIAS PARA LOS SELECTS DE LOS FORMULARIOS
                             _categoriesOptions.value = resource.data
+                            _loadingOptions.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _loadingOptions.value = false
                         }
                     }
                 }

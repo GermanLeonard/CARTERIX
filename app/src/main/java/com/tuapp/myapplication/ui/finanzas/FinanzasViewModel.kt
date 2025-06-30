@@ -139,6 +139,10 @@ class FinanzasViewModel(
         }
     }
 
+    fun resetCode() {
+        _inviteCode.value = ""
+    }
+
     private var _isRefreshingFinanceList = MutableStateFlow(false)
     val isRefreshingFinanceList: StateFlow<Boolean> = _isRefreshingFinanceList
 
@@ -210,24 +214,39 @@ class FinanzasViewModel(
         }
     }
 
+    private var _loadingJoin = MutableStateFlow(false)
+    val loadingJoin: StateFlow<Boolean> = _loadingJoin
+
+    private var _joinedFinance = MutableStateFlow(false)
+    val joinedFinance: StateFlow<Boolean> = _joinedFinance
+
+    private var _joiningError = MutableStateFlow("")
+    val joiningError: StateFlow<String> = _joiningError
+
     fun joinFinance(codigo: String){
         viewModelScope.launch {
             finanzaRepository.joinFinance(JoinFinanceRequestDomain(codigo))
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingJoin.value = true
+                            _joiningError.value = ""
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            resource.data
+                            _joinedFinance.value = resource.data.success
+                            _loadingJoin.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _joiningError.value = resource.message
+                            _loadingJoin.value = false
                         }
                     }
                 }
         }
+    }
+
+    fun resetJoinedState() {
+        _joinedFinance.value = false
     }
 
     private var _loadingCreate = MutableStateFlow(false)
@@ -285,24 +304,39 @@ class FinanzasViewModel(
         }
     }
 
+    private var _loadingDelete = MutableStateFlow(false)
+    val loadingDelete: StateFlow<Boolean> = _loadingDelete
+
+    private var _deletedUser = MutableStateFlow(false)
+    val deletedUser: StateFlow<Boolean> = _deletedUser
+
+    private var _deletingError = MutableStateFlow("")
+    val deletingError: StateFlow<String> = _deletingError
+
     fun deleteFromFinance(userId: Int, finanzaId: Int) {
         viewModelScope.launch {
             finanzaRepository.deleteFromFinance(userId, finanzaId)
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingDelete.value = true
+                            _deletingError.value = ""
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            resource.data
+                            _deletedUser.value = resource.data.success
+                            _loadingDelete.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _deletingError.value = ""
+                            _loadingDelete.value = false
                         }
                     }
                 }
         }
+    }
+
+    fun resetDeletedUserState() {
+        _deletedUser.value = false
     }
 
     companion object {

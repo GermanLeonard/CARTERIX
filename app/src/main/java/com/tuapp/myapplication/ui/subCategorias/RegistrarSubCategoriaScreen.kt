@@ -13,7 +13,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,8 +47,8 @@ fun RegistrarSubcategoriaScreen(
 
     var presupuesto by rememberSaveable { mutableStateOf("") }
 
-    var showCategoriaMenu by rememberSaveable { mutableStateOf(false) }
-    var showTipoMenu by rememberSaveable { mutableStateOf(false) }
+    var expandedTipoGasto by rememberSaveable { mutableStateOf(false) }
+    var expandedCategoria by rememberSaveable { mutableStateOf(false) }
 
     var mensajeRegistro by rememberSaveable { mutableStateOf("") }
 
@@ -105,7 +104,7 @@ fun RegistrarSubcategoriaScreen(
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0xFFE8EAF6), shape = RoundedCornerShape(8.dp))
-                    .clickable { showCategoriaMenu = !showCategoriaMenu }
+                    .clickable { expandedCategoria = true }
                     .padding(16.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -116,26 +115,19 @@ fun RegistrarSubcategoriaScreen(
                     }
                 }
 
-                if (showCategoriaMenu) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.White)
-                            .padding(4.dp)
-                    ) {
-                        categoriesOptions.forEach {
-                            Text(
-                                text = it.categoria_nombre,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        categoriaPadre = it.categoria_nombre
-                                        categoriaId = it.categoria_id
-                                        showCategoriaMenu = false
-                                    }
-                                    .padding(12.dp)
-                            )
-                        }
+                DropdownMenu(
+                    expanded = expandedCategoria,
+                    onDismissRequest = { expandedCategoria = false}
+                ) {
+                    categoriesOptions.forEach{
+                        DropdownMenuItem(
+                            text = { Text(it.categoria_nombre)},
+                            onClick = {
+                                categoriaPadre = it.categoria_nombre
+                                categoriaId = it.categoria_id
+                                expandedCategoria = false
+                            }
+                        )
                     }
                 }
 
@@ -156,7 +148,7 @@ fun RegistrarSubcategoriaScreen(
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0xFFE8EAF6), shape = RoundedCornerShape(8.dp))
-                    .clickable { showTipoMenu = !showTipoMenu }
+                    .clickable {expandedTipoGasto = true}
                     .padding(16.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -167,26 +159,21 @@ fun RegistrarSubcategoriaScreen(
                     }
                 }
 
-                if (showTipoMenu) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.White)
-                            .padding(4.dp)
-                    ) {
-                        gastoOpciones.forEach {
-                            Text(
-                                text = it.tipo_nombre,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        tipoGasto = it.tipo_nombre
-                                        gastoId = it.tipo_id
-                                        showTipoMenu = false
-                                    }
-                                    .padding(12.dp)
-                            )
-                        }
+                DropdownMenu(
+                    expanded = expandedTipoGasto,
+                    onDismissRequest = {
+                        expandedTipoGasto = false
+                    }
+                ) {
+                    gastoOpciones.forEach {
+                        DropdownMenuItem(
+                            text = {Text(it.tipo_nombre)},
+                            onClick = {
+                                tipoGasto = it.tipo_nombre
+                                gastoId = it.tipo_id
+                                expandedTipoGasto = false
+                            }
+                        )
                     }
                 }
 

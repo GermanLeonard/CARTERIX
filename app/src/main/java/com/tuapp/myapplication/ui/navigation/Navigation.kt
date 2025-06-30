@@ -32,6 +32,7 @@ import com.tuapp.myapplication.ui.transacciones.DetallesTransaccionScreen
 import com.tuapp.myapplication.ui.transacciones.RegistrarTransaccionesScreen
 import com.tuapp.myapplication.ui.transacciones.TransaccionesScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaGrupal.GroupDetailsScreen
+import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.ConsejoIAScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.FiltroGraficoScreen
 import com.tuapp.myapplication.ui.profile.EditProfileScreen
 import com.tuapp.myapplication.ui.subCategorias.DetalleSubCategoriaScreen
@@ -57,8 +58,6 @@ fun AppNavigation(
         is TokenState.Loaded -> {
 
             val token = (tokenState as TokenState.Loaded).token
-            // val token = "hola"
-
 
             NavHost(
                 navController = navController,
@@ -202,7 +201,12 @@ fun AppNavigation(
                         finanzaId = finanzaId
                     )
                 }
+                composable<ConsejoScreen> { backStackEntry ->
+                    val id = backStackEntry.arguments?.getInt("finanzaId") ?: return@composable
+                    val finanzaId: Int? = if(id != 0) id else null
 
+                    ConsejoIAScreen(navController, finanzaId)
+                }
             }
         }
 

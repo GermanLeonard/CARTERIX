@@ -37,8 +37,6 @@ class SubCategoriesViewModel(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
-    private val _subcategoriaDetalle = MutableStateFlow<SubCategoriaDomain?>(null)
-    val subcategoriaDetalle: StateFlow<SubCategoriaDomain?> = _subcategoriaDetalle
 
     fun getSubCategoriesList(finanzaId: Int? = null, isRefreshing: Boolean = false){
         viewModelScope.launch {
@@ -70,19 +68,31 @@ class SubCategoriesViewModel(
         }
     }
 
+    private var _loadingDetails = MutableStateFlow(false)
+    val loadingDetails: StateFlow<Boolean> = _loadingDetails
+
+    private var _subcategoriaDetalle = MutableStateFlow(SubCategoriaDomain(0, "", 0.0, 0))
+    val subcategoriaDetalle: StateFlow<SubCategoriaDomain> = _subcategoriaDetalle
+
+    private var _detailsError = MutableStateFlow("")
+    val detailsError: StateFlow<String> = _detailsError
+
     fun getSubCategoryDetails(subCategoryId: Int) {
         viewModelScope.launch {
             subCategoryRepository.getSubCategoryDetails(subCategoryId)
                 .collect { resource ->
                     when (resource) {
                         is Resource.Loading -> {
+                            _loadingDetails.value = true
+                            _detailsError.value = ""
                         }
-
                         is Resource.Success -> {
-                            resource.data
+                            _subcategoriaDetalle.value = resource.data
+                            _loadingDetails.value = false
                         }
-
                         is Resource.Error -> {
+                            _detailsError.value = resource.message
+                            _loadingDetails.value = false
                         }
                     }
                 }

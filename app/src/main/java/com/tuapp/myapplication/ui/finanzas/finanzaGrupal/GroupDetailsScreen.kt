@@ -58,6 +58,10 @@ fun GroupDetailsScreen(
     val inviteCode by viewModel.inviteCode.collectAsStateWithLifecycle()
     val inviteError by viewModel.inviteError.collectAsStateWithLifecycle()
 
+    val loadingDeleting by viewModel.loadingDelete.collectAsStateWithLifecycle()
+    val deletedUser by viewModel.deletedUser.collectAsStateWithLifecycle()
+    val deletingError by viewModel.deletingError.collectAsStateWithLifecycle()
+
     LaunchedEffect(finanzaId) {
         viewModel.getFinanceDetails(finanzaId)
     }
@@ -66,6 +70,14 @@ fun GroupDetailsScreen(
         isAdmin = details.finanza_miembros.find {
             it.nombre_usuario == userCredentials.nombre
         }?.rol_usuario == 1
+    }
+
+    LaunchedEffect(deletedUser) {
+        if(deletedUser){
+            viewModel.getFinanceDetails(finanzaId)
+            showDeleteConfirmation = null
+            viewModel.resetDeletedUserState()
+        }
     }
 
     Scaffold(
@@ -196,7 +208,10 @@ fun GroupDetailsScreen(
 
     if (showInviteDialog) {
         AlertDialog(
-            onDismissRequest = { showInviteDialog = false },
+            onDismissRequest = {
+                showInviteDialog = false
+                viewModel.resetCode()
+                               },
             title = { Text("Código de Invitación") },
             text = {
                 Column(
@@ -223,23 +238,28 @@ fun GroupDetailsScreen(
                         }
                     } else if(inviteCode.isNotBlank()){
                         CopyableCodeField(inviteCode)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("El codigo expira en 15 minutos")
                     }
                 }
             },
             confirmButton = {
-                TextButton(
-                    onClick = { showInviteDialog = false }
-                ) {
-                    Text("Cerrar")
-                }
-            },
-            dismissButton = {
                 TextButton(
                     onClick = {
                         viewModel.createInvite(finanzaId)
                     }
                 ) {
                     Text("Generar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showInviteDialog = false
+                        viewModel.resetCode()
+                    }
+                ) {
+                    Text("Cerrar")
                 }
             }
         )
@@ -251,13 +271,26 @@ fun GroupDetailsScreen(
             onDismissRequest = { showDeleteConfirmation = null },
             title = { Text("Confirmar eliminación") },
             text = {
-                Text("¿Estás seguro de que quieres eliminar a ${miembro?.nombre_usuario} del grupo?")
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    if(loadingDeleting){
+                        CircularProgressIndicator()
+                    } else {
+                        Text("¿Estás seguro de que quieres eliminar a ${miembro?.nombre_usuario} del grupo?")
+                        Spacer(modifier = Modifier.height(8.dp))
+                        if(deletingError.isNotBlank()){
+                            Text(deletingError, fontSize = 15.sp, color = Color.Red)
+                        }
+                    }
+                }
             },
             confirmButton = {
                 TextButton(
                     onClick = {
                         viewModel.deleteFromFinance(userId, finanzaId)
-                        showDeleteConfirmation = null
                     }
                 ) {
                     Text("Eliminar", color = Color.Red)
@@ -293,7 +326,6 @@ fun CopyableCodeField(code: String) {
             fontSize = 20.sp,
             color = Color.Black
         )
-
         IconButton(onClick = {
             clipboardManager.setText(AnnotatedString(code))
             Toast.makeText(context, "Copiado al portapapeles", Toast.LENGTH_SHORT).show()

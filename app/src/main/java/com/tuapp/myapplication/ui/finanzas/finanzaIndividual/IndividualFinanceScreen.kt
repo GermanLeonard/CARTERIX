@@ -8,6 +8,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -26,6 +28,7 @@ import com.tuapp.myapplication.ui.components.CustomTopBar
 import com.tuapp.myapplication.ui.components.MonthSelector
 import com.tuapp.myapplication.ui.components.TabSelector
 import com.tuapp.myapplication.ui.finanzas.FinanzasViewModel
+import com.tuapp.myapplication.ui.navigation.ConsejoScreen
 import com.tuapp.myapplication.ui.navigation.Routes
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -85,6 +88,18 @@ fun IndividualFinanceScreen(
                 showOptions = finanzaId != null,
                 finanzaId = finanzaId
             )
+        },
+        floatingActionButton = {
+           FloatingActionButton(
+                onClick = {
+                    navController.navigate(ConsejoScreen(finanzaId ?: 0))
+                },
+                containerColor = verde,
+                modifier = Modifier
+                   .padding(end = 24.dp, bottom = 80.dp)
+           ) {
+               Icon(Icons.Filled.Check , contentDescription = "Pedir consejo", tint = Color.White )
+           }
         },
         bottomBar = {
             BottomNavBar(navController = navController, currentRoute = currentRoute)

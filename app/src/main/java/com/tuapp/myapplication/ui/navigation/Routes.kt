@@ -57,6 +57,8 @@ data class FilterByCategoryScreen(val finanzaId: Int, val nombreFinanza: String)
 @Serializable
 data class DetalleSubCategoriaRoute(val subcategoriaId: Int, val finanzaId: Int)
 
+@Serializable
+data class ConsejoScreen(val finanzaId: Int)
 
 object Routes {
     const val INDIVIDUAL = "individual"
@@ -74,4 +76,5 @@ object Routes {
     const val FINANZA_CONJUNTA = "Lista de Finanzas"
     const val FILTRAR_CATEGORIA = "Filtrar Categoria"
     const val AHORRO = "Metas de Ahorro"
+    const val CONSEJO = "Pidele un tip a la IA"
 }
