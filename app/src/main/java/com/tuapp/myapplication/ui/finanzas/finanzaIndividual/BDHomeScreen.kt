@@ -40,7 +40,7 @@ fun BDHomeScreen(
 
     Scaffold(
         topBar = {
-            CustomTopBar(nombreFinanza, navController)
+            CustomTopBar(nombreFinanza, navController, showOptions = finanzaId != 0, finanzaId = if(finanzaId != 0) finanzaId else null)
         },
         bottomBar = {
             BottomNavBar(navController = navController, currentRoute = currentRoute)

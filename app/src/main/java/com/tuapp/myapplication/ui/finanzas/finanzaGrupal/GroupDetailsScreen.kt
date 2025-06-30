@@ -1,5 +1,6 @@
 package com.tuapp.myapplication.ui.finanzas.finanzaGrupal
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,17 +8,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AdminPanelSettings
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,8 +30,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.tuapp.myapplication.ui.finanzas.FinanzasViewModel
 import com.tuapp.myapplication.ui.auth.UserViewModel
+import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.components.CustomTopBar
+import com.tuapp.myapplication.ui.navigation.Routes
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GroupDetailsScreen(
     finanzaId: Int,
@@ -35,52 +41,48 @@ fun GroupDetailsScreen(
     viewModel: FinanzasViewModel = viewModel(factory = FinanzasViewModel.Factory),
     userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
 ) {
+
+    val verde = Color(0xFF2E7D32)
+
     val details by viewModel.financeDetails.collectAsStateWithLifecycle()
     val loading by viewModel.loadingDetails.collectAsStateWithLifecycle()
+    val detailsError by viewModel.detailsError.collectAsStateWithLifecycle()
     val userCredentials by userViewModel.userCredential.collectAsStateWithLifecycle()
 
-    var showInviteDialog by remember { mutableStateOf(false) }
-    var showDeleteConfirmation by remember { mutableStateOf<Int?>(null) }
-    var inviteCode by remember { mutableStateOf("") }
+    var showInviteDialog by rememberSaveable { mutableStateOf(false) }
+    var showDeleteConfirmation by rememberSaveable { mutableStateOf<Int?>(null) }
+
+    var isAdmin by rememberSaveable { mutableStateOf(false) }
+
+    val loadingInvite by viewModel.loadingInvite.collectAsStateWithLifecycle()
+    val inviteCode by viewModel.inviteCode.collectAsStateWithLifecycle()
+    val inviteError by viewModel.inviteError.collectAsStateWithLifecycle()
 
     LaunchedEffect(finanzaId) {
         viewModel.getFinanceDetails(finanzaId)
     }
 
-    val isAdmin = details?.finanza_miembros?.find {
-        it.nombre_usuario == userCredentials.nombre
-    }?.rol_usuario == 1
+    LaunchedEffect(details) {
+        isAdmin = details.finanza_miembros.find {
+            it.nombre_usuario == userCredentials.nombre
+        }?.rol_usuario == 1
+    }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = details?.finanza_titulo ?: "Cargando...",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Color.White)
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* Opciones futuras */ }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Opciones", tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF2E7D32)
+            CustomTopBar(
+                Routes.DETALLE_FINANZA,
+                navController,
+                true
                 )
-            )
+        },
+        bottomBar = {
+            BottomNavBar(navController, Routes.GROUP)
         },
         floatingActionButton = {
             if (isAdmin) {
                 FloatingActionButton(
                     onClick = {
-                        viewModel.createInvite(finanzaId)
                         showInviteDialog = true
                     },
                     containerColor = Color(0xFF2E7D32)
@@ -88,17 +90,33 @@ fun GroupDetailsScreen(
                     Icon(Icons.Default.Add, contentDescription = "Generar invitación", tint = Color.White)
                 }
             }
-        }
-    ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
-            if (loading || details == null) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = Color(0xFF2E7D32))
+        },
+        contentColor = Color.Black,
+        containerColor = verde
+    ) { innerPadding ->
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 8.dp)
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
+                    )
+                    .padding(horizontal = 16.dp)
+            ) {
+                if(loading) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        CircularProgressIndicator()
+                    }
+                } else if(detailsError.isNotBlank()){
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        Text(detailsError, fontSize = 15.sp, color = Color.Red)
+                    }
                 }
-            } else {
+
+                Spacer(modifier = Modifier.height(25.dp))
+
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -123,7 +141,7 @@ fun GroupDetailsScreen(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = details!!.finanza_descripcion.ifEmpty { "Sin descripción" },
+                                    text = details.finanza_descripcion.ifEmpty { "Sin descripción" },
                                     color = Color.DarkGray,
                                     fontSize = 14.sp
                                 )
@@ -149,7 +167,7 @@ fun GroupDetailsScreen(
                                 shape = RoundedCornerShape(16.dp)
                             ) {
                                 Text(
-                                    text = "${details!!.finanza_miembros.size}",
+                                    text = "${details.finanza_miembros.size}",
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                                     color = Color.White,
                                     fontWeight = FontWeight.Bold
@@ -159,7 +177,7 @@ fun GroupDetailsScreen(
                     }
 
                     // Lista de miembros
-                    items(details!!.finanza_miembros) { miembro ->
+                    items(details.finanza_miembros) { miembro ->
                         MemberCard(
                             miembro = miembro,
                             isCurrentUserAdmin = isAdmin,
@@ -181,18 +199,30 @@ fun GroupDetailsScreen(
             onDismissRequest = { showInviteDialog = false },
             title = { Text("Código de Invitación") },
             text = {
-                Column {
-                    Text("Comparte este código para invitar nuevos miembros:")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
-                    ) {
-                        Text(
-                            text = inviteCode.ifEmpty { "Generando..." },
-                            modifier = Modifier.padding(16.dp),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
-                        )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    if(loadingInvite){
+                        CircularProgressIndicator()
+                    } else if(inviteCode.isBlank()) {
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+                        ) {
+                            Text(
+                                text = "Generar Codigo",
+                                modifier = Modifier.padding(16.dp),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        if(inviteError.isNotBlank()){
+                            Text(inviteError, fontSize = 15.sp, color = Color.Red)
+                        }
+                    } else if(inviteCode.isNotBlank()){
+                        CopyableCodeField(inviteCode)
                     }
                 }
             },
@@ -206,20 +236,17 @@ fun GroupDetailsScreen(
             dismissButton = {
                 TextButton(
                     onClick = {
-                        showInviteDialog = false
+                        viewModel.createInvite(finanzaId)
                     }
                 ) {
-                    Text("Copiar")
+                    Text("Generar")
                 }
             }
         )
-
-        LaunchedEffect(Unit) {
-        }
     }
 
     showDeleteConfirmation?.let { userId ->
-        val miembro = details?.finanza_miembros?.find { it.id_usuario == userId }
+        val miembro = details.finanza_miembros.find { it.id_usuario == userId }
         AlertDialog(
             onDismissRequest = { showDeleteConfirmation = null },
             title = { Text("Confirmar eliminación") },
@@ -246,6 +273,36 @@ fun GroupDetailsScreen(
         )
     }
 }
+
+@Composable
+fun CopyableCodeField(code: String) {
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFF5F5F5), shape = RoundedCornerShape(50.dp))
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = code,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            color = Color.Black
+        )
+
+        IconButton(onClick = {
+            clipboardManager.setText(AnnotatedString(code))
+            Toast.makeText(context, "Copiado al portapapeles", Toast.LENGTH_SHORT).show()
+        }) {
+            Icon(Icons.Default.ContentCopy, contentDescription = "Copiar", tint = Color.Black)
+        }
+    }
+}
+
 
 @Composable
 fun MemberCard(

@@ -107,8 +107,8 @@ class IngresosViewModel(
                         _creatingError.value = ""
                     }
                     is Resource.Success -> {
-                        _creatingLoading.value = resource.data.success
-                        _isLoading.value = false
+                        _createdIncome.value = resource.data.success
+                        _creatingLoading.value = false
                     }
                     is Resource.Error -> {
                         _creatingError.value = resource.message

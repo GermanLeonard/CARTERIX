@@ -141,25 +141,38 @@ class UserViewModel(
         }
     }
 
+    private var _loadingChangeProfile = MutableStateFlow(false)
+    val loadingChangeProfile: StateFlow<Boolean> = _loadingChangeProfile
+
+    private var _changeProfileError = MutableStateFlow("")
+    val changeProfileError: StateFlow<String> = _changeProfileError
+
     fun changeProfile(nombre: String, correo: String){
         viewModelScope.launch {
             userRepository.changeProfile(ChangeProfileRequestDomain(nombre, correo))
                 .collect{ resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingChangeProfile.value = true
+                            _changeProfileError.value = ""
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            resource.data.message
+                            _loadingChangeProfile.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _changeProfileError.value = resource.message
+                            _loadingChangeProfile.value = false
                         }
                     }
                 }
         }
     }
+
+    private var _loadingChangePassword = MutableStateFlow(false)
+    val loadingChangePassword: StateFlow<Boolean> = _loadingChangePassword
+
+    private var _changePasswordError = MutableStateFlow("")
+    val changePasswordError: StateFlow<String> = _changePasswordError
 
     fun changePassword(contrasenaActual: String, nuevaContrasena: String, confirmarContrasena: String){
         viewModelScope.launch {
@@ -167,14 +180,15 @@ class UserViewModel(
                 .collect{ resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingChangePassword.value = true
+                            _changePasswordError.value = ""
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            resource.data.message
+                            _loadingChangePassword.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _changePasswordError.value = resource.message
+                            _loadingChangePassword.value = false
                         }
                     }
                 }

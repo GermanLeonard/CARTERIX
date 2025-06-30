@@ -12,6 +12,8 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -26,19 +28,35 @@ import androidx.navigation.NavHostController
 import com.tuapp.myapplication.data.models.financeModels.response.FinancesListResponseDomain
 import com.tuapp.myapplication.ui.auth.UserViewModel
 import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.components.CustomTopBar
 import com.tuapp.myapplication.ui.finanzas.FinanzasViewModel
 import com.tuapp.myapplication.ui.navigation.FinanzaIndividualScreen
 import com.tuapp.myapplication.ui.navigation.Routes
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GrupalFinanceScreen(
     navController: NavHostController,
     viewModel: FinanzasViewModel = viewModel(factory = FinanzasViewModel.Factory),
     userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
 ) {
+    val verde = Color(0xFF2E7D32)
 
     val userCredentials by userViewModel.userCredential.collectAsStateWithLifecycle()
     var nombre by rememberSaveable { mutableStateOf("") }
+
+    val loadingFinanceList by viewModel.loadingFinanceList.collectAsStateWithLifecycle()
+    val loadingFinanceListError by viewModel.loadingFinancesListError.collectAsStateWithLifecycle()
+
+    val grupos by viewModel.listaGrupos.collectAsState()
+    var showJoinDialog by rememberSaveable { mutableStateOf(false) }
+    var showCreateDialog by rememberSaveable { mutableStateOf(false) }
+
+    val createdFinance by viewModel.createdFinance.collectAsStateWithLifecycle()
+    val creatingError by viewModel.creatingError.collectAsStateWithLifecycle()
+
+    val pullToRefreshState = rememberPullToRefreshState()
+    val isRefreshing by viewModel.isRefreshingFinanceList.collectAsStateWithLifecycle()
 
     LaunchedEffect(userCredentials) {
         nombre = userCredentials.nombre
@@ -48,11 +66,18 @@ fun GrupalFinanceScreen(
         viewModel.getFinancesList()
     }
 
-    val grupos by viewModel.listaGrupos.collectAsState()
-    var showJoinDialog by rememberSaveable { mutableStateOf(false) }
-    var showCreateDialog by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(createdFinance) {
+        if(createdFinance){
+            viewModel.getFinancesList()
+            showCreateDialog = false
+            viewModel.resetCreatedState()
+        }
+    }
 
     Scaffold(
+        topBar = {
+            CustomTopBar(Routes.FINANZA_CONJUNTA, navController)
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showCreateDialog = true },
@@ -64,31 +89,15 @@ fun GrupalFinanceScreen(
         bottomBar = {
             BottomNavBar(navController = navController, currentRoute = Routes.GROUP)
         },
+        contentColor = Color.Black,
+        containerColor = verde
     ) { paddingValues ->
-
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color.White)
         ) {
-            // Header verde
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFF2E7D32))
-                    .padding(vertical = 24.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Lista de Finanzas",
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
@@ -97,36 +106,51 @@ fun GrupalFinanceScreen(
                     )
                     .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
+                    if(loadingFinanceList){
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                            CircularProgressIndicator()
+                        }
+                    } else if(loadingFinanceListError.isNotBlank()){
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                            Text(loadingFinanceListError, fontSize = 15.sp, color = Color.Red)
+                        }
+                    }
 
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                    if (grupos.isEmpty()) {
-                        Text("No estás en ningún grupo aún.")
-                    } else {
-                        LazyColumn(modifier = Modifier.weight(1f)) {
-                            items(grupos) { grupo ->
-                                GrupoItem(grupo, navController, viewModel, nombre)
+                    PullToRefreshBox(
+                        state = pullToRefreshState,
+                        isRefreshing = isRefreshing,
+                        onRefresh = {
+                            viewModel.getFinancesList(true)
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        if (grupos.isEmpty()) {
+                            Text("No estás en ningún grupo aún.")
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                items(grupos) { grupo ->
+                                    GrupoItem(grupo, navController, viewModel, nombre)
+                                }
                             }
                         }
                     }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        FloatingActionButton(
-                            onClick = { showJoinDialog = true },
-                            containerColor = Color(0xFF2E7D32)
-                        ) {
-                            Icon(Icons.Default.Link, contentDescription = "Unirse a grupo")
-                        }
-                    }
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(alignment = Alignment.BottomEnd)
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                FloatingActionButton(
+                    onClick = { showJoinDialog = true },
+                    containerColor = Color(0xFF2E7D32)
+                ) {
+                    Icon(Icons.Default.Link, contentDescription = "Unirse a grupo")
                 }
             }
         }
@@ -137,7 +161,6 @@ fun GrupalFinanceScreen(
             onDismiss = { showJoinDialog = false },
             onJoin = { code ->
                 viewModel.joinFinance(code)
-                showJoinDialog = false
             }
         )
     }
@@ -147,8 +170,9 @@ fun GrupalFinanceScreen(
             onDismiss = { showCreateDialog = false },
             onCreate = { titulo, descripcion ->
                 viewModel.createFinance(titulo, descripcion)
-                showCreateDialog = false
-            }
+            },
+            finanzasViewModel = viewModel,
+            errorMessage = creatingError
         )
     }
 }

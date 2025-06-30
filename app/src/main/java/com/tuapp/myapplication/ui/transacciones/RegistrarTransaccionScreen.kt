@@ -73,6 +73,12 @@ fun RegistrarTransaccionesScreen(
         transaccionesViewModel.getTransactionsOptions(finanzaId)
     }
 
+    LaunchedEffect(transactionCreated) {
+        if(transactionCreated){
+            navController.popBackStack()
+        }
+    }
+
     Scaffold(
         topBar = {
             CustomTopBar(Routes.REGISTRAR_TRANSACCION, navController, true)
@@ -256,10 +262,6 @@ fun RegistrarTransaccionesScreen(
                                 transaccionesViewModel.createTransaction(idTipo, idCategoria, monto.toDouble(), descripcion, fechaTransaccion, finanzaId )
                             } else{
                                 creatingError = "Completa todo los campos para registrar una transacción"
-                            }
-
-                            if(transactionCreated){
-                                navController.popBackStack()
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = verde),

@@ -13,6 +13,7 @@ import com.tuapp.myapplication.data.models.financeModels.response.CategorieRespo
 import com.tuapp.myapplication.data.models.financeModels.response.DatoAnalisisDomain
 import com.tuapp.myapplication.data.models.financeModels.response.FinanceDetailsResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.FinancesListResponseDomain
+import com.tuapp.myapplication.data.models.financeModels.response.FinanzaMiembroDomain
 import com.tuapp.myapplication.data.models.financeModels.response.ResumenAhorrosResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.ResumenEgresosResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.ResumenFinancieroResponseDomain
@@ -26,11 +27,6 @@ import kotlinx.coroutines.launch
 class FinanzasViewModel(
     private val finanzaRepository: FinanceRepository
 ): ViewModel() {
-
-    private var _roleId = MutableStateFlow(0)
-    val roleId: StateFlow<Int> = _roleId
-
-    // NUEVOS ESTADOS PARA RESUMEN ANALISIS
 
     private var _resumenFinanciero = MutableStateFlow(ResumenFinancieroResponseDomain(0.0, 0.0, 0.0))
     val resumenFinanciero: StateFlow<ResumenFinancieroResponseDomain> = _resumenFinanciero
@@ -46,28 +42,6 @@ class FinanzasViewModel(
 
     private val _listaGrupos = MutableStateFlow<List<FinancesListResponseDomain>>(emptyList())
     val listaGrupos: StateFlow<List<FinancesListResponseDomain>> = _listaGrupos
-
-    private val _financeDetails = MutableStateFlow<FinanceDetailsResponseDomain?>(null)
-    val financeDetails: StateFlow<FinanceDetailsResponseDomain?> = _financeDetails.asStateFlow()
-
-    private val _loadingDetails = MutableStateFlow(false)
-    val loadingDetails: StateFlow<Boolean> = _loadingDetails.asStateFlow()
-
-
-    fun getRole(finanzaId: Int) {
-        viewModelScope.launch {
-            finanzaRepository.getRole(finanzaId).collect { role ->
-                _roleId.value = role
-            }
-        }
-    }
-
-    //CREEN USTEDES LOS ESTADOS QUE SERAN NECESARIOS A MOSTRAR EN LA VISTA
-    // (la informacion, estados de cargando, mensajes de error, etc.)
-
-    //PONER EL ID DE LA FINANZA EN CASO DE SER CONJUNTA
-    //ESTO ES LO QUE SE MOSTRARA EN LA PANTALLA PRINCIPAL
-    //ESTO SE MOSTRARA EN LA PANTALLA DE LA FINANZA EN EL APARTADO "ANALISIS" "RESUMEN"
 
     private var _loadingResumen = MutableStateFlow(false)
     val loadingResumen: StateFlow<Boolean> = _loadingResumen
@@ -134,44 +108,85 @@ class FinanzasViewModel(
         }
     }
 
+    private var _loadingInvite = MutableStateFlow(false)
+    val loadingInvite: StateFlow<Boolean> = _loadingInvite
+
+    private var _inviteError = MutableStateFlow("")
+    val inviteError: StateFlow<String> = _inviteError
+
+    private var _inviteCode = MutableStateFlow("")
+    val inviteCode: StateFlow<String> = _inviteCode
+
     fun createInvite(finanzaId: Int){
         viewModelScope.launch {
             finanzaRepository.createInvite(finanzaId)
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingInvite.value = true
+                            _inviteError.value = ""
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            resource.data
+                            _inviteCode.value = resource.data.codigo_invitacion
+                            _loadingInvite.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _inviteError.value = resource.message
+                            _loadingInvite.value = false
                         }
                     }
                 }
         }
     }
 
-    fun getFinancesList() {
+    private var _isRefreshingFinanceList = MutableStateFlow(false)
+    val isRefreshingFinanceList: StateFlow<Boolean> = _isRefreshingFinanceList
+
+    private var _loadingFinancesList = MutableStateFlow(false)
+    val loadingFinanceList: StateFlow<Boolean> = _loadingFinancesList
+
+    private var _loadingFinancesListError = MutableStateFlow("")
+    val loadingFinancesListError: StateFlow<String> = _loadingFinancesListError
+
+    fun getFinancesList(isRefreshing: Boolean = false) {
         viewModelScope.launch {
             finanzaRepository.getFinancesList()
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            // Opcional: Puedes manejar estado de carga si deseas
+                            if(isRefreshing){
+                                _isRefreshingFinanceList.value = true
+                            } else {
+                                _loadingFinancesList.value = true
+                            }
+                            _loadingFinancesListError.value = ""
                         }
                         is Resource.Success -> {
                             _listaGrupos.value = resource.data
+                            _loadingFinancesList.value = false
+                            _isRefreshingFinanceList.value = false
                         }
                         is Resource.Error -> {
-                            // Opcional: Mostrar error o log
+                            _loadingFinancesListError.value = resource.message
+                            _loadingFinancesList.value = false
+                            _isRefreshingFinanceList.value = false
                         }
                     }
                 }
         }
     }
+
+    private var _financeDetails = MutableStateFlow<FinanceDetailsResponseDomain>(
+        FinanceDetailsResponseDomain(
+       "", emptyList(), ""
+    ))
+    val financeDetails: StateFlow<FinanceDetailsResponseDomain> = _financeDetails
+
+    private var _loadingDetails = MutableStateFlow(false)
+    val loadingDetails: StateFlow<Boolean> = _loadingDetails
+
+    private var _detailsError = MutableStateFlow("")
+    val detailsError: StateFlow<String> = _detailsError
 
     fun getFinanceDetails(finanzaId: Int){
         viewModelScope.launch {
@@ -180,14 +195,15 @@ class FinanzasViewModel(
                     when(resource){
                         is Resource.Loading -> {
                             _loadingDetails.value = true
+                            _detailsError.value = ""
                         }
                         is Resource.Success -> {
+                            _financeDetails.value = resource.data
                             _loadingDetails.value = false
-                            _financeDetails.value = resource.data // ¡Aquí guardas los datos!
                         }
                         is Resource.Error -> {
+                            _detailsError.value = resource.message
                             _loadingDetails.value = false
-                            // Maneja el error como necesites
                         }
                     }
                 }
@@ -214,24 +230,39 @@ class FinanzasViewModel(
         }
     }
 
+    private var _loadingCreate = MutableStateFlow(false)
+    val loadingCreate: StateFlow<Boolean> = _loadingCreate
+
+    private var _createdFinance = MutableStateFlow(false)
+    val createdFinance: StateFlow<Boolean> = _createdFinance
+
+    private var _creatingError = MutableStateFlow("")
+    val creatingError: StateFlow<String> = _creatingError
+
     fun createFinance(titulo: String, descripcion: String) {
         viewModelScope.launch {
             finanzaRepository.createFinance(CreateFinanceRequestDomain(titulo, descripcion))
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingCreate.value = true
+                            _creatingError.value = ""
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            resource.data
+                            _createdFinance.value = resource.data.success
+                            _loadingCreate.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _creatingError.value = resource.message
+                            _loadingCreate.value = false
                         }
                     }
                 }
         }
+    }
+
+    fun resetCreatedState() {
+        _createdFinance.value = false
     }
 
     fun leaveFinance(finanzaId: Int) {

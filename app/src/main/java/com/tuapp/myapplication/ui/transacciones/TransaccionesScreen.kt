@@ -88,7 +88,7 @@ fun TransaccionesScreen(
             BottomNavBar(navController = navController, currentRoute = currentRoute)
         },
         topBar = {
-            CustomTopBar(nombreFinanza, navController)
+            CustomTopBar(nombreFinanza, navController, showOptions = finanzaId != null, finanzaId = finanzaId)
         },
         containerColor = verde,
         contentColor = Color.Black

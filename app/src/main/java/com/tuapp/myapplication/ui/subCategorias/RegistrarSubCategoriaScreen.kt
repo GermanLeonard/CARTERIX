@@ -65,6 +65,12 @@ fun RegistrarSubcategoriaScreen(
         subCategoriaViewModel.getExpensesOptions()
     }
 
+    LaunchedEffect(createdCategory) {
+        if(createdCategory){
+            navController.popBackStack()
+        }
+    }
+
     Scaffold(
         topBar = {
             CustomTopBar(Routes.REGISTRAR_SUBCATEGORIA, navController, true)
@@ -224,10 +230,6 @@ fun RegistrarSubcategoriaScreen(
                                 )
                             } else {
                                 mensajeRegistro = "Completa todos los campos para registrar"
-                            }
-
-                            if(createdCategory){
-                                navController.popBackStack()
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = verde)

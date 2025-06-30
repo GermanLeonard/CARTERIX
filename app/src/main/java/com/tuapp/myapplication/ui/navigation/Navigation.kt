@@ -16,7 +16,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.tuapp.myapplication.helpers.TokenState
-import com.tuapp.myapplication.profile.EditProfileScreen
 import com.tuapp.myapplication.profile.ProfileScreen
 import com.tuapp.myapplication.ui.ahorro.AhorrosScreen
 import com.tuapp.myapplication.ui.auth.LoginScreen
@@ -34,6 +33,7 @@ import com.tuapp.myapplication.ui.transacciones.RegistrarTransaccionesScreen
 import com.tuapp.myapplication.ui.transacciones.TransaccionesScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaGrupal.GroupDetailsScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.FiltroGraficoScreen
+import com.tuapp.myapplication.ui.profile.EditProfileScreen
 import com.tuapp.myapplication.ui.subCategorias.DetalleSubCategoriaScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -83,7 +83,7 @@ fun AppNavigation(
 
                     val finanzaId: Int? = if (id == 0) null else id
                     val titulo: String =
-                        if (nombreFinanza.isBlank()) "Finanza principal" else nombreFinanza
+                        nombreFinanza.ifBlank { "Finanza principal" }
 
                     IndividualFinanceScreen(
                         navController,
@@ -110,7 +110,7 @@ fun AppNavigation(
                     val nombreFinanza =
                         backStackEntry.arguments?.getString("nombreFinanza") ?: return@composable
                     val titulo: String =
-                        if (nombreFinanza.isBlank()) "Finanza principal" else nombreFinanza
+                        nombreFinanza.ifBlank { "Finanza principal" }
 
                     TransaccionesScreen(
                         navController,
@@ -145,7 +145,7 @@ fun AppNavigation(
                         backStackEntry.arguments?.getString("nombreFinanza") ?: return@composable
 
                     val titulo: String =
-                        if (nombreFinanza.isBlank()) "Finanza principal" else nombreFinanza
+                        nombreFinanza.ifBlank { "Finanza principal" }
                     BDHomeScreen(navController, finanzaId = id, titulo)
                 }
 
@@ -186,12 +186,10 @@ fun AppNavigation(
 
                 composable<FilterByCategoryScreen> { backStackEntry ->
                     val finanzaId = backStackEntry.arguments?.getInt("finanzaId") ?: return@composable
-                    val nombreFinanza = backStackEntry.arguments?.getString("nombreFinanza") ?: return@composable
 
                     FiltroGraficoScreen(
                         navController = navController,
                         finanzaId = finanzaId,
-                        nombreFinanza = nombreFinanza
                     )
                 }
                 composable<DetalleSubCategoriaRoute> { backStackEntry ->

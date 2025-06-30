@@ -1,4 +1,4 @@
-package com.tuapp.myapplication.profile
+package com.tuapp.myapplication.ui.profile
 
 import android.util.Patterns
 import androidx.compose.foundation.background
@@ -44,10 +44,15 @@ fun EditProfileScreen(
         if(email.isBlank()) email = userCredentials.correo
     }
 
+    val loadingChangeProfile by userViewModel.loadingChangeProfile.collectAsStateWithLifecycle()
+    val changeProfileError by userViewModel.changeProfileError.collectAsStateWithLifecycle()
+
+    val loadingChangePassword by userViewModel.loadingChangePassword.collectAsStateWithLifecycle()
+    val changePasswordError by userViewModel.changePasswordError.collectAsStateWithLifecycle()
+
     // VALIDACIONES
     var emailError by rememberSaveable { mutableStateOf<String?>(null) }
     var nuevaContrasenaError by rememberSaveable { mutableStateOf<String?>(null) }
-    var confirmarContrasenaError by rememberSaveable { mutableStateOf<String?>(null) }
 
     Scaffold(
         topBar = {
@@ -71,6 +76,13 @@ fun EditProfileScreen(
                     .padding(horizontal = 25.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
+                if(loadingChangeProfile || loadingChangePassword){
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        CircularProgressIndicator()
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(30.dp))
 
                     Text("Información de perfil", fontWeight = FontWeight.Bold, fontSize = 25.sp)
@@ -83,8 +95,10 @@ fun EditProfileScreen(
                     }
 
                     // MOSTRAR ERROR DE EMAIL
-                    if (emailError != null) {
-                        Text(emailError!!, color = Color.Red, fontSize = 12.sp)
+                    if (changeProfileError.isBlank()) {
+                        Text(emailError ?: "", color = Color.Red, fontSize = 12.sp)
+                    } else {
+                        Text(changeProfileError, color = Color.Red, fontSize = 12.sp)
                     }
 
                     Button(
@@ -94,8 +108,6 @@ fun EditProfileScreen(
                                 emailError = "Correo inválido"
                             } else {
                                 emailError = null
-                                // Aqui iria la logica real de actualizacion de datos
-                                //manejen errores y success porfavor
                                 userViewModel.changeProfile(nombre, email)
                             }
                         },
@@ -116,38 +128,28 @@ fun EditProfileScreen(
                         nuevaContrasenaError = null
                     }
 
-                    // MOSTRAR ERROR DE NUEVA CONTRASEÑA
-                    if (nuevaContrasenaError != null) {
-                        Text(nuevaContrasenaError!!, color = Color.Red, fontSize = 12.sp)
-                    }
 
                     CustomField("Confirmar contraseña", confirmarContrasena) {
                         confirmarContrasena = it
-                        confirmarContrasenaError = null
                     }
 
-                    // MOSTRAR ERROR DE CONFIRMACION
-                    if (confirmarContrasenaError != null) {
-                        Text(confirmarContrasenaError!!, color = Color.Red, fontSize = 12.sp)
-                    }
+                if (changePasswordError.isBlank()) {
+                    Text(nuevaContrasenaError ?: "", color = Color.Red, fontSize = 12.sp)
+                } else{
+                    Text(changePasswordError, color = Color.Red, fontSize = 12.sp)
+                }
 
                     Button(
                         onClick = {
-                            val regexContrasena = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[\\d\\W]).{8,}$")
+                            val regexContrasena = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_])[A-Za-z\\d\\W_]{8,}$")
                             var valido = true
 
                             if (!regexContrasena.matches(nuevaContrasena)) {
-                                nuevaContrasenaError = "Debe tener al menos 8 caracteres, mayúscula, minúscula y número o símbolo"
-                                valido = false
-                            }
-
-                            if (nuevaContrasena != confirmarContrasena) {
-                                confirmarContrasenaError = "Las contraseñas no coinciden"
+                                nuevaContrasenaError = "La contraseña ebe tener al menos 8 caracteres, mayúscula, minúscula, número y símbolo"
                                 valido = false
                             }
 
                             if (valido) {
-                                // Aqui iria la logica real de actualizacióon de contraseña
                                 userViewModel.changePassword(contrasenaActual, nuevaContrasena, confirmarContrasena)
                             }
                         },

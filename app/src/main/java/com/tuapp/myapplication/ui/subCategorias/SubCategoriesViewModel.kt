@@ -40,7 +40,6 @@ class SubCategoriesViewModel(
     private val _subcategoriaDetalle = MutableStateFlow<SubCategoriaDomain?>(null)
     val subcategoriaDetalle: StateFlow<SubCategoriaDomain?> = _subcategoriaDetalle
 
-
     fun getSubCategoriesList(finanzaId: Int? = null, isRefreshing: Boolean = false){
         viewModelScope.launch {
             subCategoryRepository.getSubCategoriesList(finanzaId)

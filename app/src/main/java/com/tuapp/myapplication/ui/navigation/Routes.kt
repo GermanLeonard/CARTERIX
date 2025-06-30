@@ -59,8 +59,6 @@ data class DetalleSubCategoriaRoute(val subcategoriaId: Int, val finanzaId: Int)
 
 
 object Routes {
-    const val LOGIN = "login"
-    const val REGISTER = "register"
     const val INDIVIDUAL = "individual"
     const val GROUP = "grupal"
     const val PROFILE = "Perfil"
@@ -72,6 +70,8 @@ object Routes {
     const val INGRESOS = "Ingresos"
     const val REGISTRAR_TRANSACCION = "Registrar Transaccion"
     const val DETALLE_TRANSACCION = "Detalles Transaccion"
-    const val TRANSACCIONES = "transacciones"
+    const val DETALLE_FINANZA = "Detalles Finanza"
+    const val FINANZA_CONJUNTA = "Lista de Finanzas"
+    const val FILTRAR_CATEGORIA = "Filtrar Categoria"
     const val AHORRO = "Metas de Ahorro"
 }

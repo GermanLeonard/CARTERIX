@@ -151,18 +151,18 @@ fun CategoriasEgresoScreen(
                                     Card(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(80.dp)
+                                            .height(100.dp)
                                             .padding(vertical = 6.dp),
                                         colors = CardDefaults.cardColors(containerColor = Color(0xFFE6F4EA))
                                     ) {
                                         Box(
-                                            modifier = Modifier.fillMaxSize(),
-                                            contentAlignment = Alignment.Center
+                                            modifier = Modifier.fillMaxSize().padding(6.dp),
                                         ) {
                                             Text(
                                                 categoria.categoria_nombre,
                                                 fontWeight = FontWeight.Medium,
-                                                fontSize = 18.sp
+                                                fontSize = 18.sp,
+                                                modifier = Modifier.align(Alignment.Center)
                                             )
 
                                             IconButton(
@@ -177,6 +177,14 @@ fun CategoriasEgresoScreen(
                                                     imageVector = Icons.Default.Edit,
                                                     contentDescription = null,
                                                     tint = Color(0xFF3D4B4E)
+                                                )
+                                            }
+                                            if(finanzaId != null){
+                                                Text(
+                                                    categoria.nombre_usuario,
+                                                    color = Color.Gray,
+                                                    fontSize = 12.sp,
+                                                    modifier = Modifier.align(Alignment.BottomEnd)
                                                 )
                                             }
                                         }
@@ -194,7 +202,6 @@ fun CategoriasEgresoScreen(
                             TextButton(onClick = {
                                 if(nuevaCategoria.isNotBlank()){
                                     categoryViewModel.createCategory(nuevaCategoria, finanzaId)
-                                    showDialog = false
                                 }
                             }) {
                                 Text("Agregar")

@@ -17,9 +17,6 @@ interface FinanceRepository {
     suspend fun getSummary(mes: Int, anio: Int, finanzaId: Int?): Flow<Resource<PrincipalFinanceResponseDomain>>
     suspend fun getData(mes: Int, anio: Int, finanzaId: Int?): Flow<Resource<List<CategorieResponseDomain>>>
 
-    //FINANZA CONJUNTA
-    suspend fun getRole(finanzaId: Int): Flow<Int>
-
     suspend fun createInvite(finanzaId: Int): Flow<Resource<CreateInviteResponseDomain>>
     suspend fun getFinancesList(): Flow<Resource<List<FinancesListResponseDomain>>>
     suspend fun getFinanceDetails(finanzaId: Int): Flow<Resource<FinanceDetailsResponseDomain>>

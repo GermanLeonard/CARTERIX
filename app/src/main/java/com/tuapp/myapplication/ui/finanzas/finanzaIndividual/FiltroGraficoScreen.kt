@@ -10,14 +10,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -28,14 +28,17 @@ import androidx.navigation.NavController
 import com.tuapp.myapplication.data.models.categoryModels.response.CategoriesListDomain
 import com.tuapp.myapplication.data.models.categoryModels.response.CategorieDataResponseDomain
 import com.tuapp.myapplication.ui.categorias.CategoriesViewModel
+import com.tuapp.myapplication.ui.components.CustomTopBar
+import com.tuapp.myapplication.ui.navigation.Routes
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FiltroGraficoScreen(
     navController: NavController,
     finanzaId: Int,
-    nombreFinanza: String
 ) {
+
+    val verde = Color(0xFF2E7D32)
+
     val gradientColors = listOf(
         Color(0xFF1B5E20),
         Color(0xFF2E7D32),
@@ -61,91 +64,54 @@ fun FiltroGraficoScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        "ANÁLISIS POR CATEGORÍAS",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navController.popBackStack() },
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(
-                                Color.White.copy(alpha = 0.2f),
-                                CircleShape
-                            )
-                    ) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
-                )
-            )
+            CustomTopBar(Routes.FILTRAR_CATEGORIA, navController = navController, true)
         },
-        containerColor = Color.Transparent
+        containerColor = verde,
+        contentColor = Color.Black,
     ) { innerPadding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(gradientColors)
-                )
+                .padding(innerPadding)
         ) {
+            // Espacio vacío decorativo
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Contenido principal
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
+                    .padding(top = 8.dp)
+                    .background(
+                        color = Color(0xFFF8F9FA),
+                        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+                    )
+                    .padding(16.dp)
             ) {
-                // Espacio vacío decorativo
+                // Lista de categorías
+                EnhancedCategoriesList(
+                    categories = categories,
+                    selectedCategory = selectedCategory,
+                    onCategorySelect = { selectedCategory = it }
+                )
+
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Contenido principal
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 8.dp)
-                        .background(
-                            color = Color(0xFFF8F9FA),
-                            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
-                        )
-                        .padding(16.dp)
+                // Detalles de la categoría seleccionada
+                AnimatedVisibility(
+                    visible = selectedCategory != null,
+                    enter = slideInVertically() + fadeIn(),
+                    exit = slideOutVertically() + fadeOut()
                 ) {
-                    // Lista de categorías
-                    EnhancedCategoriesList(
-                        categories = categories,
-                        selectedCategory = selectedCategory,
-                        onCategorySelect = { selectedCategory = it }
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Detalles de la categoría seleccionada
-                    AnimatedVisibility(
-                        visible = selectedCategory != null,
-                        enter = slideInVertically() + fadeIn(),
-                        exit = slideOutVertically() + fadeOut()
-                    ) {
-                        when {
-                            loadingDetails -> {
-                                LoadingCard()
-                            }
-                            categoryDetails != null -> {
-                                EnhancedCategorySummary(categoryDetails!!)
-                            }
-                            else -> {
-                                EmptyStateCard()
-                            }
+                    when {
+                        loadingDetails -> {
+                            LoadingCard()
+                        }
+                        categoryDetails != null -> {
+                            EnhancedCategorySummary(categoryDetails!!)
+                        }
+                        else -> {
+                            EmptyStateCard()
                         }
                     }
                 }
@@ -316,7 +282,7 @@ private fun EnhancedCategorySummary(category: CategorieDataResponseDomain) {
             ) {
                 MetricCard(
                     title = "Presupuesto",
-                    value = "${"%.2f".format(category.presupuesto_total)}",
+                    value = "%.2f".format(category.presupuesto_total),
                     icon = Icons.Default.AccountBalance,
                     color = Color(0xFF1976D2),
                     modifier = Modifier.weight(1f)
@@ -326,7 +292,7 @@ private fun EnhancedCategorySummary(category: CategorieDataResponseDomain) {
 
                 MetricCard(
                     title = "Gastado",
-                    value = "${"%.2f".format(category.gasto_total)}",
+                    value = "%.2f".format(category.gasto_total),
                     icon = Icons.Default.ShoppingCart,
                     color = Color(0xFFFF9800),
                     modifier = Modifier.weight(1f)
@@ -336,8 +302,8 @@ private fun EnhancedCategorySummary(category: CategorieDataResponseDomain) {
 
                 MetricCard(
                     title = "Balance",
-                    value = "${"%.2f".format(category.diferencia_total)}",
-                    icon = if (category.diferencia_total >= 0) Icons.Default.TrendingUp else Icons.Default.TrendingDown,
+                    value = "%.2f".format(category.diferencia_total),
+                    icon = if (category.diferencia_total >= 0) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown,
                     color = when {
                         category.diferencia_total > 0 -> Color(0xFF4CAF50)
                         category.diferencia_total < 0 -> Color(0xFFF44336)
@@ -470,7 +436,7 @@ private fun EnhancedSubcategoryItem(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "${"%.2f".format(presupuesto)}",
+                        text = "%.2f".format(presupuesto),
                         fontSize = 14.sp,
                         color = Color(0xFF1976D2),
                         fontWeight = FontWeight.Medium
@@ -484,7 +450,7 @@ private fun EnhancedSubcategoryItem(
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "${"%.2f".format(gasto)}",
+                        text = "%.2f".format(gasto),
                         fontSize = 14.sp,
                         color = Color(0xFFFF9800),
                         fontWeight = FontWeight.Medium
@@ -498,7 +464,7 @@ private fun EnhancedSubcategoryItem(
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "${"%.2f".format(diferencia)}",
+                        text = "%.2f".format(diferencia),
                         fontSize = 14.sp,
                         color = when {
                             diferencia > 0 -> Color(0xFF4CAF50)

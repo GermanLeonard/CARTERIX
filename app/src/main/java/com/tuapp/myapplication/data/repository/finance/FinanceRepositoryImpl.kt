@@ -45,13 +45,6 @@ class FinanceRepositoryImpl(
     private val categorieDataDao: CategorieDataDao,
 ): FinanceRepository {
 
-    //FUNCION PARA SABER EL ROL DEL USUARIO EL CUAL SERA USADO PARA MOSTRAR BOTONES O NO
-    override suspend fun getRole(finanzaId: Int): Flow<Int> {
-        val userId = userDao.getUser().map { it.id }.first()
-
-        return financeMembersDao.getRole(userId, finanzaId)
-    }
-
     override suspend fun getSummary(mes: Int, anio: Int, finanzaId: Int?): Flow<Resource<PrincipalFinanceResponseDomain>> = flow {
         emit(Resource.Loading)
         try{
