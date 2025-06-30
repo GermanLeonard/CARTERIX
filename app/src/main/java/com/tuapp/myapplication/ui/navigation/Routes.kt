@@ -1,5 +1,6 @@
 package com.tuapp.myapplication.ui.navigation
 
+import androidx.navigation.NavHostController
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -53,6 +54,10 @@ data class GroupDetailsScreen(val finanzaId: Int)
 @Serializable
 data class FilterByCategoryScreen(val finanzaId: Int, val nombreFinanza: String)
 
+@Serializable
+data class DetalleSubCategoriaRoute(val subcategoriaId: Int, val finanzaId: Int)
+
+
 object Routes {
     const val LOGIN = "login"
     const val REGISTER = "register"
@@ -69,5 +74,4 @@ object Routes {
     const val DETALLE_TRANSACCION = "Detalles Transaccion"
     const val TRANSACCIONES = "transacciones"
     const val AHORRO = "Metas de Ahorro"
-    const val FILTER_BY_CATEGORY = "filter_by_category"
 }

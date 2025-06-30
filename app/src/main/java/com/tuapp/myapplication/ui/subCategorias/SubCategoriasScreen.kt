@@ -26,6 +26,7 @@ import com.tuapp.myapplication.ui.components.BottomNavBar
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.categorias.CategoriesViewModel
 import com.tuapp.myapplication.ui.components.CustomTopBar
+import com.tuapp.myapplication.ui.navigation.DetalleSubCategoriaRoute
 import com.tuapp.myapplication.ui.navigation.RegistrarSubCategoriaScreen
 import com.tuapp.myapplication.ui.navigation.Routes
 
@@ -173,10 +174,15 @@ fun SubcategoriasScreen(
                                 Card(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 6.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = Color(0xFFF0F0F0)
-                                    )
+                                        .padding(vertical = 6.dp)
+                                        .clickable {
+                                            navController.navigate(
+                                                DetalleSubCategoriaRoute(
+                                                    subcategoriaId = sub.sub_categoria_id,
+                                                    finanzaId = finanzaId ?: 0
+                                                )
+                                            )
+                                        }
                                 ) {
                                     Row(
                                         modifier = Modifier
@@ -203,6 +209,7 @@ fun SubcategoriasScreen(
                                         }
                                     }
                                 }
+
                             }
                         }
                     }

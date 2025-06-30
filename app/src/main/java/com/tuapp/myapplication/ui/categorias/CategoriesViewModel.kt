@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tuapp.myapplication.CarterixApplication
 import com.tuapp.myapplication.data.models.categoryModels.request.CreateOrUpdateCategorieRequestDomain
+import com.tuapp.myapplication.data.models.categoryModels.response.CategorieDataResponseDomain
 import com.tuapp.myapplication.data.models.categoryModels.response.CategoriesListDomain
 import com.tuapp.myapplication.data.models.categoryModels.response.CategoriesOptionsDomain
 import com.tuapp.myapplication.data.repository.categories.CategoryRepository
@@ -28,6 +29,12 @@ class CategoriesViewModel(
 
     private var _loadingCategories = MutableStateFlow(false)
     val loadingCategories: StateFlow<Boolean> = _loadingCategories
+
+    private var _categoryDetails = MutableStateFlow<CategorieDataResponseDomain?>(null)
+    val categoryDetails: StateFlow<CategorieDataResponseDomain?> = _categoryDetails
+
+    private var _loadingDetails = MutableStateFlow(false)
+    val loadingDetails: StateFlow<Boolean> = _loadingDetails
     //CREEN USTEDES LOS ESTADOS QUE SERAN NECESARIOS A MOSTRAR EN LA VISTA
     // (lista de categorias, estados de cargando, mensajes de error, etc.)
 
@@ -87,21 +94,22 @@ class CategoriesViewModel(
     }
 
     //TRAE LOS DETALLES DE UNA CATEGORIA EN ESPECIFICO AL DARLE CLICK
-    fun getCategoryDetails(categoriaId: Int, finanzaId: Int? = null){
+    fun getCategoryDetails(categoriaId: Int, finanzaId: Int? = null) {
         viewModelScope.launch {
+            _loadingDetails.value = true
             categoriesRepository.getCategorieData(categoriaId, finanzaId)
                 .collect { resource ->
-                    when(resource){
+                    when(resource) {
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingDetails.value = true
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            //DETALLES DEL FILTRADO POR CATEGORIAS
-                            resource.data
+                            _categoryDetails.value = resource.data
+                            _loadingDetails.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _loadingDetails.value = false
+                            // Manejar error
                         }
                     }
                 }

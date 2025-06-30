@@ -67,7 +67,7 @@ fun GroupDetailsScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Opciones futuras */a }) {
+                    IconButton(onClick = { /* Opciones futuras */ }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "Opciones", tint = Color.White)
                     }
                 },

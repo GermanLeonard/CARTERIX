@@ -2,6 +2,7 @@ package com.tuapp.myapplication.ui.finanzas.finanzaIndividual
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,12 +23,15 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.tuapp.myapplication.data.models.financeModels.response.CategorieResponseDomain
+import com.tuapp.myapplication.ui.navigation.FilterByCategoryScreen
 import kotlin.math.max
 
 @Composable
 fun DatosAnalisisView(
     datosFinanza: List<CategorieResponseDomain>,
+    navController: NavController,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -239,11 +243,19 @@ fun DatosAnalisisView(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = "Analytics",
+                        contentDescription = "Filtrar gráfico",
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .padding(8.dp)
-                            .size(20.dp),
+                            .size(20.dp)
+                            .clickable {
+                                navController.navigate(
+                                    FilterByCategoryScreen(
+                                        finanzaId = datosFinanza.firstOrNull()?.finanza_id ?: 0,
+                                        nombreFinanza = "Filtrado"
+                                    )
+                                )
+                            },
                         tint = Color(0xFFBDBDBD)
                     )
 
