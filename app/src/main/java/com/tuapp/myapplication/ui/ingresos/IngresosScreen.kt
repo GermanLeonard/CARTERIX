@@ -56,6 +56,14 @@ fun IngresosScreen(
 
     val currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL
 
+    val loadingCreating by incomeViewModel.creatingLoading.collectAsStateWithLifecycle()
+    val createdIncome by incomeViewModel.createdIncome.collectAsStateWithLifecycle()
+    val creatingError by incomeViewModel.creatingError.collectAsStateWithLifecycle()
+
+    val loadingUpdating by incomeViewModel.updatingLoading.collectAsStateWithLifecycle()
+    val updatedIncome by incomeViewModel.updatedIncome.collectAsStateWithLifecycle()
+    val updatingError by incomeViewModel.updatingError.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
         incomeViewModel.getIncomesList(finanzaId)
     }
@@ -65,6 +73,22 @@ fun IngresosScreen(
         monto = ingresoDetails.monto_ingreso.toString()
         descripcionIngreso = ingresoDetails.descripcion_ingreso
         selectedIngresoId = ingresoDetails.id_ingreso
+    }
+
+    LaunchedEffect(createdIncome) {
+        if(createdIncome){
+            incomeViewModel.getIncomesList(finanzaId)
+            showDialog = false
+            incomeViewModel.resetCreatedState()
+        }
+    }
+
+    LaunchedEffect(updatedIncome) {
+        if(updatedIncome){
+            incomeViewModel.getIncomesList(finanzaId)
+            showEditDialog = false
+            incomeViewModel.resetUpdatedState()
+        }
     }
 
     Scaffold(
@@ -103,18 +127,14 @@ fun IngresosScreen(
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
                             CircularProgressIndicator()
                         }
+                    } else if(mensajeError.isNotBlank()){
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                            Text(mensajeError, fontSize = 15.sp, color = Color.Red)
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(25.dp))
 
-                    mensajeError?.let {
-                        Text(
-                            text = it,
-                            color = Color.Red,
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                    }
                     PullToRefreshBox(
                         state = pullToRefreshState,
                         isRefreshing = isRefreshing,
@@ -171,11 +191,9 @@ fun IngresosScreen(
                 TextButton(onClick = {
                     if (nombre.isNotBlank() && descripcionIngreso.isNotBlank() && monto.isNotBlank()) {
                         incomeViewModel.createIncome(nombre, descripcionIngreso, monto.toDouble(), finanzaId)
-                        incomeViewModel.getIncomesList(finanzaId)
                         nombre = ""
                         descripcionIngreso = ""
                         monto = ""
-                        showDialog = false
                     }
                 }) {
                     Text("Registrar")
@@ -193,31 +211,43 @@ fun IngresosScreen(
             },
             title = { Text("Nuevo Ingreso") },
             text = {
-                Column {
-                    OutlinedTextField(
-                        value = nombre,
-                        onValueChange = { nombre = it },
-                        label = { Text("Nombre Ingreso") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = descripcionIngreso,
-                        onValueChange = { descripcionIngreso = it },
-                        label = { Text("Descripcion del ingreso") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = monto,
-                        onValueChange = { monto = it },
-                        label = { Text("Monto") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ){
+                    if(loadingCreating){
+                        CircularProgressIndicator()
+                    } else {
+                        OutlinedTextField(
+                            value = nombre,
+                            onValueChange = { nombre = it },
+                            label = { Text("Nombre Ingreso") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = descripcionIngreso,
+                            onValueChange = { descripcionIngreso = it },
+                            label = { Text("Descripcion del ingreso") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = monto,
+                            onValueChange = { monto = it },
+                            label = { Text("Monto") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
+                        Spacer(modifier = Modifier.height(15.dp))
+                        if (creatingError.isNotBlank()) {
+                            Text(creatingError, fontSize = 15.sp, color = Color.Red)
+                        }
+                    }
                 }
             }
         )
@@ -234,12 +264,10 @@ fun IngresosScreen(
                 TextButton(onClick = {
                     if (nombre.isNotBlank() && descripcionIngreso.isNotBlank() && monto.isNotBlank()) {
                         incomeViewModel.updateIncome(nombre, descripcionIngreso, monto.toDouble(), selectedIngresoId)
-                        incomeViewModel.getIncomesList(finanzaId)
                         nombre = ""
                         descripcionIngreso = ""
                         monto = ""
                         selectedIngresoId = 0
-                        showEditDialog = false
                     }
                 }) {
                     Text("Editar")
@@ -258,31 +286,43 @@ fun IngresosScreen(
             },
             title = { Text("Editar Ingreso") },
             text = {
-                Column {
-                    OutlinedTextField(
-                        value = nombre,
-                        onValueChange = { nombre = it },
-                        label = { Text("Nombre Ingreso") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = descripcionIngreso,
-                        onValueChange = { descripcionIngreso = it },
-                        label = { Text("Descripcion del ingreso") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = monto,
-                        onValueChange = { monto = it },
-                        label = { Text("Monto") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ){
+                    if(loadingUpdating){
+                        CircularProgressIndicator()
+                    } else {
+                        OutlinedTextField(
+                            value = nombre,
+                            onValueChange = { nombre = it },
+                            label = { Text("Nombre Ingreso") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = descripcionIngreso,
+                            onValueChange = { descripcionIngreso = it },
+                            label = { Text("Descripcion del ingreso") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = monto,
+                            onValueChange = { monto = it },
+                            label = { Text("Monto") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
+                        Spacer(modifier = Modifier.height(15.dp))
+                        if (updatingError.isNotBlank()) {
+                            Text(updatingError, fontSize = 15.sp, color = Color.Red)
+                        }
+                    }
                 }
             }
         )

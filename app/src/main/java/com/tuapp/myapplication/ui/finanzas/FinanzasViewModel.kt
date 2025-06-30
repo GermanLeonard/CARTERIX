@@ -65,6 +65,9 @@ class FinanzasViewModel(
     private var _loadingResumen = MutableStateFlow(false)
     val loadingResumen: StateFlow<Boolean> = _loadingResumen
 
+    private var _loadingResumenErrorMessage = MutableStateFlow("")
+    val loadingResumenErrorMessage: StateFlow<String> = _loadingResumenErrorMessage
+
     fun financeSummary(mes: Int, anio: Int, finanza_id: Int? = null) {
         viewModelScope.launch {
             finanzaRepository.getSummary(mes, anio, finanza_id)
@@ -72,6 +75,7 @@ class FinanzasViewModel(
                     when(resource){
                         is Resource.Loading -> {
                             _loadingResumen.value = true
+                            _loadingResumenErrorMessage.value = ""
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
@@ -82,7 +86,8 @@ class FinanzasViewModel(
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
-                            _loadingResumen.value = true
+                            _loadingResumen.value = false
+                            _loadingResumenErrorMessage.value = resource.message
                         }
                     }
                 }
@@ -95,6 +100,9 @@ class FinanzasViewModel(
     private var _loadingDatos = MutableStateFlow(false)
     val loadingDatos: StateFlow<Boolean> = _loadingDatos
 
+    private var _loadingDatosErrorMessage = MutableStateFlow("")
+    val loadingDatosErrorMessage: StateFlow<String> = _loadingDatosErrorMessage
+
     fun financeData(mes: Int, anio: Int, finanza_id: Int? = null){
         viewModelScope.launch {
             finanzaRepository.getData(mes, anio, finanza_id)
@@ -103,6 +111,7 @@ class FinanzasViewModel(
                         is Resource.Loading -> {
                             // manejar cargando si querés
                             _loadingDatos.value = true
+                            _loadingDatosErrorMessage.value = ""
                         }
                         is Resource.Success -> {
                             _listaDatosAnalisis.value = resource.data
@@ -111,6 +120,7 @@ class FinanzasViewModel(
                         is Resource.Error -> {
                             // mostrar error si querés
                             _loadingDatos.value = false
+                            _loadingDatosErrorMessage.value = resource.message
                         }
                     }
                 }

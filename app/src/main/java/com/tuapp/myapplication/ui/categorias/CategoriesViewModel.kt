@@ -58,6 +58,9 @@ class CategoriesViewModel(
     private var _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
+    private var _loadingCategoriesError = MutableStateFlow("")
+    val loadingCategoriesError: StateFlow<String> = _loadingCategoriesError
+
     //ESTO TRAE LA LISTA DE CATEGORIAS PARA EL APARTADO BD CATEGORIAS EGRESO
     fun getCategoriesList(finanzaId: Int? = null, isRefreshing: Boolean = false) {
         viewModelScope.launch {
@@ -70,6 +73,7 @@ class CategoriesViewModel(
                             } else {
                                 _loadingCategories.value = true
                             }
+                            _loadingCategoriesError.value = ""
                         }
                         is Resource.Success -> {
                             _categoriesList.value = resource.data
@@ -78,6 +82,7 @@ class CategoriesViewModel(
                         }
                         is Resource.Error -> {
                             //Manejen el "error"
+                            _loadingCategoriesError.value = resource.message
                             _loadingCategories.value = false
                             _isRefreshing.value = false
                         }
@@ -86,7 +91,6 @@ class CategoriesViewModel(
         }
     }
 
-    //TRAE LOS DETALLES DE UNA CATEGORIA EN ESPECIFICO AL DARLE CLICK
     fun getCategoryDetails(categoriaId: Int, finanzaId: Int? = null){
         viewModelScope.launch {
             categoriesRepository.getCategorieData(categoriaId, finanzaId)
@@ -108,6 +112,15 @@ class CategoriesViewModel(
         }
     }
 
+    private var _loadingCreating = MutableStateFlow(false)
+    val loadingCreating: StateFlow<Boolean> = _loadingCreating
+
+    private var _creatingCategory = MutableStateFlow(false)
+    val creatingCategory: StateFlow<Boolean> = _creatingCategory
+
+    private var _creatingError = MutableStateFlow("")
+    val creatingError: StateFlow<String> = _creatingError
+
     //CREA CATEGORIA
     fun createCategory(nombreCategoria: String, finanzaId: Int? = null) {
         viewModelScope.launch {
@@ -115,23 +128,30 @@ class CategoriesViewModel(
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
-                            _loadingCategories.value = true
+                            _loadingCreating.value = true
+                            _creatingError.value = ""
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            //RESPUESTA DE LA CREACION DE LA CATEGORIA
-                            resource.data
-                            _loadingCategories.value = false
+                            _creatingCategory.value = resource.data.success
+                            _loadingCreating.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
-                            _loadingCategories.value = false
+                            _creatingError.value = resource.message
+                            _loadingCreating.value = false
                         }
                     }
                 }
         }
     }
+
+    private var _loadingUpdating = MutableStateFlow(false)
+    val loadingUpdate: StateFlow<Boolean> = _loadingUpdating
+
+    private var _updatedCategory = MutableStateFlow(false)
+    val updatedCategory: StateFlow<Boolean> = _updatedCategory
+
+    private var _updatingError = MutableStateFlow("")
+    val updatingError: StateFlow<String> = _updatingError
 
     //ACTUALIZA EL NOMBRE DE LA CATEGORIA, HAGANDO EN EL APARTADO DE DETALLES SI QUIEREN
     //O COMO UN BOTON EN LA LISTA
@@ -141,22 +161,28 @@ class CategoriesViewModel(
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
-                            _loadingCategories.value = true
+                            _loadingUpdating.value = true
+                            _updatingError.value = ""
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            //RESPUESTA DE LA ACTUALIZACION DE LA CATEGORIA
-                            resource.data
-                            _loadingCategories.value = false
+                            _updatedCategory.value = resource.data.success
+                            _loadingUpdating.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
-                            _loadingCategories.value = false
+                            _updatingError.value = resource.message
+                            _loadingUpdating.value = false
                         }
                     }
                 }
         }
+    }
+
+    fun resetUpdateState(){
+        _updatedCategory.value = false
+    }
+
+    fun resetCreatingState(){
+        _creatingCategory.value = false
     }
 
     companion object {

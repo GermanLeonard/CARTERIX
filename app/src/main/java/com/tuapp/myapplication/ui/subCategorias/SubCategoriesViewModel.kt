@@ -1,5 +1,6 @@
 package com.tuapp.myapplication.ui.subCategorias
 
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -18,14 +19,13 @@ import kotlinx.coroutines.launch
 
 class SubCategoriesViewModel(
     private val subCategoryRepository: SubCategoryRepository
-): ViewModel(){
+): ViewModel() {
 
-    // Estados para manejar cargando y errores
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _mensajeError = MutableStateFlow<String?>(null)
-    val mensajeError: StateFlow<String?> = _mensajeError
+    private val _mensajeError = MutableStateFlow("")
+    val mensajeError: StateFlow<String> = _mensajeError
 
     private var _subCategoriesList = MutableStateFlow<List<ListaSubCategoriasDomain>>(emptyList())
     val subCategoriesList: StateFlow<List<ListaSubCategoriasDomain>> = _subCategoriesList
@@ -36,29 +36,28 @@ class SubCategoriesViewModel(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
-    fun getSubCategoriesList(finanzaId: Int? = null, isRefreshing: Boolean = false){
+    fun getSubCategoriesList(finanzaId: Int? = null, isRefreshing: Boolean = false) {
         viewModelScope.launch {
             subCategoryRepository.getSubCategoriesList(finanzaId)
                 .collect { resource ->
-                    when(resource){
+                    when (resource) {
                         is Resource.Loading -> {
-                            if(isRefreshing){
+                            if (isRefreshing) {
                                 _isRefreshing.value = true
                             } else {
                                 _isLoading.value = true
                             }
+                            _mensajeError.value = ""
                         }
+
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            _mensajeError.value = null
-                            //LISTA DE SUB CATEGORIAS
                             _subCategoriesList.value = resource.data
                             _isLoading.value = false
                             _isRefreshing.value = false
                         }
+
                         is Resource.Error -> {
-                            //Manejen el "error"
-                            _mensajeError.value = resource.message ?: "Error al obtener subcategorias"
+                            _mensajeError.value = resource.message
                             _isLoading.value = false
                             _isRefreshing.value = false
                         }
@@ -71,21 +70,37 @@ class SubCategoriesViewModel(
         viewModelScope.launch {
             subCategoryRepository.getSubCategoryDetails(subCategoryId)
                 .collect { resource ->
-                    when(resource){
+                    when (resource) {
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                        }
+
+                        is Resource.Success -> {
+                            resource.data
+                        }
+
+                        is Resource.Error -> {
+                        }
+                    }
+                }
+        }
+    }
+
+    fun getExpensesOptions() {
+        viewModelScope.launch {
+            subCategoryRepository.getExpensesOptions()
+                .collect { resource ->
+                    when (resource) {
+                        is Resource.Loading -> {
                             _isLoading.value = true
                         }
+
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            _mensajeError.value = null
-                            //DETALLES DE UNA SUB CATEGORIA
-                            resource.data
+                            _categoriesExpenses.value = resource.data
                             _isLoading.value = false
                         }
+
                         is Resource.Error -> {
-                            //Manejen el "error"
-                            _mensajeError.value = resource.message ?: "Error al obtener detalles"
+                            _mensajeError.value = resource.message
                             _isLoading.value = false
                         }
                     }
@@ -93,31 +108,14 @@ class SubCategoriesViewModel(
         }
     }
 
-    fun getExpensesOptions(){
-        viewModelScope.launch {
-            subCategoryRepository.getExpensesOptions()
-                .collect { resource ->
-                    when(resource){
-                        is Resource.Loading -> {
-                            //Manejen el "cargando"
-                            _isLoading.value = true
-                        }
-                        is Resource.Success -> {
-                            //Manejen el "success"
-                            _mensajeError.value = null
-                            //OPCIONES DE LOS TIPOS DE GASTOS PARA LOS SELECT DE LOS FORMULARIOS
-                            _categoriesExpenses.value = resource.data
-                            _isLoading.value = false
-                        }
-                        is Resource.Error -> {
-                            //Manejen el "error"
-                            _mensajeError.value = resource.message ?: "Error al obtener tipos de gasto"
-                            _isLoading.value = false
-                        }
-                    }
-                }
-        }
-    }
+    private var _loadingCreating = MutableStateFlow(false)
+    val loadingCreating: StateFlow<Boolean> = _loadingCreating
+
+    private var _createdCategory = MutableStateFlow(false)
+    val createdCategory: StateFlow<Boolean> = _createdCategory
+
+    private var _creatingError = MutableStateFlow("")
+    val creatingError: StateFlow<String> = _creatingError
 
     fun createSubCategory(
         idCategoria: Int,
@@ -136,27 +134,34 @@ class SubCategoriesViewModel(
                     tipoGastoId
                 )
             ).collect { resource ->
-                when(resource){
+                when (resource) {
                     is Resource.Loading -> {
-                        //Manejen el "cargando"
-                        _isLoading.value = true
+                        _loadingCreating.value = true
+                        _creatingError.value = ""
                     }
+
                     is Resource.Success -> {
-                        //Manejen el "success"
-                        _mensajeError.value = null
-                        //OPCIONES DE LOS TIPOS DE GASTOS PARA LOS SELECT DE LOS FORMULARIOS
-                        resource.data
-                        _isLoading.value = false
+                        _createdCategory.value = resource.data.success
+                        _loadingCreating.value = false
                     }
+
                     is Resource.Error -> {
-                        //Manejen el "error"
-                        _mensajeError.value = resource.message ?: "Error al crear subcategoria"
-                        _isLoading.value = false
+                        _creatingError.value = resource.message
+                        _loadingCreating.value = false
                     }
                 }
             }
         }
     }
+
+    private var _loadingUpdating = MutableStateFlow(false)
+    val loadingUpdating: StateFlow<Boolean> = _loadingUpdating
+
+    private var _updatedCategory = MutableStateFlow(false)
+    val updatedCategory: StateFlow<Boolean> = _updatedCategory
+
+    private var _updatingError = MutableStateFlow("")
+    val updatingError: StateFlow<String> = _updatingError
 
     fun updateSubCategory(
         subCategoriaId: Int,
@@ -175,25 +180,24 @@ class SubCategoriesViewModel(
                     tipoGastoId
                 )
             ).collect { resource ->
-                when(resource){
+                when (resource) {
                     is Resource.Loading -> {
-                        //Manejen el "cargando"
-                        _isLoading.value = true
+                        _loadingUpdating.value = true
+                        _updatingError.value = ""
                     }
+
                     is Resource.Success -> {
-                        //Manejen el "success"
-                        _mensajeError.value = null
-                        //OPCIONES DE LOS TIPOS DE GASTOS PARA LOS SELECT DE LOS FORMULARIOS
-                        resource.data
-                        _isLoading.value = false
+                        _updatedCategory.value = resource.data.success
+                        _loadingUpdating.value = false
                     }
+
                     is Resource.Error -> {
-                        //Manejen el "error"
-                        _mensajeError.value = resource.message ?: "Error al actualizar subcategoria"
-                        _isLoading.value = false
+                        _updatingError.value = resource.message
+                        _loadingUpdating.value = false
                     }
                 }
             }
+
         }
     }
 

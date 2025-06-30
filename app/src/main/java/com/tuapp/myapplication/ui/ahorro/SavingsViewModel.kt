@@ -25,8 +25,8 @@ class SavingsViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage
+    private val _errorMessage = MutableStateFlow<String>("")
+    val errorMessage: StateFlow<String> = _errorMessage
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
@@ -40,8 +40,8 @@ class SavingsViewModel(
                             _isRefreshing.value = true
                         } else {
                             _isLoading.value = true
-                            _errorMessage.value = null
                         }
+                        _errorMessage.value = ""
                     }
                     is Resource.Success -> {
                         _savingsList.value = resource.data
@@ -58,24 +58,38 @@ class SavingsViewModel(
         }
     }
 
+    private var _loadingCreating = MutableStateFlow(false)
+    val loadingCreating: StateFlow<Boolean> = _loadingCreating
+
+    private var _createdSavingGoal = MutableStateFlow(false)
+    val createdSavingGoal: StateFlow<Boolean> = _createdSavingGoal
+
+    private var _creatingError = MutableStateFlow("")
+    val creatingError: StateFlow<String> = _creatingError
+
     fun createOrUpdateSaving(finanzaId: Int?, data: CreateOrUpdateSavingDomain) {
         viewModelScope.launch {
             savingsRepository.createOrUpdateSavings(finanzaId, data).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        _isLoading.value = true
-                        _errorMessage.value = null
+                        _loadingCreating.value = true
+                        _creatingError.value = ""
                     }
                     is Resource.Success -> {
-                        _isLoading.value = false
+                        _createdSavingGoal.value = resource.data.success
+                        _loadingCreating.value = false
                     }
                     is Resource.Error -> {
-                        _isLoading.value = false
-                        _errorMessage.value = resource.message
+                        _creatingError.value = resource.message
+                        _loadingCreating.value = false
                     }
                 }
             }
         }
+    }
+
+    fun resetCreatedState() {
+        _createdSavingGoal.value = false
     }
 
     companion object {

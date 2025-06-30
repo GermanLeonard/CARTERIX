@@ -15,4 +15,7 @@ interface ConjFinanceDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFinances(finances: List<ConjFinanceEntity>)
+
+    @Query("DELETE FROM finanza_conjunta")
+    suspend fun removeFinances()
 }

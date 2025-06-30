@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -65,6 +66,9 @@ fun IndividualFinanceScreen(
 
     val datosFinanza by finanzaViewModel.listaDatosAnalisis.collectAsStateWithLifecycle()
     val loadingDatos by finanzaViewModel.loadingDatos.collectAsStateWithLifecycle()
+
+    val datosErrorMessage by finanzaViewModel.loadingDatosErrorMessage.collectAsStateWithLifecycle()
+    val resumenErrorMessage by finanzaViewModel.loadingResumenErrorMessage.collectAsStateWithLifecycle()
 
     val currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL
 
@@ -152,6 +156,10 @@ fun IndividualFinanceScreen(
                 if(loadingResumen || loadingDatos){
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
                         CircularProgressIndicator()
+                    }
+                } else if(datosErrorMessage.isNotBlank() || resumenErrorMessage.isNotBlank()){
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        Text(resumenErrorMessage.ifBlank { datosErrorMessage }, fontSize = 15.sp, color = Color.Red)
                     }
                 }
 

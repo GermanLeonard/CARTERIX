@@ -64,6 +64,7 @@ fun TransaccionesScreen(
 
     val pullToRefreshState = rememberPullToRefreshState()
     val isRefreshing by transaccionViewModel.isRefreshing.collectAsStateWithLifecycle()
+    val transactionError by transaccionViewModel.transactionListError.collectAsStateWithLifecycle()
 
     val currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL
 
@@ -130,6 +131,8 @@ fun TransaccionesScreen(
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
                             CircularProgressIndicator()
                         }
+                    }else if(transactionError.isNotBlank()){
+                        Text(transactionError, fontSize = 15.sp, color = Color.Red)
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))

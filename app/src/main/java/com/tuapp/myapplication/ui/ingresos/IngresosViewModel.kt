@@ -27,8 +27,8 @@ class IngresosViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _mensajeError = MutableStateFlow<String?>(null)
-    val mensajeError: StateFlow<String?> = _mensajeError
+    private val _mensajeError = MutableStateFlow("")
+    val mensajeError: StateFlow<String> = _mensajeError
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
@@ -44,18 +44,15 @@ class IngresosViewModel(
                             } else {
                                 _isLoading.value = true
                             }
+                            _mensajeError.value = ""
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            _mensajeError.value = null
-                            //LISTA DE INGRESOS
                             _incomeList.value = resource.data
                             _isLoading.value = false
                             _isRefreshing.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
-                            _mensajeError.value = resource.message ?: "Error al obtener ingresos"
+                            _mensajeError.value = resource.message
                             _isLoading.value = false
                             _isRefreshing.value = false
                         }
@@ -73,22 +70,25 @@ class IngresosViewModel(
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            _mensajeError.value = null
-                            //DETALLES INGRESO
                             _ingresoDetails.value = resource.data
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
-                            _mensajeError.value = resource.message ?: "Error al obtener detalles del ingreso"
                         }
                     }
                 }
         }
     }
+
+    private var _creatingLoading = MutableStateFlow(false)
+    val creatingLoading: StateFlow<Boolean> = _creatingLoading
+
+    private var _createdIncome = MutableStateFlow(false)
+    val createdIncome: StateFlow<Boolean> = _createdIncome
+
+    private var _creatingError = MutableStateFlow("")
+    val creatingError: StateFlow<String> = _creatingError
 
     fun createIncome(
         nombreIngreso: String,
@@ -103,25 +103,30 @@ class IngresosViewModel(
             ).collect { resource ->
                 when(resource){
                     is Resource.Loading -> {
-                        //Manejen el "cargando"
-                        _isLoading.value = true
+                        _creatingLoading.value = true
+                        _creatingError.value = ""
                     }
                     is Resource.Success -> {
-                        //Manejen el "success"
-                        _mensajeError.value = null
-                        //RESPUESTA DE CREACION
-                        resource.data
+                        _creatingLoading.value = resource.data.success
                         _isLoading.value = false
                     }
                     is Resource.Error -> {
-                        //Manejen el "error"
-                        _mensajeError.value = resource.message ?: "Error al crear ingreso"
+                        _creatingError.value = resource.message
                         _isLoading.value = false
                     }
                 }
             }
         }
     }
+
+    private var _updatingLoading = MutableStateFlow(false)
+    val updatingLoading: StateFlow<Boolean> = _updatingLoading
+
+    private var _updatedIncome = MutableStateFlow(false)
+    val updatedIncome: StateFlow<Boolean> = _updatedIncome
+
+    private var _updatingError = MutableStateFlow("")
+    val updatingError: StateFlow<String> = _updatingError
 
     fun updateIncome(
         nombreIngreso: String,
@@ -136,24 +141,28 @@ class IngresosViewModel(
             ).collect { resource ->
                 when(resource){
                     is Resource.Loading -> {
-                        //Manejen el "cargando"
-                        _isLoading.value = true
+                        _updatingLoading.value = true
+                        _updatingError.value = ""
                     }
                     is Resource.Success -> {
-                        //Manejen el "success"
-                        _mensajeError.value = null
-                        //RESPUESTA DE ACTUALIZACION
-                        resource.data
-                        _isLoading.value = false
+                        _updatedIncome.value = resource.data.success
+                        _updatingLoading.value = false
                     }
                     is Resource.Error -> {
-                        //Manejen el "error"
-                        _mensajeError.value = resource.message ?: "Error al actualizar ingreso"
-                        _isLoading.value = false
+                        _updatingError.value = resource.message
+                        _updatingLoading.value = false
                     }
                 }
             }
         }
+    }
+
+    fun resetUpdatedState() {
+        _updatedIncome.value = false
+    }
+
+    fun resetCreatedState() {
+        _createdIncome.value = false
     }
 
     companion object {

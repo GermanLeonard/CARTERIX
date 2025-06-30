@@ -43,11 +43,6 @@ fun SubcategoriasScreen(
     val isLoading by subCategoryViewModel.isLoading.collectAsStateWithLifecycle()
     val mensajeError by subCategoryViewModel.mensajeError.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        categoriasViewModel.getCategoriesOptions(finanzaId)
-        subCategoryViewModel.getSubCategoriesList(finanzaId)
-    }
-
     var selectedCategoria by rememberSaveable { mutableStateOf("") }
     var showMenu by rememberSaveable { mutableStateOf(false) }
 
@@ -56,6 +51,11 @@ fun SubcategoriasScreen(
 
     val currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL
     val verde = Color(0xFF2E7D32)
+
+    LaunchedEffect(Unit) {
+        categoriasViewModel.getCategoriesOptions(finanzaId)
+        subCategoryViewModel.getSubCategoriesList(finanzaId)
+    }
 
     Scaffold(
         topBar = {
@@ -90,109 +90,103 @@ fun SubcategoriasScreen(
             ) {
                 Spacer(modifier = Modifier.height(25.dp))
 
-                    Box(
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFE8EAF6), shape = RoundedCornerShape(8.dp))
+                        .clickable { showMenu = !showMenu }
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = selectedCategoria.ifEmpty { "Filtrar por Categoria" })
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                    }
+                }
+
+                if (showMenu) {
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color(0xFFE8EAF6), shape = RoundedCornerShape(8.dp))
-                            .clickable { showMenu = !showMenu }
-                            .padding(16.dp)
+                            .background(Color.White)
+                            .padding(4.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(text = selectedCategoria.ifEmpty { "Filtrar por Categoria" })
-                            Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                        }
-                    }
-
-                    if (showMenu) {
-                        Column(
+                        Text(
+                            text = "Seleccionar todos",
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(Color.White)
-                                .padding(4.dp)
-                        ) {
+                                .clickable {
+                                    selectedCategoria = ""
+                                    showMenu = false
+                                }
+                                .padding(12.dp)
+                        )
+                        categories.forEach {
+                            //UNA VEZ ELEGIDO TIENE QUE SER FILTRADO EN LA LISTA QUE REGRESA EL VIEWMODEL
+                            //POR MEDIO DEL NOMBRE CATEGORIA
                             Text(
-                                text = "Seleccionar todos",
+                                text = it.categoria_nombre,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        selectedCategoria = ""
+                                        selectedCategoria = it.categoria_nombre
                                         showMenu = false
                                     }
                                     .padding(12.dp)
                             )
-                            categories.forEach {
-                                //UNA VEZ ELEGIDO TIENE QUE SER FILTRADO EN LA LISTA QUE REGRESA EL VIEWMODEL
-                                //POR MEDIO DEL NOMBRE CATEGORIA
-                                Text(
-                                    text = it.categoria_nombre,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            selectedCategoria = it.categoria_nombre
-                                            showMenu = false
-                                        }
-                                        .padding(12.dp)
-                                )
-                            }
                         }
                     }
+                }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                    // Mostrar mensaje de error
-                    if (mensajeError != null) {
-                        Text(
-                            text = mensajeError ?: "",
-                            color = Color.Red,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(8.dp)
-                        )
+                if (isLoading) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
                     }
-
-                    if (isLoading) {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
-                        }
+                } else if(mensajeError.isNotBlank()){
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(mensajeError, fontSize = 15.sp, color = Color.Red)
                     }
+                }
 
-                    // Mostrar lista o mensaje de carga
-                    PullToRefreshBox(
-                        state = pullToRefreshState,
-                        isRefreshing = isRefreshing,
-                        onRefresh = {
-                            subCategoryViewModel.getSubCategoriesList(finanzaId, true)
-                        }
-                    ) {
-                        LazyColumn(modifier = Modifier.fillMaxSize()) {
-                            items(subCategoriasList.filter {
-                                selectedCategoria.isEmpty() || it.categoria_nombre == selectedCategoria
-                            }) { sub ->
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 6.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = Color(
-                                            0xFFF0F0F0
-                                        )
+                // Mostrar lista o mensaje de carga
+                PullToRefreshBox(
+                    state = pullToRefreshState,
+                    isRefreshing = isRefreshing,
+                    onRefresh = {
+                        subCategoryViewModel.getSubCategoriesList(finanzaId, true)
+                    }
+                ) {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(subCategoriasList.filter {
+                            selectedCategoria.isEmpty() || it.categoria_nombre == selectedCategoria
+                        }) { sub ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 6.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color(
+                                        0xFFF0F0F0
                                     )
-                                ) {
-                                    Column(modifier = Modifier.padding(12.dp)) {
-                                        Text(
-                                            sub.categoria_nombre,
-                                            color = Color.Black,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text("${sub.sub_categoria_nombre} - ${sub.tipo_gasto}")
-                                        Text("Presupuesto: $${sub.presupuesto}", color = verde)
-                                    }
+                                )
+                            ) {
+                                Column(modifier = Modifier.padding(12.dp)) {
+                                    Text(
+                                        sub.categoria_nombre,
+                                        color = Color.Black,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text("${sub.sub_categoria_nombre} - ${sub.tipo_gasto}")
+                                    Text("Presupuesto: $${sub.presupuesto}", color = verde)
                                 }
                             }
                         }
                     }
+                }
             }
         }
     }

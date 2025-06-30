@@ -1,5 +1,6 @@
 package com.tuapp.myapplication.ui.finanzas.finanzaIndividual
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,10 +12,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.tuapp.myapplication.R
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.ui.components.CustomTopBar
 import com.tuapp.myapplication.ui.components.TabSelector
@@ -73,16 +76,16 @@ fun BDHomeScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        BDCard("Categorias Egreso") { navController.navigate(CategoriaEgresoScreen(finanzaId)) }
-                        BDCard("SubCategorias") { navController.navigate(SubCategoriaScreen(finanzaId)) }
+                        BDCard("Categorias Egreso", R.drawable.categorias_logo, "categorias") { navController.navigate(CategoriaEgresoScreen(finanzaId)) }
+                        BDCard("SubCategorias", R.drawable.sub_categorias, "sub categorias") { navController.navigate(SubCategoriaScreen(finanzaId)) }
                     }
 
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        BDCard("Ingresos") { navController.navigate(IngresosScreen(finanzaId)) }
-                        BDCard("Ahorro") { navController.navigate(AhorroScreen(finanzaId)) }
+                        BDCard("Ingresos", R.drawable.ingresos, "ingresos") { navController.navigate(IngresosScreen(finanzaId)) }
+                        BDCard("Ahorro", R.drawable.ahorro, "ahorros") { navController.navigate(AhorroScreen(finanzaId)) }
                     }
             }
         }
@@ -90,19 +93,28 @@ fun BDHomeScreen(
 }
 
 @Composable
-fun BDCard(title: String, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .padding(12.dp)
-            .size(width = 160.dp, height = 160.dp)
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFE6F4EA))
+fun BDCard(title: String, image: Int, description: String,  onClick: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+        Card(
+            modifier = Modifier
+                .padding(12.dp)
+                .size(width = 160.dp, height = 160.dp)
+                .clickable { onClick() },
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFE6F4EA))
         ) {
-            Text(title, fontWeight = FontWeight.Medium)
+            Box(
+                modifier = Modifier.fillMaxSize().padding(50.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(image),
+                    contentDescription = description,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
+        Text(title, fontSize = 15.sp, fontWeight = FontWeight.SemiBold  )
     }
 }

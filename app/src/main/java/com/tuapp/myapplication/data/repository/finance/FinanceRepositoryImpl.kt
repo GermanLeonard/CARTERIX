@@ -138,6 +138,7 @@ class FinanceRepositoryImpl(
             val financeListResponse = financeService.getFinancesList()
 
             if(financeListResponse.finanzas.isNotEmpty()){
+                conjFinanceDao.removeFinances()
                 conjFinanceDao.insertFinances(financeListResponse.toEntity())
             }else {
                 emit(Resource.Success(emptyList()))

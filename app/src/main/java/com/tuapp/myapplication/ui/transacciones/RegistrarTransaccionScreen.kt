@@ -63,8 +63,11 @@ fun RegistrarTransaccionesScreen(
 
     var fechaTransaccion by rememberSaveable { mutableStateOf("") }
 
-    //AGREGUEN UN CAMPO QUE EL USUARIO PUEDA ELEGIR DE FECHA PARA EL REGISTRO,
-    // PUES SE TIENE QUE REGISTRAR LA FECHA DE LA TRANSACCION
+    var creatingError by rememberSaveable { mutableStateOf("") }
+
+    val loadingCreating by transaccionesViewModel.loadingCreate.collectAsStateWithLifecycle()
+    val createErrorMessage by transaccionesViewModel.createErrorMessage.collectAsStateWithLifecycle()
+    val transactionCreated by transaccionesViewModel.transactionCreated.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         transaccionesViewModel.getTransactionsOptions(finanzaId)
@@ -81,6 +84,13 @@ fun RegistrarTransaccionesScreen(
         containerColor = verde
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+
+            if(loadingCreating){
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                    CircularProgressIndicator()
+                }
+            }
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -101,7 +111,7 @@ fun RegistrarTransaccionesScreen(
                         .clickable { showTipoMenu = true }
                         .padding(16.dp)) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text(if (tipo.isNotEmpty()) tipo else "Selecciona el tipo")
+                            Text(tipo.ifEmpty { "Selecciona el tipo" })
                             Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                         }
                     }
@@ -127,7 +137,7 @@ fun RegistrarTransaccionesScreen(
                         .clickable { showCategoriaMenu = true }
                         .padding(16.dp)) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text(if (categoria.isNotEmpty()) categoria else "Selecciona categoría")
+                            Text(categoria.ifEmpty { "Selecciona categoría" })
                             Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                         }
                     }
@@ -227,17 +237,35 @@ fun RegistrarTransaccionesScreen(
                         }
                     }
 
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        if(createErrorMessage.isBlank()){
+                            Text(creatingError.ifBlank { "" }, fontSize = 12.sp, color = Color.Red)
+                        } else {
+                            Text(createErrorMessage, fontSize = 12.sp, color = Color.Red)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(25.dp))
+
                     Button(
                         onClick = {
-                            if (idTipo != 0 && idCategoria != 0 && monto.isNotBlank()) {
+                            if (idTipo != 0 && idCategoria != 0 && monto.isNotBlank() && descripcion.isNotBlank()) {
                                 transaccionesViewModel.createTransaction(idTipo, idCategoria, monto.toDouble(), descripcion, fechaTransaccion, finanzaId )
+                            } else{
+                                creatingError = "Completa todo los campos para registrar una transacción"
+                            }
+
+                            if(transactionCreated){
                                 navController.popBackStack()
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = verde),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Guardar")
+                        Text("Registrar")
                     }
                 }
         }

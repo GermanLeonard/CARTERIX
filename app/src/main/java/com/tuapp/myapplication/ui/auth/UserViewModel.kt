@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class UserViewModel(
-    private val sensitiveInfoRepository: SensitiveInfoRepository,
+    sensitiveInfoRepository: SensitiveInfoRepository,
     private val userRepository: UserRepository
 ):ViewModel() {
 
@@ -33,7 +33,7 @@ class UserViewModel(
     // (estados de cargando, mensajes de error, etc.)
 
     //ESTE ES UN EJEMPLO DE PRUEBA
-    private val _isLoggedIn = MutableStateFlow<Boolean>(false)
+    private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
 
     //Esta funcion sera usada para traer el nombre y el correo y usarlo en la vista de cambiar perfil,
@@ -56,50 +56,95 @@ class UserViewModel(
         }
     }
 
+    private var _registerLoading = MutableStateFlow(false)
+    val registerLoading: StateFlow<Boolean> = _registerLoading
+
+    private var _registerEmailError = MutableStateFlow("")
+    val registerEmailError: StateFlow<String> = _registerEmailError
+
+    private var _registerApiError = MutableStateFlow("")
+    val registerApiError: StateFlow<String> = _registerApiError
+
+    private var _registerMessage = MutableStateFlow("")
+    val registerMessage: StateFlow<String> = _registerMessage
+
     fun registerUser(nombre: String, correo: String, contrasena: String) {
         viewModelScope.launch {
             userRepository.registerUser(RegisterRequestDomain(nombre, correo, contrasena))
-                .collect({ resource ->
+                .collect{ resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _registerLoading.value = true
+                            _registerEmailError.value = ""
+                            _registerApiError.value = ""
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            resource.data.message
+                            _registerMessage.value = resource.data.message
+                            _registerLoading.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _registerLoading.value = false
+                            when(resource.httpCode) {
+                                409 -> _registerEmailError.value = resource.message
+                                else -> _registerApiError.value = resource.message
+                            }
                         }
                     }
-                })
+                }
         }
     }
+
+    private var _loginLoading = MutableStateFlow(false)
+    val loginLoading: StateFlow<Boolean> = _loginLoading
+
+    private var _emailError = MutableStateFlow("")
+    val emailError: StateFlow<String> = _emailError
+
+    private var _passwordError = MutableStateFlow("")
+    val passwordError: StateFlow<String> = _passwordError
+
+    private var _apiError = MutableStateFlow("")
+    val apiError: StateFlow<String> = _apiError
 
     fun loginUser(correo: String, contrasena: String){
         viewModelScope.launch {
             userRepository.loginUser(LoginRequestDomain(correo, contrasena))
-                .collect({ resource ->
+                .collect{ resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loginLoading.value = true
+                            _emailError.value = ""
+                            _passwordError.value = ""
+                            _apiError.value = ""
                         }
                         is Resource.Success -> {
                             //Manejen el "success"
                             _isLoggedIn.value = resource.data.success
+                            _loginLoading.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _loginLoading.value = false
+                            when(resource.httpCode){
+                                404 -> {
+                                    _emailError.value = resource.message
+                                }
+                                409 -> {
+                                    _passwordError.value = resource.message
+                                }
+                                else -> {
+                                    _apiError.value = resource.message
+                                }
+                            }
                         }
                     }
-                })
+                }
         }
     }
 
     fun changeProfile(nombre: String, correo: String){
         viewModelScope.launch {
             userRepository.changeProfile(ChangeProfileRequestDomain(nombre, correo))
-                .collect({ resource ->
+                .collect{ resource ->
                     when(resource){
                         is Resource.Loading -> {
                             //Manejen el "cargando"
@@ -112,14 +157,14 @@ class UserViewModel(
                             //Manejen el "error"
                         }
                     }
-                })
+                }
         }
     }
 
     fun changePassword(contrasenaActual: String, nuevaContrasena: String, confirmarContrasena: String){
         viewModelScope.launch {
             userRepository.changePassword(ChangePasswordRequestDomain(contrasenaActual, nuevaContrasena, confirmarContrasena))
-                .collect({ resource ->
+                .collect{ resource ->
                     when(resource){
                         is Resource.Loading -> {
                             //Manejen el "cargando"
@@ -132,13 +177,14 @@ class UserViewModel(
                             //Manejen el "error"
                         }
                     }
-                })
+                }
         }
     }
 
     fun closeSession() {
         viewModelScope.launch {
             userRepository.closeSession()
+            _isLoggedIn.value = false
         }
     }
 

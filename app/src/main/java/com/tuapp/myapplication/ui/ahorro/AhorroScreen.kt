@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -41,7 +40,7 @@ fun AhorrosScreen(
 
     val ahorroList by viewModel.savingsList.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-    val error by viewModel.errorMessage.collectAsStateWithLifecycle()
+    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     var showDialog by rememberSaveable { mutableStateOf(false) }
 
     val calendar = Calendar.getInstance()
@@ -52,8 +51,19 @@ fun AhorrosScreen(
 
     val currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL
 
+    val createdGoal by viewModel.createdSavingGoal.collectAsStateWithLifecycle()
+    val creatingError by viewModel.creatingError.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
         viewModel.getSavingsData(finanzaId, anio)
+    }
+
+    LaunchedEffect(createdGoal) {
+        if(createdGoal){
+            viewModel.getSavingsData(finanzaId, anio)
+            showDialog = false
+            viewModel.resetCreatedState()
+        }
     }
 
     Scaffold(
@@ -94,6 +104,10 @@ fun AhorrosScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 CircularProgressIndicator()
+                            }
+                        } else if(errorMessage.isNotBlank()){
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                                Text(errorMessage, fontSize = 15.sp, color = Color.Red)
                             }
                         }
 
@@ -174,9 +188,9 @@ fun AhorrosScreen(
                 onDismiss = { showDialog = false },
                 onCreate = { data ->
                     viewModel.createOrUpdateSaving(finanzaId, data)
-                    viewModel.getSavingsData(finanzaId, anio)
-                    showDialog = false
-                }
+                },
+                savingsViewModel = viewModel,
+                errorMessage = creatingError
             )
         }
     }

@@ -40,6 +40,8 @@ fun DetallesTransaccionScreen(
     var descripcion by rememberSaveable { mutableStateOf("") }
     var nombreRegistro by rememberSaveable { mutableStateOf("") }
 
+    val detailsErrorMessage by transaccionesViewModel.detailsErrorMessage.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
         transaccionesViewModel.getTransactionDetails(transaccionId)
     }
@@ -79,6 +81,10 @@ fun DetallesTransaccionScreen(
                 if(loadingDetails){
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
                         CircularProgressIndicator()
+                    }
+                } else if(detailsErrorMessage.isNotBlank()){
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        Text(detailsErrorMessage, fontSize = 15.sp, color = Color.Red)
                     }
                 }
                 Column(

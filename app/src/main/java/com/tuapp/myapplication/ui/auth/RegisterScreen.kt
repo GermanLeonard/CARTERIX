@@ -14,13 +14,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.tuapp.myapplication.R
 import com.tuapp.myapplication.ui.navigation.LoginScreen
 
 @Composable
@@ -35,6 +38,12 @@ fun RegisterScreen(
     // Mensajes de error
     var correoError by rememberSaveable { mutableStateOf<String?>(null) }
     var contrasenaError by rememberSaveable { mutableStateOf<String?>(null) }
+
+    val registerLoading by userViewModel.registerLoading.collectAsStateWithLifecycle()
+    val emailError by userViewModel.registerEmailError.collectAsStateWithLifecycle()
+    val apiError by userViewModel.registerApiError.collectAsStateWithLifecycle()
+
+    val registerMessage by userViewModel.registerMessage.collectAsStateWithLifecycle()
 
     val verde = Color(0xFF2E7D32)
     val verdeClaro = Color(0xFF66BB6A)
@@ -63,12 +72,24 @@ fun RegisterScreen(
         ) {
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(
-                text = "Carterix",
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                color = verde
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    contentDescription = "Logo",
+                    tint = verde,
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    "Carterix",
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = verde
+                )
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -135,11 +156,13 @@ fun RegisterScreen(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
-            if (correoError != null) {
+            if(emailError.isBlank() && apiError.isBlank()){
                 Text(correoError ?: "", color = Color.Red, fontSize = 12.sp)
+            } else if(apiError.isNotBlank()) {
+                Text(apiError, color = Color.Red, fontSize = 12.sp)
+            } else {
+                Text(emailError, color = Color.Red, fontSize = 12.sp)
             }
-
-            Spacer(modifier = Modifier.height(4.dp))
 
             // Campo Contraseña
             OutlinedTextField(
@@ -166,15 +189,16 @@ fun RegisterScreen(
                 ),
                 textStyle = LocalTextStyle.current.copy(fontSize = 16.sp)
             )
-            if (contrasenaError != null) {
-                Text(contrasenaError ?: "", color = Color.Red, fontSize = 12.sp)
+
+            Text(contrasenaError ?: "", color = Color.Red, fontSize = 12.sp)
+            if(registerMessage.isNotBlank()){
+                Text(registerMessage, color = verde, fontSize = 12.sp)
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Button(
                 onClick = {
-                    // APLIQUEN VALIDACION DE CORREO Y DE CONTRASEÑA POR FAVOR
                     val correoRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")
                     val contrasenaRegex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[\\d\\W]).{8,}$")
 
@@ -217,8 +241,15 @@ fun RegisterScreen(
                     Text("Iniciar sesión", color = verdeClaro, fontSize = 14.sp)
                 }
             }
-
             Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        if (registerLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color.White),
+                contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
         }
     }
 }

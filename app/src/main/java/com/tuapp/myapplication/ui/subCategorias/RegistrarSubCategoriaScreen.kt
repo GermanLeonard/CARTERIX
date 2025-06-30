@@ -51,6 +51,12 @@ fun RegistrarSubcategoriaScreen(
     var showCategoriaMenu by rememberSaveable { mutableStateOf(false) }
     var showTipoMenu by rememberSaveable { mutableStateOf(false) }
 
+    var mensajeRegistro by rememberSaveable { mutableStateOf("") }
+
+    val loadingCreating by subCategoriaViewModel.loadingCreating.collectAsStateWithLifecycle()
+    val createdCategory by subCategoriaViewModel.createdCategory.collectAsStateWithLifecycle()
+    val creatingError by subCategoriaViewModel.creatingError.collectAsStateWithLifecycle()
+
     val verde = Color(0xFF2E7D32)
     val currentRoute = Routes.BD_HOME
 
@@ -81,114 +87,134 @@ fun RegistrarSubcategoriaScreen(
                     .padding(horizontal = 25.dp)
             ) {
 
+                if(loadingCreating){
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center ){
+                        CircularProgressIndicator()
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(25.dp))
 
-                    Text("Categoria Padre")
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFE8EAF6), shape = RoundedCornerShape(8.dp))
-                        .clickable { showCategoriaMenu = !showCategoriaMenu }
-                        .padding(16.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(text = categoriaPadre.ifEmpty { "Selecciona la categoria Padre" })
-                            Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                        }
-                    }
-
-                    if (showCategoriaMenu) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color.White)
-                                .padding(4.dp)
-                        ) {
-                            categoriesOptions.forEach {
-                                Text(
-                                    text = it.categoria_nombre,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            categoriaPadre = it.categoria_nombre
-                                            categoriaId = it.categoria_id
-                                            showCategoriaMenu = false
-                                        }
-                                        .padding(12.dp)
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text("Nombre de Subcategoria")
-                    TextField(
-                        value = nombre,
-                        onValueChange = { nombre = it },
-                        placeholder = { Text("Ej: Gasolina") },
+                Text("Categoria Padre")
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFE8EAF6), shape = RoundedCornerShape(8.dp))
+                    .clickable { showCategoriaMenu = !showCategoriaMenu }
+                    .padding(16.dp)) {
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = categoriaPadre.ifEmpty { "Selecciona la categoria Padre" })
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                    }
+                }
 
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text("Tipo de Gasto")
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFE8EAF6), shape = RoundedCornerShape(8.dp))
-                        .clickable { showTipoMenu = !showTipoMenu }
-                        .padding(16.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(text = tipoGasto.ifEmpty { "Selecciona el tipo de gasto" })
-                            Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                if (showCategoriaMenu) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                            .padding(4.dp)
+                    ) {
+                        categoriesOptions.forEach {
+                            Text(
+                                text = it.categoria_nombre,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        categoriaPadre = it.categoria_nombre
+                                        categoriaId = it.categoria_id
+                                        showCategoriaMenu = false
+                                    }
+                                    .padding(12.dp)
+                            )
                         }
                     }
+                }
 
-                    if (showTipoMenu) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color.White)
-                                .padding(4.dp)
-                        ) {
-                            gastoOpciones.forEach {
-                                Text(
-                                    text = it.tipo_nombre,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            tipoGasto = it.tipo_nombre
-                                            gastoId = it.tipo_id
-                                            showTipoMenu = false
-                                        }
-                                        .padding(12.dp)
-                                )
-                            }
-                        }
-                    }
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                Text("Nombre de Subcategoria")
+                TextField(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    placeholder = { Text("Ej: Gasolina") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
 
-                    Text("Presupuesto Mensual")
-                    TextField(
-                        value = presupuesto,
-                        onValueChange = { presupuesto = it },
-                        placeholder = { Text("Ej: 100.0") },
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text("Tipo de Gasto")
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFE8EAF6), shape = RoundedCornerShape(8.dp))
+                    .clickable { showTipoMenu = !showTipoMenu }
+                    .padding(16.dp)) {
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(text = tipoGasto.ifEmpty { "Selecciona el tipo de gasto" })
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                    }
+                }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                if (showTipoMenu) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                            .padding(4.dp)
+                    ) {
+                        gastoOpciones.forEach {
+                            Text(
+                                text = it.tipo_nombre,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        tipoGasto = it.tipo_nombre
+                                        gastoId = it.tipo_id
+                                        showTipoMenu = false
+                                    }
+                                    .padding(12.dp)
+                            )
+                        }
+                    }
+                }
 
-                    Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
-                        Button(
-                            onClick = {
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text("Presupuesto Mensual")
+                TextField(
+                    value = presupuesto,
+                    onValueChange = { presupuesto = it },
+                    placeholder = { Text("Ej: 100.0") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    if(creatingError.isBlank()){
+                        Text(mensajeRegistro.ifBlank { "" }, fontSize = 12.sp, color = Color.Red)
+                    } else {
+                        Text(creatingError, fontSize = 12.sp, color = Color.Red)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+                    Button(
+                        onClick = {
+                            if(categoriaId != 0 && nombre.isNotBlank() && presupuesto.isNotBlank() && gastoId != 0){
                                 subCategoriaViewModel.createSubCategory(
                                     idCategoria = categoriaId,
                                     nombreSubCategoria = nombre,
@@ -196,17 +222,23 @@ fun RegistrarSubcategoriaScreen(
                                     tipoGastoId = gastoId,
                                     finanzaId = finanzaId
                                 )
-                                navController.popBackStack()
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = verde)
-                        ) {
-                            Text("Registrar")
-                        }
+                            } else {
+                                mensajeRegistro = "Completa todos los campos para registrar"
+                            }
 
-                        OutlinedButton(onClick = { navController.popBackStack() }) {
-                            Text("Cancelar", color = verde)
-                        }
+                            if(createdCategory){
+                                navController.popBackStack()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = verde)
+                    ) {
+                        Text("Registrar")
                     }
+
+                    OutlinedButton(onClick = { navController.popBackStack() }) {
+                        Text("Cancelar", color = verde)
+                    }
+                }
             }
         }
     }

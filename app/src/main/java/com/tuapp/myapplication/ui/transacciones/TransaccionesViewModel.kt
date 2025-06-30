@@ -35,8 +35,8 @@ class TransaccionesViewModel(
     )
     val transactionDetails: StateFlow<TransactionsDetailsDomain> = _transactionDetails
 
-    private var _loadingDetailsTransaction = MutableStateFlow(false)
-    val loadingDetailsTransaction: StateFlow<Boolean> = _loadingDetailsTransaction
+    private var _transactionListError = MutableStateFlow("")
+    val transactionListError: StateFlow<String> = _transactionListError
 
     fun getTransactionsList(mes: Int, anio: Int, finanzaId: Int? = null, isRefreshing: Boolean = false){
         viewModelScope.launch {
@@ -49,6 +49,7 @@ class TransaccionesViewModel(
                             }else {
                                 _loadingTransactions.value = true
                             }
+                            _transactionListError.value = ""
                         }
                         is Resource.Success -> {
                             _transactionsList.value = resource.data
@@ -56,6 +57,7 @@ class TransaccionesViewModel(
                             _isRefreshing.value = false
                         }
                         is Resource.Error -> {
+                            _transactionListError.value = resource.message
                             _loadingTransactions.value = false
                             _isRefreshing.value = false
                         }
@@ -88,6 +90,12 @@ class TransaccionesViewModel(
         }
     }
 
+    private var _loadingDetailsTransaction = MutableStateFlow(false)
+    val loadingDetailsTransaction: StateFlow<Boolean> = _loadingDetailsTransaction
+
+    private var _detailsErrorMessage = MutableStateFlow("")
+    val detailsErrorMessage: StateFlow<String> = _detailsErrorMessage
+
     fun getTransactionDetails(transaccionId: Int) {
         viewModelScope.launch {
             transaccionRepository.getTransactionDetails(transaccionId)
@@ -95,20 +103,29 @@ class TransaccionesViewModel(
                     when(resource){
                         is Resource.Loading -> {
                             _loadingDetailsTransaction.value = true
+                            _detailsErrorMessage.value = ""
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
                             _transactionDetails.value = resource.data
                             _loadingDetailsTransaction.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _detailsErrorMessage.value = resource.message
                             _loadingDetailsTransaction.value = false
                         }
                     }
                 }
         }
     }
+
+    private var _transactionCreated = MutableStateFlow(false)
+    val transactionCreated: StateFlow<Boolean> = _transactionCreated
+
+    private var _loadingCreate = MutableStateFlow(false)
+    val loadingCreate: StateFlow<Boolean> = _loadingCreate
+
+    private var _createErrorMessage = MutableStateFlow("")
+    val createErrorMessage: StateFlow<String> = _createErrorMessage
 
     fun createTransaction(
         tipoTransaccion: Int,
@@ -126,15 +143,16 @@ class TransaccionesViewModel(
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingCreate.value = true
+                            _transactionCreated.value = false
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            //RESPUESTA DE LA CREACION DE UNA TRANSACCION
-                            resource.data
+                            _transactionCreated.value = resource.data.success
+                            _loadingCreate.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _createErrorMessage.value = resource.message
+                            _loadingCreate.value = false
                         }
                     }
                 }
