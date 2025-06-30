@@ -26,6 +26,7 @@ import com.tuapp.myapplication.ui.components.BottomNavBar
 import androidx.navigation.NavController
 import com.tuapp.myapplication.ui.categorias.CategoriesViewModel
 import com.tuapp.myapplication.ui.components.CustomTopBar
+import com.tuapp.myapplication.ui.navigation.DetalleSubCategoriaRoute
 import com.tuapp.myapplication.ui.navigation.RegistrarSubCategoriaScreen
 import com.tuapp.myapplication.ui.navigation.Routes
 
@@ -152,37 +153,57 @@ fun SubcategoriasScreen(
                     }
                 }
 
-                // Mostrar lista o mensaje de carga
-                PullToRefreshBox(
-                    state = pullToRefreshState,
-                    isRefreshing = isRefreshing,
-                    onRefresh = {
-                        subCategoryViewModel.getSubCategoriesList(finanzaId, true)
-                    }
-                ) {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(subCategoriasList.filter {
-                            selectedCategoria.isEmpty() || it.categoria_nombre == selectedCategoria
-                        }) { sub ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 6.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color(
-                                        0xFFF0F0F0
-                                    )
-                                )
-                            ) {
-                                Column(modifier = Modifier.padding(12.dp)) {
-                                    Text(
-                                        sub.categoria_nombre,
-                                        color = Color.Black,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Text("${sub.sub_categoria_nombre} - ${sub.tipo_gasto}")
-                                    Text("Presupuesto: $${sub.presupuesto}", color = verde)
+                    // Mostrar lista o mensaje de carga
+                    PullToRefreshBox(
+                        state = pullToRefreshState,
+                        isRefreshing = isRefreshing,
+                        onRefresh = {
+                            subCategoryViewModel.getSubCategoriesList(finanzaId, true)
+                        }
+                    ) {
+                        LazyColumn(modifier = Modifier.fillMaxSize()) {
+                            items(subCategoriasList.filter {
+                                selectedCategoria.isEmpty() || it.categoria_nombre == selectedCategoria
+                            }) { sub ->
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 6.dp)
+                                        .clickable {
+                                            navController.navigate(
+                                                DetalleSubCategoriaRoute(
+                                                    subcategoriaId = sub.sub_categoria_id,
+                                                    finanzaId = finanzaId ?: 0
+                                                )
+                                            )
+                                        }
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(12.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Column {
+                                            Text(
+                                                sub.categoria_nombre,
+                                                color = Color.Black,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Text("${sub.sub_categoria_nombre} - ${sub.tipo_gasto}")
+                                            Text("Presupuesto: $${sub.presupuesto}", color = verde)
+                                        }
+                                        if (finanzaId != null) {
+                                            Text(
+                                                text = sub.nombre_usuario,
+                                                modifier = Modifier.align(Alignment.CenterVertically),
+                                                fontSize = 12.sp,
+                                                color = Color.Gray
+                                            )
+                                        }
+                                    }
                                 }
+
                             }
                         }
                     }
@@ -190,6 +211,6 @@ fun SubcategoriasScreen(
             }
         }
     }
-}
+
 
 

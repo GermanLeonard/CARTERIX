@@ -11,6 +11,7 @@ import com.tuapp.myapplication.CarterixApplication
 import com.tuapp.myapplication.data.models.subCategoryModels.request.CreateOrUpdateSubCategoryDomain
 import com.tuapp.myapplication.data.models.subCategoryModels.response.ListaSubCategoriasDomain
 import com.tuapp.myapplication.data.models.subCategoryModels.response.OptionsDomain
+import com.tuapp.myapplication.data.models.subCategoryModels.response.SubCategoriaDomain
 import com.tuapp.myapplication.data.repository.subCategories.SubCategoryRepository
 import com.tuapp.myapplication.helpers.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +37,11 @@ class SubCategoriesViewModel(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
-    fun getSubCategoriesList(finanzaId: Int? = null, isRefreshing: Boolean = false) {
+    private val _subcategoriaDetalle = MutableStateFlow<SubCategoriaDomain?>(null)
+    val subcategoriaDetalle: StateFlow<SubCategoriaDomain?> = _subcategoriaDetalle
+
+
+    fun getSubCategoriesList(finanzaId: Int? = null, isRefreshing: Boolean = false){
         viewModelScope.launch {
             subCategoryRepository.getSubCategoriesList(finanzaId)
                 .collect { resource ->

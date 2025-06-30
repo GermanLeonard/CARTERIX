@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tuapp.myapplication.CarterixApplication
 import com.tuapp.myapplication.data.models.categoryModels.request.CreateOrUpdateCategorieRequestDomain
+import com.tuapp.myapplication.data.models.categoryModels.response.CategorieDataResponseDomain
 import com.tuapp.myapplication.data.models.categoryModels.response.CategoriesListDomain
 import com.tuapp.myapplication.data.models.categoryModels.response.CategoriesOptionsDomain
 import com.tuapp.myapplication.data.repository.categories.CategoryRepository
@@ -28,12 +29,13 @@ class CategoriesViewModel(
 
     private var _loadingCategories = MutableStateFlow(false)
     val loadingCategories: StateFlow<Boolean> = _loadingCategories
-    //CREEN USTEDES LOS ESTADOS QUE SERAN NECESARIOS A MOSTRAR EN LA VISTA
-    // (lista de categorias, estados de cargando, mensajes de error, etc.)
 
-    //PASAR EL ID SI ES CONJUNTA,
-    //ESTAS SON LAS OPCIONES DE CATEGORIAS QUE SE VAN A MOSTRAR EN EL SELECT
-    //PARA FILTRAR DATOS POR CATEGORIA
+    private var _categoryDetails = MutableStateFlow<CategorieDataResponseDomain?>(null)
+    val categoryDetails: StateFlow<CategorieDataResponseDomain?> = _categoryDetails
+
+    private var _loadingDetails = MutableStateFlow(false)
+    val loadingDetails: StateFlow<Boolean> = _loadingDetails
+
     fun getCategoriesOptions(finanzaId: Int? = null) {
         viewModelScope.launch {
             categoriesRepository.getCategoriesOptions(finanzaId)
@@ -61,7 +63,6 @@ class CategoriesViewModel(
     private var _loadingCategoriesError = MutableStateFlow("")
     val loadingCategoriesError: StateFlow<String> = _loadingCategoriesError
 
-    //ESTO TRAE LA LISTA DE CATEGORIAS PARA EL APARTADO BD CATEGORIAS EGRESO
     fun getCategoriesList(finanzaId: Int? = null, isRefreshing: Boolean = false) {
         viewModelScope.launch {
             categoriesRepository.getCategoriesList(finanzaId)
@@ -95,17 +96,17 @@ class CategoriesViewModel(
         viewModelScope.launch {
             categoriesRepository.getCategorieData(categoriaId, finanzaId)
                 .collect { resource ->
-                    when(resource){
+                    when(resource) {
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingDetails.value = true
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            //DETALLES DEL FILTRADO POR CATEGORIAS
-                            resource.data
+                            _categoryDetails.value = resource.data
+                            _loadingDetails.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _loadingDetails.value = false
+                            // Manejar error
                         }
                     }
                 }
@@ -121,7 +122,6 @@ class CategoriesViewModel(
     private var _creatingError = MutableStateFlow("")
     val creatingError: StateFlow<String> = _creatingError
 
-    //CREA CATEGORIA
     fun createCategory(nombreCategoria: String, finanzaId: Int? = null) {
         viewModelScope.launch {
             categoriesRepository.createCategorie(finanzaId, CreateOrUpdateCategorieRequestDomain(nombreCategoria))

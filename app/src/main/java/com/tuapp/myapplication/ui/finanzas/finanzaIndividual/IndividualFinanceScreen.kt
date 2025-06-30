@@ -172,7 +172,10 @@ fun IndividualFinanceScreen(
                         resumenAhorros
                     )
                 }  else {
-                    DatosAnalisisView(datosFinanza)
+                    DatosAnalisisView(
+                        datosFinanza = datosFinanza,
+                        navController = navController
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))

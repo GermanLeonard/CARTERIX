@@ -32,6 +32,9 @@ import com.tuapp.myapplication.ui.subCategorias.SubcategoriasScreen
 import com.tuapp.myapplication.ui.transacciones.DetallesTransaccionScreen
 import com.tuapp.myapplication.ui.transacciones.RegistrarTransaccionesScreen
 import com.tuapp.myapplication.ui.transacciones.TransaccionesScreen
+import com.tuapp.myapplication.ui.finanzas.finanzaGrupal.GroupDetailsScreen
+import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.FiltroGraficoScreen
+import com.tuapp.myapplication.ui.subCategorias.DetalleSubCategoriaScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -44,7 +47,7 @@ fun AppNavigation(
         userViewModel.checkUser()
     }
 
-    when(tokenState){
+    when (tokenState) {
         TokenState.Loading -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
@@ -59,10 +62,13 @@ fun AppNavigation(
 
             NavHost(
                 navController = navController,
-                startDestination = if(token != null) FinanzaIndividualScreen(0, "") else LoginScreen
+                startDestination = if (token != null) FinanzaIndividualScreen(
+                    0,
+                    ""
+                ) else LoginScreen
             ) {
 
-                composable <LoginScreen> {
+                composable<LoginScreen> {
                     LoginScreen(navController)
                 }
 
@@ -72,12 +78,18 @@ fun AppNavigation(
 
                 composable<FinanzaIndividualScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
-                    val nombreFinanza = backStackEntry.arguments?.getString("nombreFinanza") ?: return@composable
+                    val nombreFinanza =
+                        backStackEntry.arguments?.getString("nombreFinanza") ?: return@composable
 
-                    val finanzaId: Int? = if(id == 0) null else id
-                    val titulo: String = if(nombreFinanza.isBlank()) "Finanza principal" else nombreFinanza
+                    val finanzaId: Int? = if (id == 0) null else id
+                    val titulo: String =
+                        if (nombreFinanza.isBlank()) "Finanza principal" else nombreFinanza
 
-                    IndividualFinanceScreen(navController, finanzaId = finanzaId, nombreFinanza = titulo)
+                    IndividualFinanceScreen(
+                        navController,
+                        finanzaId = finanzaId,
+                        nombreFinanza = titulo
+                    )
                 }
 
                 composable<FinanzaGrupalScreen> {
@@ -93,68 +105,108 @@ fun AppNavigation(
 
                 composable<TransaccionesScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
-                    val finanzaId: Int? = if(id == 0) null else id
+                    val finanzaId: Int? = if (id == 0) null else id
 
-                    val nombreFinanza = backStackEntry.arguments?.getString("nombreFinanza") ?: return@composable
-                    val titulo: String = if(nombreFinanza.isBlank()) "Finanza principal" else nombreFinanza
+                    val nombreFinanza =
+                        backStackEntry.arguments?.getString("nombreFinanza") ?: return@composable
+                    val titulo: String =
+                        if (nombreFinanza.isBlank()) "Finanza principal" else nombreFinanza
 
-                    TransaccionesScreen(navController, finanzaId = finanzaId, nombreFinanza = titulo)
+                    TransaccionesScreen(
+                        navController,
+                        finanzaId = finanzaId,
+                        nombreFinanza = titulo
+                    )
                 }
 
                 composable<RegistrarTransaccionScreen> { backStackEntry ->
 
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
-                    val finanzaId: Int? = if(id == 0) null else id
+                    val finanzaId: Int? = if (id == 0) null else id
 
                     RegistrarTransaccionesScreen(navController, finanzaId)
                 }
 
                 composable<DetalleTransaccionScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
-                    val finanzaId = backStackEntry.arguments?.getInt("finanzaId") ?: return@composable
-                    DetallesTransaccionScreen(navController, id, if(finanzaId == 0) null else finanzaId )
+                    val finanzaId =
+                        backStackEntry.arguments?.getInt("finanzaId") ?: return@composable
+                    DetallesTransaccionScreen(
+                        navController,
+                        id,
+                        if (finanzaId == 0) null else finanzaId
+                    )
                 }
 
                 composable<BDHomeScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
 
-                    val nombreFinanza = backStackEntry.arguments?.getString("nombreFinanza") ?: return@composable
+                    val nombreFinanza =
+                        backStackEntry.arguments?.getString("nombreFinanza") ?: return@composable
 
-                    val titulo: String = if(nombreFinanza.isBlank()) "Finanza principal" else nombreFinanza
+                    val titulo: String =
+                        if (nombreFinanza.isBlank()) "Finanza principal" else nombreFinanza
                     BDHomeScreen(navController, finanzaId = id, titulo)
                 }
 
                 composable<CategoriaEgresoScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
-                    val finanzaId = if(id == 0) null else id
+                    val finanzaId = if (id == 0) null else id
                     CategoriasEgresoScreen(navController, finanzaId)
                 }
                 composable<SubCategoriaScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
-                    val finanzaId = if(id == 0) null else id
+                    val finanzaId = if (id == 0) null else id
                     SubcategoriasScreen(navController, finanzaId)
                 }
 
                 composable<AhorroScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
-                    val finanzaId = if(id == 0) null else id
+                    val finanzaId = if (id == 0) null else id
                     AhorrosScreen(navController, finanzaId)
                 }
 
                 composable<RegistrarSubCategoriaScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
-                    val finanzaId = if(id == 0) null else id
+                    val finanzaId = if (id == 0) null else id
                     RegistrarSubcategoriaScreen(navController, finanzaId)
                 }
 
                 composable<IngresosScreen> { backStackEntry ->
                     val id = backStackEntry.arguments?.getInt("id") ?: return@composable
-                    val finanzaId = if(id == 0) null else id
+                    val finanzaId = if (id == 0) null else id
                     IngresosScreen(navController, finanzaId)
                 }
+
+                composable<GroupDetailsScreen> { backStackEntry ->
+                    val finanzaId =
+                        backStackEntry.arguments?.getInt("finanzaId") ?: return@composable
+                    GroupDetailsScreen(finanzaId = finanzaId, navController = navController)
+                }
+
+                composable<FilterByCategoryScreen> { backStackEntry ->
+                    val finanzaId = backStackEntry.arguments?.getInt("finanzaId") ?: return@composable
+                    val nombreFinanza = backStackEntry.arguments?.getString("nombreFinanza") ?: return@composable
+
+                    FiltroGraficoScreen(
+                        navController = navController,
+                        finanzaId = finanzaId,
+                        nombreFinanza = nombreFinanza
+                    )
+                }
+                composable<DetalleSubCategoriaRoute> { backStackEntry ->
+                    val subcategoriaId = backStackEntry.arguments?.getInt("subcategoriaId") ?: return@composable
+                    val finanzaId = backStackEntry.arguments?.getInt("finanzaId") ?: return@composable
+
+                    DetalleSubCategoriaScreen(
+                        navController = navController,
+                        subcategoriaId = subcategoriaId,
+                        finanzaId = finanzaId
+                    )
+                }
+
             }
         }
+
     }
-
 }
-
