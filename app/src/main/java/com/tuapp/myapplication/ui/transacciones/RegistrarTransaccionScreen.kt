@@ -90,13 +90,6 @@ fun RegistrarTransaccionesScreen(
         containerColor = verde
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-
-            if(loadingCreating){
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                    CircularProgressIndicator()
-                }
-            }
-
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -107,6 +100,12 @@ fun RegistrarTransaccionesScreen(
                         )
                         .padding(horizontal = 25.dp)
                 ) {
+
+                    if(loadingCreating){
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                            CircularProgressIndicator()
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(20.dp))
 

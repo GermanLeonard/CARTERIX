@@ -8,7 +8,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -25,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.tuapp.myapplication.ui.WebSocketViewModel
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.ui.components.CustomTopBar
 import com.tuapp.myapplication.ui.components.MonthSelector
@@ -41,7 +44,8 @@ fun TransaccionesScreen(
     navController: NavController,
     transaccionViewModel: TransaccionesViewModel = viewModel(factory = TransaccionesViewModel.Factory),
     finanzaId: Int?,
-    nombreFinanza: String
+    nombreFinanza: String,
+    webSocketViewModel: WebSocketViewModel = viewModel(factory = WebSocketViewModel.Factory)
 ) {
 
     val currentDate = rememberSaveable { LocalDate.now() }
@@ -68,9 +72,16 @@ fun TransaccionesScreen(
 
     val currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL
 
-    //AGREGUEN OPCION PARA FILTRAR POR MES Y AÑO
-    LaunchedEffect(selectedMonth) {
-        transaccionViewModel.getTransactionsList(mes, selectedYear, finanzaId)
+    val transactionTrigger by webSocketViewModel.transaccionTrigger.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        if(finanzaId != null){
+            webSocketViewModel.startListening(finanzaId)
+        }
+    }
+
+    LaunchedEffect(transactionTrigger, selectedMonth) {
+        transaccionViewModel.getTransactionsList(mes, selectedYear, finanzaId, isWebSocketCall = transactionTrigger > 0)
     }
 
     Scaffold(

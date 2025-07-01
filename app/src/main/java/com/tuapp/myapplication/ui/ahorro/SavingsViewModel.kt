@@ -31,14 +31,14 @@ class SavingsViewModel(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
-    fun getSavingsData(finanzaId: Int?, anio: Int, isRefreshing: Boolean = false) {
+    fun getSavingsData(finanzaId: Int?, anio: Int, isRefreshing: Boolean = false, isWebSocketCall: Boolean = false) {
         viewModelScope.launch {
             savingsRepository.getSavingsData(finanzaId, anio).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
                         if(isRefreshing){
                             _isRefreshing.value = true
-                        } else {
+                        } else if(!isWebSocketCall) {
                             _isLoading.value = true
                         }
                         _errorMessage.value = ""

@@ -38,7 +38,7 @@ class TransaccionesViewModel(
     private var _transactionListError = MutableStateFlow("")
     val transactionListError: StateFlow<String> = _transactionListError
 
-    fun getTransactionsList(mes: Int, anio: Int, finanzaId: Int? = null, isRefreshing: Boolean = false){
+    fun getTransactionsList(mes: Int, anio: Int, finanzaId: Int? = null, isRefreshing: Boolean = false, isWebSocketCall: Boolean = false){
         viewModelScope.launch {
             transaccionRepository.getTransactionsList(mes, anio, finanzaId)
                 .collect { resource ->
@@ -46,7 +46,7 @@ class TransaccionesViewModel(
                         is Resource.Loading -> {
                             if(isRefreshing){
                                _isRefreshing.value = true
-                            }else {
+                            }else if(!isWebSocketCall) {
                                 _loadingTransactions.value = true
                             }
                             _transactionListError.value = ""

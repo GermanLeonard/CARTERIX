@@ -10,22 +10,21 @@ import com.tuapp.myapplication.CarterixApplication
 import com.tuapp.myapplication.data.models.financeModels.request.CreateFinanceRequestDomain
 import com.tuapp.myapplication.data.models.financeModels.request.JoinFinanceRequestDomain
 import com.tuapp.myapplication.data.models.financeModels.response.CategorieResponseDomain
-import com.tuapp.myapplication.data.models.financeModels.response.DatoAnalisisDomain
 import com.tuapp.myapplication.data.models.financeModels.response.FinanceDetailsResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.FinancesListResponseDomain
-import com.tuapp.myapplication.data.models.financeModels.response.FinanzaMiembroDomain
 import com.tuapp.myapplication.data.models.financeModels.response.ResumenAhorrosResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.ResumenEgresosResponseDomain
 import com.tuapp.myapplication.data.models.financeModels.response.ResumenFinancieroResponseDomain
 import com.tuapp.myapplication.data.repository.finance.FinanceRepository
+import com.tuapp.myapplication.data.repository.ia.GenerativeRepository
 import com.tuapp.myapplication.helpers.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class FinanzasViewModel(
-    private val finanzaRepository: FinanceRepository
+    private val finanzaRepository: FinanceRepository,
+    private val generativeRepository: GenerativeRepository
 ): ViewModel() {
 
     private var _resumenFinanciero = MutableStateFlow(ResumenFinancieroResponseDomain(0.0, 0.0, 0.0))
@@ -49,13 +48,15 @@ class FinanzasViewModel(
     private var _loadingResumenErrorMessage = MutableStateFlow("")
     val loadingResumenErrorMessage: StateFlow<String> = _loadingResumenErrorMessage
 
-    fun financeSummary(mes: Int, anio: Int, finanza_id: Int? = null) {
+    fun financeSummary(mes: Int, anio: Int, finanzaId: Int? = null, isWebSocketCall: Boolean = false) {
         viewModelScope.launch {
-            finanzaRepository.getSummary(mes, anio, finanza_id)
+            finanzaRepository.getSummary(mes, anio, finanzaId)
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            _loadingResumen.value = true
+                            if(!isWebSocketCall){
+                                _loadingResumen.value = true
+                            }
                             _loadingResumenErrorMessage.value = ""
                         }
                         is Resource.Success -> {
@@ -84,14 +85,15 @@ class FinanzasViewModel(
     private var _loadingDatosErrorMessage = MutableStateFlow("")
     val loadingDatosErrorMessage: StateFlow<String> = _loadingDatosErrorMessage
 
-    fun financeData(mes: Int, anio: Int, finanza_id: Int? = null){
+    fun financeData(mes: Int, anio: Int, finanzaId: Int? = null, isWebSocketCall: Boolean = false){
         viewModelScope.launch {
-            finanzaRepository.getData(mes, anio, finanza_id)
+            finanzaRepository.getData(mes, anio, finanzaId)
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            // manejar cargando si querés
-                            _loadingDatos.value = true
+                            if(!isWebSocketCall){
+                                _loadingDatos.value = true
+                            }
                             _loadingDatosErrorMessage.value = ""
                         }
                         is Resource.Success -> {
@@ -180,7 +182,7 @@ class FinanzasViewModel(
         }
     }
 
-    private var _financeDetails = MutableStateFlow<FinanceDetailsResponseDomain>(
+    private var _financeDetails = MutableStateFlow(
         FinanceDetailsResponseDomain(
        "", emptyList(), ""
     ))
@@ -344,7 +346,8 @@ class FinanzasViewModel(
             initializer {
                 val application = this[APPLICATION_KEY] as CarterixApplication
                 FinanzasViewModel(
-                    application.appProvider.provideFinanceRepository()
+                    application.appProvider.provideFinanceRepository(),
+                    application.appProvider.provideGenerativeRepository()
                 )
             }
         }

@@ -125,8 +125,6 @@ fun SubcategoriasScreen(
                                 .padding(12.dp)
                         )
                         categories.forEach {
-                            //UNA VEZ ELEGIDO TIENE QUE SER FILTRADO EN LA LISTA QUE REGRESA EL VIEWMODEL
-                            //POR MEDIO DEL NOMBRE CATEGORIA
                             Text(
                                 text = it.categoria_nombre,
                                 modifier = Modifier

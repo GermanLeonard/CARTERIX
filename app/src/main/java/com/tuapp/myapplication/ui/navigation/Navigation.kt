@@ -32,7 +32,7 @@ import com.tuapp.myapplication.ui.transacciones.DetallesTransaccionScreen
 import com.tuapp.myapplication.ui.transacciones.RegistrarTransaccionesScreen
 import com.tuapp.myapplication.ui.transacciones.TransaccionesScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaGrupal.GroupDetailsScreen
-import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.ConsejoIAScreen
+import com.tuapp.myapplication.ui.consejo.ConsejoIAScreen
 import com.tuapp.myapplication.ui.finanzas.finanzaIndividual.FiltroGraficoScreen
 import com.tuapp.myapplication.ui.profile.EditProfileScreen
 import com.tuapp.myapplication.ui.subCategorias.DetalleSubCategoriaScreen
@@ -193,7 +193,9 @@ fun AppNavigation(
                 }
                 composable<DetalleSubCategoriaRoute> { backStackEntry ->
                     val subcategoriaId = backStackEntry.arguments?.getInt("subcategoriaId") ?: return@composable
-                    val finanzaId = backStackEntry.arguments?.getInt("finanzaId") ?: return@composable
+                    val id = backStackEntry.arguments?.getInt("finanzaId") ?: return@composable
+
+                    val finanzaId: Int? = if(id != 0) id else null
 
                     DetalleSubCategoriaScreen(
                         navController = navController,

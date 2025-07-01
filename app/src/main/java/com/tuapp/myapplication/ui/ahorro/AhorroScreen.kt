@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.tuapp.myapplication.ui.WebSocketViewModel
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.ui.components.CustomTopBar
 import com.tuapp.myapplication.ui.navigation.Routes
@@ -33,7 +35,8 @@ import java.util.*
 fun AhorrosScreen(
     navController: NavHostController,
     finanzaId: Int?,
-    viewModel: SavingsViewModel = viewModel(factory = SavingsViewModel.Factory)
+    viewModel: SavingsViewModel = viewModel(factory = SavingsViewModel.Factory),
+    webSocketViewModel: WebSocketViewModel = viewModel(factory = WebSocketViewModel.Factory)
 ) {
 
     val verde = Color(0xFF2E7D32)
@@ -54,8 +57,16 @@ fun AhorrosScreen(
     val createdGoal by viewModel.createdSavingGoal.collectAsStateWithLifecycle()
     val creatingError by viewModel.creatingError.collectAsStateWithLifecycle()
 
+    val ahorroTrigger by webSocketViewModel.ahorroTrigger.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
-        viewModel.getSavingsData(finanzaId, anio)
+        if(finanzaId != null){
+            webSocketViewModel.startListening(finanzaId)
+        }
+    }
+
+    LaunchedEffect(ahorroTrigger) {
+        viewModel.getSavingsData(finanzaId, anio, isWebSocketCall = ahorroTrigger > 0)
     }
 
     LaunchedEffect(createdGoal) {
@@ -90,6 +101,7 @@ fun AhorrosScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    //.verticalScroll(scrollState)
                     .padding(vertical = 8.dp)
                     .background(
                         color = Color.White,

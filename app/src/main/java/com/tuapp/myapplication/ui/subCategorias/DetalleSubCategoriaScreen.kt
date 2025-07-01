@@ -112,185 +112,185 @@ fun DetalleSubCategoriaScreen(
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(detailsError, fontSize = 15.sp, color = Color.Red)
                     }
-                }
+                } else {
+                    Spacer(modifier = Modifier.height(25.dp))
 
-                Spacer(modifier = Modifier.height(25.dp))
-
-                Text("Categoria Padre")
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        if(editingSubCategory) Color(0xFFE8EAF6) else Color(0xFFE0E0E0),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .clickable(enabled = editingSubCategory) {
-                        expandedCategoria = true
-                    }
-                    .padding(16.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = categoriaPadre.ifEmpty { "Selecciona la categoria Padre" },
-                            color = if(editingSubCategory) Color.Black else Color.Gray
+                    Text("Categoria Padre")
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            if(editingSubCategory) Color(0xFFE8EAF6) else Color(0xFFE0E0E0),
+                            shape = RoundedCornerShape(8.dp)
                         )
-                        Icon(
-                            Icons.Default.ArrowDropDown,
-                            contentDescription = null,
-                            tint = if(editingSubCategory) Color.Black else Color.Gray
-                        )
-                    }
-                }
-
-                DropdownMenu(
-                    expanded = expandedCategoria,
-                    onDismissRequest = { expandedCategoria = false}
-                ) {
-                    categoriesOptions.forEach{
-                        DropdownMenuItem(
-                            text = { Text(it.categoria_nombre)},
-                            onClick = {
-                                categoriaPadre = it.categoria_nombre
-                                categoriaId = it.categoria_id
-                                expandedCategoria = false
-                            }
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text("Nombre de Subcategoria")
-                TextField(
-                    value = nombre,
-                    onValueChange = { nombre = it },
-                    placeholder = { Text("Ej: Gasolina") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    enabled = editingSubCategory
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text("Tipo de Gasto")
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        if (editingSubCategory) Color(0xFFE8EAF6) else Color(0xFFE0E0E0),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .clickable(enabled = editingSubCategory) {
-                       expandedTipoGasto = true
-                    }
-                    .padding(16.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = tipoGasto.ifEmpty { "Selecciona el tipo de gasto" },
-                            color = if(editingSubCategory) Color.Black else Color.Gray
-                        )
-                        Icon(
-                            Icons.Default.ArrowDropDown,
-                            contentDescription = null,
-                            tint = if(editingSubCategory) Color.Black else Color.Gray
-                        )
-                    }
-                }
-
-                DropdownMenu(
-                    expanded = expandedTipoGasto,
-                    onDismissRequest = {
-                        expandedTipoGasto = false
-                    }
-                ) {
-                    gastoOpciones.forEach {
-                        DropdownMenuItem(
-                            text = {Text(it.tipo_nombre)},
-                            onClick = {
-                                tipoGasto = it.tipo_nombre
-                                gastoId = it.tipo_id
-                                expandedTipoGasto = false
-                            }
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text("Presupuesto Mensual")
-                TextField(
-                    value = presupuesto,
-                    onValueChange = { presupuesto = it },
-                    placeholder = { Text("Ej: 100.0") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    enabled = editingSubCategory,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    if(updatingError.isBlank()){
-                        Text(mensajeActualizar.ifBlank { "" }, fontSize = 12.sp, color = Color.Red)
-                    } else {
-                        Text(updatingError, fontSize = 12.sp, color = Color.Red)
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                AnimatedContent(targetState = editingSubCategory, label = "") { isEditing ->
-                    if (isEditing) {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Button(
-                                onClick = {
-                                    if (categoriaId != 0 && nombre.isNotBlank() && presupuesto.isNotBlank() && gastoId != 0) {
-                                        subCategoriesViewModel.updateSubCategory(
-                                            subCategoriaId = subcategoriaId,
-                                            idCategoria = categoriaId,
-                                            nombreSubCategoria = nombre,
-                                            presupuestoMensual = presupuesto.toDouble(),
-                                            tipoGastoId = gastoId,
-                                        )
-                                    } else {
-                                        mensajeActualizar = "Completa todos los campos para actualizar la finanza"
-                                    }
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = verde)
-                            ) {
-                                Text("Actualizar")
-                            }
-
-                            OutlinedButton(onClick = { editingSubCategory = false }) {
-                                Text("Cancelar", color = verde)
-                            }
+                        .clickable(enabled = editingSubCategory) {
+                            expandedCategoria = true
                         }
-                    } else {
+                        .padding(16.dp)) {
                         Row(
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Button(
-                                onClick = {
-                                    editingSubCategory = true
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = verde)
-                            ) {
-                                Text("Editar")
-                            }
+                            Text(
+                                text = categoriaPadre.ifEmpty { "Selecciona la categoria Padre" },
+                                color = if(editingSubCategory) Color.Black else Color.Gray
+                            )
+                            Icon(
+                                Icons.Default.ArrowDropDown,
+                                contentDescription = null,
+                                tint = if(editingSubCategory) Color.Black else Color.Gray
+                            )
+                        }
+                    }
 
-                            OutlinedButton(onClick = { navController.popBackStack() }) {
-                                Text("Cancelar", color = verde)
+                    DropdownMenu(
+                        expanded = expandedCategoria,
+                        onDismissRequest = { expandedCategoria = false}
+                    ) {
+                        categoriesOptions.forEach{
+                            DropdownMenuItem(
+                                text = { Text(it.categoria_nombre)},
+                                onClick = {
+                                    categoriaPadre = it.categoria_nombre
+                                    categoriaId = it.categoria_id
+                                    expandedCategoria = false
+                                }
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text("Nombre de Subcategoria")
+                    TextField(
+                        value = nombre,
+                        onValueChange = { nombre = it },
+                        placeholder = { Text("Ej: Gasolina") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        enabled = editingSubCategory
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text("Tipo de Gasto")
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            if (editingSubCategory) Color(0xFFE8EAF6) else Color(0xFFE0E0E0),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .clickable(enabled = editingSubCategory) {
+                            expandedTipoGasto = true
+                        }
+                        .padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = tipoGasto.ifEmpty { "Selecciona el tipo de gasto" },
+                                color = if(editingSubCategory) Color.Black else Color.Gray
+                            )
+                            Icon(
+                                Icons.Default.ArrowDropDown,
+                                contentDescription = null,
+                                tint = if(editingSubCategory) Color.Black else Color.Gray
+                            )
+                        }
+                    }
+
+                    DropdownMenu(
+                        expanded = expandedTipoGasto,
+                        onDismissRequest = {
+                            expandedTipoGasto = false
+                        }
+                    ) {
+                        gastoOpciones.forEach {
+                            DropdownMenuItem(
+                                text = {Text(it.tipo_nombre)},
+                                onClick = {
+                                    tipoGasto = it.tipo_nombre
+                                    gastoId = it.tipo_id
+                                    expandedTipoGasto = false
+                                }
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text("Presupuesto Mensual")
+                    TextField(
+                        value = presupuesto,
+                        onValueChange = { presupuesto = it },
+                        placeholder = { Text("Ej: 100.0") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        enabled = editingSubCategory,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        if(updatingError.isBlank()){
+                            Text(mensajeActualizar.ifBlank { "" }, fontSize = 12.sp, color = Color.Red)
+                        } else {
+                            Text(updatingError, fontSize = 12.sp, color = Color.Red)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    AnimatedContent(targetState = editingSubCategory, label = "") { isEditing ->
+                        if (isEditing) {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Button(
+                                    onClick = {
+                                        if (categoriaId != 0 && nombre.isNotBlank() && presupuesto.isNotBlank() && gastoId != 0) {
+                                            subCategoriesViewModel.updateSubCategory(
+                                                subCategoriaId = subcategoriaId,
+                                                idCategoria = categoriaId,
+                                                nombreSubCategoria = nombre,
+                                                presupuestoMensual = presupuesto.toDouble(),
+                                                tipoGastoId = gastoId,
+                                            )
+                                        } else {
+                                            mensajeActualizar = "Completa todos los campos para actualizar la finanza"
+                                        }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = verde)
+                                ) {
+                                    Text("Actualizar")
+                                }
+
+                                OutlinedButton(onClick = { editingSubCategory = false }) {
+                                    Text("Cancelar", color = verde)
+                                }
+                            }
+                        } else if(categoriaPadre != "Ahorro") {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Button(
+                                    onClick = {
+                                        editingSubCategory = true
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = verde)
+                                ) {
+                                    Text("Editar")
+                                }
+
+                                OutlinedButton(onClick = { navController.popBackStack() }) {
+                                    Text("Cancelar", color = verde)
+                                }
                             }
                         }
                     }

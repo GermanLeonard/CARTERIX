@@ -2,6 +2,7 @@ package com.tuapp.myapplication.data.remote.websocket
 
 import android.util.Log
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
@@ -19,8 +20,12 @@ class AppWebSocketListener(
         try {
             val gson = Gson()
 
-            val event = gson.fromJson(text, WebSocketEvent::class.java)
-            onEventReceived(event)
+            val type = object : TypeToken<List<WebSocketEvent>>() {}.type
+            val event: List<WebSocketEvent> = gson.fromJson(text, type)
+
+            event.forEach {
+                onEventReceived(it)
+            }
         } catch (e: Exception) {
             Log.e("WebSocket", "Error al parsear el evento: ${e.message}")
         }

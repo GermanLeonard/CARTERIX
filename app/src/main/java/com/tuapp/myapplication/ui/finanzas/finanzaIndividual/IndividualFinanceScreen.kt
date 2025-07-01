@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.tuapp.myapplication.ui.WebSocketViewModel
 import com.tuapp.myapplication.ui.components.BottomNavBar
 import com.tuapp.myapplication.ui.components.CustomTopBar
 import com.tuapp.myapplication.ui.components.MonthSelector
@@ -41,7 +42,8 @@ fun IndividualFinanceScreen(
     navController: NavController,
     finanzaViewModel: FinanzasViewModel = viewModel(factory = FinanzasViewModel.Factory),
     finanzaId: Int? = null,
-    nombreFinanza: String
+    nombreFinanza: String,
+    webSocketViewModel: WebSocketViewModel = viewModel(factory = WebSocketViewModel.Factory)
 ) {
     val verde = Color(0xFF2E7D32)
     val verdeClaro = Color(0xFF66BB6A)
@@ -75,9 +77,21 @@ fun IndividualFinanceScreen(
 
     val currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL
 
-    LaunchedEffect(selectedMonth) {
-        finanzaViewModel.financeSummary(mes, selectedYear, finanzaId)
-        finanzaViewModel.financeData(mes, selectedYear, finanzaId)
+    val resumenFinanzaTrigger by webSocketViewModel.resumenFinanzaTrigger.collectAsStateWithLifecycle()
+    val datosFinanzaTrigger by webSocketViewModel.datosFinanzaTrigger.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        if(finanzaId != null){
+            webSocketViewModel.startListening(finanzaId)
+        }
+    }
+
+    LaunchedEffect(resumenFinanzaTrigger, selectedMonth) {
+        finanzaViewModel.financeSummary(mes, selectedYear, finanzaId, resumenFinanzaTrigger > 0)
+    }
+
+    LaunchedEffect(datosFinanzaTrigger, selectedMonth) {
+        finanzaViewModel.financeData(mes, selectedYear, finanzaId, datosFinanzaTrigger > 0)
     }
 
     Scaffold(

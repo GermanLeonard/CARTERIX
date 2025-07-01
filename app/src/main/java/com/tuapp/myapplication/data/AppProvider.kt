@@ -4,12 +4,17 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
 import com.tuapp.myapplication.data.database.AppDatabase
 import com.tuapp.myapplication.data.remote.RetrofitInstance
 import com.tuapp.myapplication.data.repository.categories.CategoryRepository
 import com.tuapp.myapplication.data.repository.categories.CategoryRepositoryImpl
 import com.tuapp.myapplication.data.repository.finance.FinanceRepository
 import com.tuapp.myapplication.data.repository.finance.FinanceRepositoryImpl
+import com.tuapp.myapplication.data.repository.ia.GenerativeRepository
+import com.tuapp.myapplication.data.repository.ia.GenerativeRepositoryImpl
 import com.tuapp.myapplication.data.repository.incomes.IncomesRepository
 import com.tuapp.myapplication.data.repository.incomes.IncomesRepositoryImpl
 import com.tuapp.myapplication.data.repository.savings.SavingsRepository
@@ -65,6 +70,9 @@ class AppProvider(context: Context) {
     private val savingsDao = appDatabase.ahorroDao()
     private val savingsRepository = SavingsRepositoryImpl(savingsService, savingsDao, userDao)
 
+    private val generativeModel = Firebase.ai(backend = GenerativeBackend.vertexAI()).generativeModel("gemini-2.5-flash")
+    private val generativeRepository = GenerativeRepositoryImpl(generativeModel)
+
     fun provideUserRepository(): UserRepository {
         return userRepository
     }
@@ -95,5 +103,9 @@ class AppProvider(context: Context) {
 
     fun provideSavingRepository(): SavingsRepository {
         return savingsRepository
+    }
+
+    fun provideGenerativeRepository(): GenerativeRepository {
+        return generativeRepository
     }
 }
