@@ -14,6 +14,8 @@ private val LightColors = lightColorScheme(
     surface = Color.White,
     onSurface = Color.Black
 )
+val PurpleSoft = Color(0xFF7C4DFF)
+val GreenSoft = Color(0xFF81C784)
 
 @Composable
 fun CarterixTheme(content: @Composable () -> Unit) {

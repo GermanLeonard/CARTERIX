@@ -1,5 +1,6 @@
 package com.tuapp.myapplication.ui.subCategorias
 
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -8,76 +9,127 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.tuapp.myapplication.CarterixApplication
 import com.tuapp.myapplication.data.models.subCategoryModels.request.CreateOrUpdateSubCategoryDomain
+import com.tuapp.myapplication.data.models.subCategoryModels.response.ListaSubCategoriasDomain
+import com.tuapp.myapplication.data.models.subCategoryModels.response.OptionsDomain
+import com.tuapp.myapplication.data.models.subCategoryModels.response.SubCategoriaDomain
 import com.tuapp.myapplication.data.repository.subCategories.SubCategoryRepository
 import com.tuapp.myapplication.helpers.Resource
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SubCategoriesViewModel(
     private val subCategoryRepository: SubCategoryRepository
-): ViewModel(){
+): ViewModel() {
 
-    fun getSubCategoriesList(finanzaId: Int? = null){
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _mensajeError = MutableStateFlow("")
+    val mensajeError: StateFlow<String> = _mensajeError
+
+    private var _subCategoriesList = MutableStateFlow<List<ListaSubCategoriasDomain>>(emptyList())
+    val subCategoriesList: StateFlow<List<ListaSubCategoriasDomain>> = _subCategoriesList
+
+    private var _categoriesExpenses = MutableStateFlow<List<OptionsDomain>>(emptyList())
+    val categoriesExpenses: StateFlow<List<OptionsDomain>> = _categoriesExpenses
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+
+
+    fun getSubCategoriesList(finanzaId: Int? = null, isRefreshing: Boolean = false){
         viewModelScope.launch {
             subCategoryRepository.getSubCategoriesList(finanzaId)
                 .collect { resource ->
-                    when(resource){
+                    when (resource) {
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            if (isRefreshing) {
+                                _isRefreshing.value = true
+                            } else {
+                                _isLoading.value = true
+                            }
+                            _mensajeError.value = ""
                         }
+
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            //LISTA DE SUB CATEGORIAS
-                            resource.data
+                            _subCategoriesList.value = resource.data
+                            _isLoading.value = false
+                            _isRefreshing.value = false
                         }
+
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _mensajeError.value = resource.message
+                            _isLoading.value = false
+                            _isRefreshing.value = false
                         }
                     }
                 }
         }
     }
+
+    private var _loadingDetails = MutableStateFlow(false)
+    val loadingDetails: StateFlow<Boolean> = _loadingDetails
+
+    private var _subcategoriaDetalle = MutableStateFlow(SubCategoriaDomain(0, "", 0.0, 0))
+    val subcategoriaDetalle: StateFlow<SubCategoriaDomain> = _subcategoriaDetalle
+
+    private var _detailsError = MutableStateFlow("")
+    val detailsError: StateFlow<String> = _detailsError
 
     fun getSubCategoryDetails(subCategoryId: Int) {
         viewModelScope.launch {
             subCategoryRepository.getSubCategoryDetails(subCategoryId)
                 .collect { resource ->
-                    when(resource){
+                    when (resource) {
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingDetails.value = true
+                            _detailsError.value = ""
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            //DETALLES DE UNA SUB CATEGORIA
-                            resource.data
+                            _subcategoriaDetalle.value = resource.data
+                            _loadingDetails.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _detailsError.value = resource.message
+                            _loadingDetails.value = false
                         }
                     }
                 }
         }
     }
 
-    fun getExpensesOptions(){
+    fun getExpensesOptions() {
         viewModelScope.launch {
             subCategoryRepository.getExpensesOptions()
                 .collect { resource ->
-                    when(resource){
+                    when (resource) {
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _isLoading.value = true
                         }
+
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            //OPCIONES DE LOS TIPOS DE GASTOS PARA LOS SELECT DE LOS FORMULARIOS
-                            resource.data
+                            _categoriesExpenses.value = resource.data
+                            _isLoading.value = false
                         }
+
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _mensajeError.value = resource.message
+                            _isLoading.value = false
                         }
                     }
                 }
         }
     }
+
+    private var _loadingCreating = MutableStateFlow(false)
+    val loadingCreating: StateFlow<Boolean> = _loadingCreating
+
+    private var _createdCategory = MutableStateFlow(false)
+    val createdCategory: StateFlow<Boolean> = _createdCategory
+
+    private var _creatingError = MutableStateFlow("")
+    val creatingError: StateFlow<String> = _creatingError
 
     fun createSubCategory(
         idCategoria: Int,
@@ -96,22 +148,34 @@ class SubCategoriesViewModel(
                     tipoGastoId
                 )
             ).collect { resource ->
-                when(resource){
+                when (resource) {
                     is Resource.Loading -> {
-                        //Manejen el "cargando"
+                        _loadingCreating.value = true
+                        _creatingError.value = ""
                     }
+
                     is Resource.Success -> {
-                        //Manejen el "success"
-                        //OPCIONES DE LOS TIPOS DE GASTOS PARA LOS SELECT DE LOS FORMULARIOS
-                        resource.data
+                        _createdCategory.value = resource.data.success
+                        _loadingCreating.value = false
                     }
+
                     is Resource.Error -> {
-                        //Manejen el "error"
+                        _creatingError.value = resource.message
+                        _loadingCreating.value = false
                     }
                 }
             }
         }
     }
+
+    private var _loadingUpdating = MutableStateFlow(false)
+    val loadingUpdating: StateFlow<Boolean> = _loadingUpdating
+
+    private var _updatedCategory = MutableStateFlow(false)
+    val updatedCategory: StateFlow<Boolean> = _updatedCategory
+
+    private var _updatingError = MutableStateFlow("")
+    val updatingError: StateFlow<String> = _updatingError
 
     fun updateSubCategory(
         subCategoriaId: Int,
@@ -130,20 +194,24 @@ class SubCategoriesViewModel(
                     tipoGastoId
                 )
             ).collect { resource ->
-                when(resource){
+                when (resource) {
                     is Resource.Loading -> {
-                        //Manejen el "cargando"
+                        _loadingUpdating.value = true
+                        _updatingError.value = ""
                     }
+
                     is Resource.Success -> {
-                        //Manejen el "success"
-                        //OPCIONES DE LOS TIPOS DE GASTOS PARA LOS SELECT DE LOS FORMULARIOS
-                        resource.data
+                        _updatedCategory.value = resource.data.success
+                        _loadingUpdating.value = false
                     }
+
                     is Resource.Error -> {
-                        //Manejen el "error"
+                        _updatingError.value = resource.message
+                        _loadingUpdating.value = false
                     }
                 }
             }
+
         }
     }
 

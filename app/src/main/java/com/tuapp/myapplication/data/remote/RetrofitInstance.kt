@@ -4,7 +4,9 @@ import com.tuapp.myapplication.data.remote.categories.CategoriesService
 import com.tuapp.myapplication.data.remote.finance.FinanceService
 import com.tuapp.myapplication.data.remote.ingresos.IncomesService
 import com.tuapp.myapplication.data.remote.interceptors.AuthInterceptor
+import com.tuapp.myapplication.data.remote.saving.SavingService
 import com.tuapp.myapplication.data.remote.subCategories.SubCategoriesService
+import com.tuapp.myapplication.data.remote.transactions.TransactionsService
 import com.tuapp.myapplication.data.remote.user.UserService
 import com.tuapp.myapplication.data.repository.sensitive.SensitiveInfoRepository
 import okhttp3.OkHttpClient
@@ -13,7 +15,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
-    private val BASE_URL = "http://10.0.2.2:8000/"
+    private val BASE_URL = "https://backend-aplicacion-de-finanzas.onrender.com"
 
     fun getInstance(repository: SensitiveInfoRepository): Retrofit {
         val client = OkHttpClient.Builder()
@@ -48,5 +50,13 @@ object RetrofitInstance {
 
     fun getIncomesService(repository: SensitiveInfoRepository): IncomesService {
         return getInstance(repository).create(IncomesService::class.java)
+    }
+
+    fun getTransactionsService(repository: SensitiveInfoRepository): TransactionsService {
+        return getInstance(repository).create(TransactionsService::class.java)
+    }
+
+    fun getSavingsService(repository: SensitiveInfoRepository): SavingService {
+        return getInstance(repository).create(SavingService::class.java)
     }
 }

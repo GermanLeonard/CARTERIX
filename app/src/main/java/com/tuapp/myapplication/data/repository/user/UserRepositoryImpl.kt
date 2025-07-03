@@ -38,6 +38,17 @@ class UserRepositoryImpl(
         return userDao.getUser().map { it.toDomain() }
     }
 
+    override suspend fun checkUserAndDeleteToken() {
+        try{
+            val user = userDao.getUserOnce()
+            if(user == null) {
+                sensitiveInfoRepository.clearToken()
+            }
+        } catch (e: Exception) {
+            sensitiveInfoRepository.clearToken()
+        }
+    }
+
     override suspend fun closeSession() {
         sensitiveInfoRepository.clearToken()
     }

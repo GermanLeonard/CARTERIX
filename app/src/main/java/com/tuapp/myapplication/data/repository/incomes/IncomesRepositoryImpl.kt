@@ -5,10 +5,10 @@ import com.tuapp.myapplication.data.database.dao.income.IncomeDao
 import com.tuapp.myapplication.data.database.dao.user.UserDao
 import com.tuapp.myapplication.data.database.entities.income.toDomain
 import com.tuapp.myapplication.data.models.CommonResponseDomain
-import com.tuapp.myapplication.data.models.incomes.request.CreateOrUpdateIncomeRequestDomain
-import com.tuapp.myapplication.data.models.incomes.request.toRequest
-import com.tuapp.myapplication.data.models.incomes.response.IngresoDetailsResponseDomain
-import com.tuapp.myapplication.data.models.incomes.response.IngresoResponseDomain
+import com.tuapp.myapplication.data.models.incomesModels.request.CreateOrUpdateIncomeRequestDomain
+import com.tuapp.myapplication.data.models.incomesModels.request.toRequest
+import com.tuapp.myapplication.data.models.incomesModels.response.IngresoDetailsResponseDomain
+import com.tuapp.myapplication.data.models.incomesModels.response.IngresoResponseDomain
 import com.tuapp.myapplication.data.remote.ingresos.IncomesService
 import com.tuapp.myapplication.data.remote.responses.incomesResponse.toDomain
 import com.tuapp.myapplication.data.remote.responses.incomesResponse.toEntity

@@ -4,110 +4,130 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.tuapp.myapplication.ui.categorias.CategoriesViewModel
 import com.tuapp.myapplication.ui.components.BottomNavBar
-import com.tuapp.myapplication.data.database.AppDatabase
-import com.tuapp.myapplication.data.repository.CategoriaEgresoRepository
-import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModel
-import com.tuapp.myapplication.ui.viewmodel.CategoriaEgresoViewModelFactory
+import com.tuapp.myapplication.ui.components.CustomTopBar
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
-fun RegistrarSubcategoriaScreen(navController: NavController) {
-    val context = LocalContext.current
+fun RegistrarSubcategoriaScreen(
+    navController: NavController,
+    finanzaId: Int?,
+    categoriasViewModel: CategoriesViewModel = viewModel(factory = CategoriesViewModel.Factory),
+    subCategoriaViewModel: SubCategoriesViewModel = viewModel(factory = SubCategoriesViewModel.Factory),
+) {
 
-    val categoriaViewModel: CategoriaEgresoViewModel = viewModel(
-        factory = CategoriaEgresoViewModelFactory(
-            CategoriaEgresoRepository(AppDatabase.getDatabase(context).categoriaEgresoDao())
-        )
-    )
+    val categoriesOptions by categoriasViewModel.categoriesOptions.collectAsStateWithLifecycle()
+    val gastoOpciones by subCategoriaViewModel.categoriesExpenses.collectAsStateWithLifecycle()
 
-    val categorias by categoriaViewModel.categorias.collectAsState()
-    val tiposGasto = listOf("Gasto Fijo", "Gasto Variable")
+    var categoriaPadre by rememberSaveable { mutableStateOf("") }
+    //id de la categoria que se usara para la peticion
+    var categoriaId by rememberSaveable { mutableIntStateOf(0) }
 
-    var categoriaPadre by remember { mutableStateOf("") }
-    var nombre by remember { mutableStateOf("") }
-    var tipoGasto by remember { mutableStateOf("") }
-    var presupuesto by remember { mutableStateOf("") }
+    var nombre by rememberSaveable { mutableStateOf("") }
 
-    var showCategoriaMenu by remember { mutableStateOf(false) }
-    var showTipoMenu by remember { mutableStateOf(false) }
+    var tipoGasto by rememberSaveable { mutableStateOf("") }
+    //id del tipo de gasto que se usara para la peticion
+    var gastoId by rememberSaveable { mutableIntStateOf(0) }
+
+    var presupuesto by rememberSaveable { mutableStateOf("") }
+
+    var expandedTipoGasto by rememberSaveable { mutableStateOf(false) }
+    var expandedCategoria by rememberSaveable { mutableStateOf(false) }
+
+    var mensajeRegistro by rememberSaveable { mutableStateOf("") }
+
+    val loadingCreating by subCategoriaViewModel.loadingCreating.collectAsStateWithLifecycle()
+    val createdCategory by subCategoriaViewModel.createdCategory.collectAsStateWithLifecycle()
+    val creatingError by subCategoriaViewModel.creatingError.collectAsStateWithLifecycle()
 
     val verde = Color(0xFF2E7D32)
     val currentRoute = Routes.BD_HOME
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
+    LaunchedEffect(Unit) {
+        categoriasViewModel.getCategoriesOptions(finanzaId)
+        subCategoriaViewModel.getExpensesOptions()
+    }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .background(verde),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Registrar\nSubCategoria",
-                    fontSize = 22.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+    LaunchedEffect(createdCategory) {
+        if(createdCategory){
+            navController.popBackStack()
+        }
+    }
 
+    Scaffold(
+        topBar = {
+            CustomTopBar(Routes.REGISTRAR_SUBCATEGORIA, navController, true)
+        },
+        bottomBar = {
+            BottomNavBar(navController = navController, currentRoute = currentRoute)
+        },
+        contentColor = Color.Black,
+        containerColor = verde
+    ) { innerPadding ->
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .background(Color.White, shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
-                    .padding(20.dp)
-                    .weight(1f)
+                    .fillMaxSize()
+                    .padding(vertical = 8.dp)
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
+                    )
+                    .padding(horizontal = 25.dp)
             ) {
+
+                if(loadingCreating){
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center ){
+                        CircularProgressIndicator()
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(25.dp))
+
                 Text("Categoria Padre")
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0xFFE8EAF6), shape = RoundedCornerShape(8.dp))
-                    .clickable { showCategoriaMenu = !showCategoriaMenu }
+                    .clickable { expandedCategoria = true }
                     .padding(16.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = if (categoriaPadre.isNotEmpty()) categoriaPadre else "Selecciona la categoria Padre")
+                        Text(text = categoriaPadre.ifEmpty { "Selecciona la categoria Padre" })
                         Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                     }
                 }
 
-                if (showCategoriaMenu) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.White)
-                            .padding(4.dp)
-                    ) {
-                        categorias.forEach {
-                            Text(
-                                text = it.nombreCategoria,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        categoriaPadre = it.nombreCategoria
-                                        showCategoriaMenu = false
-                                    }
-                                    .padding(12.dp)
-                            )
-                        }
+                DropdownMenu(
+                    expanded = expandedCategoria,
+                    onDismissRequest = { expandedCategoria = false}
+                ) {
+                    categoriesOptions.forEach{
+                        DropdownMenuItem(
+                            text = { Text(it.categoria_nombre)},
+                            onClick = {
+                                categoriaPadre = it.categoria_nombre
+                                categoriaId = it.categoria_id
+                                expandedCategoria = false
+                            }
+                        )
                     }
                 }
 
@@ -118,7 +138,8 @@ fun RegistrarSubcategoriaScreen(navController: NavController) {
                     value = nombre,
                     onValueChange = { nombre = it },
                     placeholder = { Text("Ej: Gasolina") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -127,36 +148,32 @@ fun RegistrarSubcategoriaScreen(navController: NavController) {
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0xFFE8EAF6), shape = RoundedCornerShape(8.dp))
-                    .clickable { showTipoMenu = !showTipoMenu }
+                    .clickable {expandedTipoGasto = true}
                     .padding(16.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = if (tipoGasto.isNotEmpty()) tipoGasto else "Selecciona el tipo de gasto")
+                        Text(text = tipoGasto.ifEmpty { "Selecciona el tipo de gasto" })
                         Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                     }
                 }
 
-                if (showTipoMenu) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.White)
-                            .padding(4.dp)
-                    ) {
-                        tiposGasto.forEach {
-                            Text(
-                                text = it,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        tipoGasto = it
-                                        showTipoMenu = false
-                                    }
-                                    .padding(12.dp)
-                            )
-                        }
+                DropdownMenu(
+                    expanded = expandedTipoGasto,
+                    onDismissRequest = {
+                        expandedTipoGasto = false
+                    }
+                ) {
+                    gastoOpciones.forEach {
+                        DropdownMenuItem(
+                            text = {Text(it.tipo_nombre)},
+                            onClick = {
+                                tipoGasto = it.tipo_nombre
+                                gastoId = it.tipo_id
+                                expandedTipoGasto = false
+                            }
+                        )
                     }
                 }
 
@@ -167,23 +184,40 @@ fun RegistrarSubcategoriaScreen(navController: NavController) {
                     value = presupuesto,
                     onValueChange = { presupuesto = it },
                     placeholder = { Text("Ej: 100.0") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    if(creatingError.isBlank()){
+                        Text(mensajeRegistro.ifBlank { "" }, fontSize = 12.sp, color = Color.Red)
+                    } else {
+                        Text(creatingError, fontSize = 12.sp, color = Color.Red)
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
                     Button(
                         onClick = {
-                            //subcategoriaViewModel.agregar(
-                            //Subcategoria(
-                            //       categoriaPadre = categoriaPadre,
-                            //        nombre = nombre,
-                            //        tipo = tipoGasto,
-                            //        presupuesto = presupuesto.toDoubleOrNull() ?: 0.0
-                            //    )
-                            //)
-                            navController.popBackStack()
+                            if(categoriaId != 0 && nombre.isNotBlank() && presupuesto.isNotBlank() && gastoId != 0){
+                                subCategoriaViewModel.createSubCategory(
+                                    idCategoria = categoriaId,
+                                    nombreSubCategoria = nombre,
+                                    presupuestoMensual = presupuesto.toDouble(),
+                                    tipoGastoId = gastoId,
+                                    finanzaId = finanzaId
+                                )
+                            } else {
+                                mensajeRegistro = "Completa todos los campos para registrar"
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = verde)
                     ) {
@@ -195,11 +229,6 @@ fun RegistrarSubcategoriaScreen(navController: NavController) {
                     }
                 }
             }
-        }
-
-
-        Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-            BottomNavBar(navController = navController, currentRoute = currentRoute)
         }
     }
 }

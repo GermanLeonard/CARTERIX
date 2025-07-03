@@ -7,17 +7,25 @@ import androidx.room.RoomDatabase
 import com.tuapp.myapplication.data.database.dao.category.CategoriaEgresoDao
 import com.tuapp.myapplication.data.database.dao.income.IncomeDao
 import com.tuapp.myapplication.data.database.dao.finance.CategorieDataDao
+import com.tuapp.myapplication.data.database.dao.finance.ConjFinanceDao
+import com.tuapp.myapplication.data.database.dao.finance.FinanceMembersDao
 import com.tuapp.myapplication.data.database.dao.finance.FinanceSummaryDao
+import com.tuapp.myapplication.data.database.dao.saving.SavingsDao
 import com.tuapp.myapplication.data.database.dao.subCategory.ExpensesTypeDao
 import com.tuapp.myapplication.data.database.dao.subCategory.SubCategoryDao
+import com.tuapp.myapplication.data.database.dao.transactions.TransactionDao
 import com.tuapp.myapplication.data.database.dao.user.UserDao
 import com.tuapp.myapplication.data.database.entities.finance.CategorieDataEntity
 import com.tuapp.myapplication.data.database.entities.finance.FinanceSummaryEntity
 import com.tuapp.myapplication.data.database.entities.user.UserEntity
 import com.tuapp.myapplication.data.database.entities.category.CategoriaEgresoEntity
+import com.tuapp.myapplication.data.database.entities.finance.ConjFinanceEntity
+import com.tuapp.myapplication.data.database.entities.finance.FinanceMembersEntity
 import com.tuapp.myapplication.data.database.entities.income.IncomesEntity
+import com.tuapp.myapplication.data.database.entities.savings.SavingsEntity
 import com.tuapp.myapplication.data.database.entities.subCategory.ExpensesTypesEntity
 import com.tuapp.myapplication.data.database.entities.subCategory.SubCategoriaEgresoEntity
+import com.tuapp.myapplication.data.database.entities.transactions.TransactionEntity
 
 @Database(
     entities = [
@@ -28,8 +36,12 @@ import com.tuapp.myapplication.data.database.entities.subCategory.SubCategoriaEg
         SubCategoriaEgresoEntity::class,
         ExpensesTypesEntity::class,
         IncomesEntity::class,
+        TransactionEntity::class,
+        SavingsEntity::class,
+        ConjFinanceEntity::class,
+        FinanceMembersEntity::class
                ],
-    version = 8,
+    version = 12,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -40,9 +52,11 @@ abstract class AppDatabase : RoomDatabase() {
     //Finanza individual y conjunta
     abstract fun resumenFinancieroDao(): FinanceSummaryDao
     abstract fun categoriaDataDao(): CategorieDataDao
+    abstract fun finanzaConjuntaDao(): ConjFinanceDao
+    abstract fun miembrosFinanzasDao(): FinanceMembersDao
 
     //Transacciones
-
+    abstract fun transaccionDao(): TransactionDao
 
     //Tipos
     abstract fun tipoGastosDao(): ExpensesTypeDao
@@ -53,6 +67,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun ingresoDao(): IncomeDao
 
     //Ahorros
+    abstract fun ahorroDao(): SavingsDao
 
     companion object {
         @Volatile

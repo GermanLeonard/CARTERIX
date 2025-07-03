@@ -1,138 +1,191 @@
 // reemplaza la vista anterior
 package com.tuapp.myapplication.ui.transacciones
 
-import androidx.compose.foundation.BorderStroke
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.tuapp.myapplication.components.BottomNavBar
-import com.tuapp.myapplication.data.database.AppDatabase
-import com.tuapp.myapplication.data.repository.TransaccionRepository
-import com.tuapp.myapplication.data.viewmodel.TransaccionViewModel
-import com.tuapp.myapplication.data.viewmodel.TransaccionViewModelFactory
+import com.tuapp.myapplication.ui.WebSocketViewModel
+import com.tuapp.myapplication.ui.components.BottomNavBar
+import com.tuapp.myapplication.ui.components.CustomTopBar
+import com.tuapp.myapplication.ui.components.MonthSelector
+import com.tuapp.myapplication.ui.components.TabSelector
+import com.tuapp.myapplication.ui.navigation.*
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TransaccionesScreen(navController: NavController) {
-    val context = LocalContext.current
-    val dao = AppDatabase.getDatabase(context).transaccionDao()
-    val repo = TransaccionRepository(dao)
-    val viewModel: TransaccionViewModel = viewModel(factory = TransaccionViewModelFactory(repo))
+fun TransaccionesScreen(
+    navController: NavController,
+    transaccionViewModel: TransaccionesViewModel = viewModel(factory = TransaccionesViewModel.Factory),
+    finanzaId: Int?,
+    nombreFinanza: String,
+    webSocketViewModel: WebSocketViewModel = viewModel(factory = WebSocketViewModel.Factory)
+) {
 
-    val transacciones by viewModel.transacciones.collectAsState()
+    val currentDate = rememberSaveable { LocalDate.now() }
+
+    val currentMonth = rememberSaveable {
+        currentDate.month.getDisplayName(TextStyle.FULL, Locale("es")).replaceFirstChar { it.uppercase() }
+    }
+
+    var selectedMonth by rememberSaveable { mutableStateOf(currentMonth) }
+    var selectedYear by rememberSaveable { mutableIntStateOf(currentDate.year) }
+
+    val months = listOf("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+    val mes = months.indexOf(selectedMonth) + 1
+
+    val loadingTransactions by transaccionViewModel.loadingTransactions.collectAsStateWithLifecycle()
+    val transactions by transaccionViewModel.transactionsList.collectAsStateWithLifecycle()
 
     val verde = Color(0xFF2E7D32)
-    val verdeClaro = Color(0xFF66BB6A)
-    val verdePastel = Color(0xFFE6F4EA)
-    val currentRoute = Routes.INDIVIDUAL
+    var selectedTab by rememberSaveable { mutableStateOf("Transacciones") }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Box(
+    val pullToRefreshState = rememberPullToRefreshState()
+    val isRefreshing by transaccionViewModel.isRefreshing.collectAsStateWithLifecycle()
+    val transactionError by transaccionViewModel.transactionListError.collectAsStateWithLifecycle()
+
+    val currentRoute = if(finanzaId != null) Routes.GROUP else Routes.INDIVIDUAL
+
+    val transactionTrigger by webSocketViewModel.transaccionTrigger.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        if(finanzaId != null){
+            webSocketViewModel.startListening(finanzaId)
+        }
+    }
+
+    LaunchedEffect(transactionTrigger, selectedMonth) {
+        transaccionViewModel.getTransactionsList(mes, selectedYear, finanzaId, isWebSocketCall = transactionTrigger > 0)
+    }
+
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navController.navigate(RegistrarTransaccionScreen(finanzaId ?: 0)) },
+                containerColor = verde,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .background(verde),
-                contentAlignment = Alignment.TopCenter
+                    .padding(end = 24.dp, bottom = 80.dp)
             ) {
-                Text("Finanza principal", fontSize = 24.sp, color = Color.White, modifier = Modifier.padding(top = 32.dp))
+                Icon(Icons.Filled.Add, contentDescription = "Agregar", tint = Color.White)
+            }
+        },
+        bottomBar = {
+            BottomNavBar(navController = navController, currentRoute = currentRoute)
+        },
+        topBar = {
+            CustomTopBar(nombreFinanza, navController, showOptions = finanzaId != null, finanzaId = finanzaId)
+        },
+        containerColor = verde,
+        contentColor = Color.Black
+    ) { innerPadding ->
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(16.dp)
+            ){
+                TabSelector(
+                    selectedTab = selectedTab,
+                    onTabSelected = { selectedTab = it },
+                    navController = navController,
+                    finanzaId = finanzaId ?: 0,
+                    nombreFinanza = nombreFinanza
+                )
             }
 
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.White, RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp))
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
-            ) {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .background(verdePastel, RoundedCornerShape(50))
-                        .border(BorderStroke(2.dp, verde), RoundedCornerShape(50))
-                        .padding(6.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    .padding(vertical = 8.dp)
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
+                    )
+                    .padding(horizontal = 25.dp)
                 ) {
-                    listOf("Analisis", "Transacciones", "BD").forEach { tab ->
-                        val isSelected = tab == "Transacciones"
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 4.dp)
-                                .background(
-                                    if (isSelected) verdeClaro else Color.Transparent,
-                                    RoundedCornerShape(50)
-                                )
-                                .clickable {
-                                    when (tab) {
-                                        "Analisis" -> navController.navigate(Routes.INDIVIDUAL)
-                                        "BD" -> navController.navigate(Routes.BD_HOME)
-                                    }
-                                }
-                                .padding(vertical = 8.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(tab, color = Color.Black)
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    MonthSelector(
+                        selectedMonth = selectedMonth,
+                        selectedYear = selectedYear,
+                        onMonthSelected = { mesSeleccionado, anioSeleccionado ->
+                            selectedMonth = months[mesSeleccionado - 1]
+                            selectedYear = anioSeleccionado
                         }
+                    )
+
+                    if(loadingTransactions){
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                            CircularProgressIndicator()
+                        }
+                    }else if(transactionError.isNotBlank()){
+                        Text(transactionError, fontSize = 15.sp, color = Color.Red)
                     }
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                if (transacciones.isEmpty()) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No hay transacciones registradas.", color = Color.Gray)
-                    }
-                } else {
-                    LazyColumn {
-                        items(transacciones) { t ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 6.dp)
-                                    .clickable {
-                                        navController.navigate(Routes.detalleTransaccionRoute(t.id))
-
-                                    },
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+                    PullToRefreshBox(
+                        state = pullToRefreshState,
+                        isRefreshing = isRefreshing,
+                        onRefresh = {
+                            transaccionViewModel.getTransactionsList(mes, selectedYear, finanzaId, true)
+                        }
+                    ) {
+                        if (transactions.isEmpty()) {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("No hay transacciones registradas.", color = Color.Gray)
+                            }
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize()
                             ) {
-                                Column(modifier = Modifier.padding(12.dp)) {
-                                    Text("${t.tipo} - ${t.categoria}", fontWeight = FontWeight.Bold)
-                                    Text("$${t.monto}", color = if (t.tipo == "Ingreso") verde else Color.Red)
+                                items(transactions) { t ->
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 6.dp)
+                                            .clickable {
+                                                navController.navigate(DetalleTransaccionScreen(t.transaccion_id, finanzaId ?: 0))
+                                            },
+                                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+                                    ) {
+                                        Column(modifier = Modifier.padding(12.dp)) {
+                                            Text("${t.tipo_movimiento_nombre} - ${t.nombre_categoria}", fontWeight = FontWeight.Bold)
+                                            Text(
+                                                "$${t.monto_transaccion}",
+                                                color = if (t.tipo_movimiento_nombre == "Ingreso") verde else Color.Red
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-        }
-
-        FloatingActionButton(
-            onClick = { navController.navigate(Routes.REGISTRAR_TRANSACCION) },
-            containerColor = verde,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 24.dp, bottom = 80.dp)
-        ) {
-            Icon(Icons.Filled.Add, contentDescription = "Agregar", tint = Color.White)
-        }
-
-        Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-            BottomNavBar(navController = navController, currentRoute = currentRoute)
         }
     }
 }

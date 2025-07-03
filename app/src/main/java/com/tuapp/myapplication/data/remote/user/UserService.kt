@@ -21,6 +21,6 @@ interface UserService {
     @PATCH("usuario/cambiar-perfil")
     suspend fun changeProfile(@Body changeProfileRequest: ChangeProfileRequest): ChangeProfileResponse
 
-    @POST("usuario/cambiar-contrasena")
+    @PATCH("usuario/cambiar-contrasena")
     suspend fun changePassword(@Body changePasswordRequest: ChangePasswordRequest): CommonResponse
 }

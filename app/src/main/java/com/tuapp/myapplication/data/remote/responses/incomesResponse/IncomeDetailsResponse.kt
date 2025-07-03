@@ -1,7 +1,7 @@
 package com.tuapp.myapplication.data.remote.responses.incomesResponse
 
 import com.google.gson.annotations.SerializedName
-import com.tuapp.myapplication.data.models.incomes.response.IngresoDetailsResponseDomain
+import com.tuapp.myapplication.data.models.incomesModels.response.IngresoDetailsResponseDomain
 
 data class IncomeDetailsResponse(
     @SerializedName("ingreso")

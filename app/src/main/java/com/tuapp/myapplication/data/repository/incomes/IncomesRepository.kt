@@ -1,9 +1,9 @@
 package com.tuapp.myapplication.data.repository.incomes
 
 import com.tuapp.myapplication.data.models.CommonResponseDomain
-import com.tuapp.myapplication.data.models.incomes.request.CreateOrUpdateIncomeRequestDomain
-import com.tuapp.myapplication.data.models.incomes.response.IngresoDetailsResponseDomain
-import com.tuapp.myapplication.data.models.incomes.response.IngresoResponseDomain
+import com.tuapp.myapplication.data.models.incomesModels.request.CreateOrUpdateIncomeRequestDomain
+import com.tuapp.myapplication.data.models.incomesModels.response.IngresoDetailsResponseDomain
+import com.tuapp.myapplication.data.models.incomesModels.response.IngresoResponseDomain
 import com.tuapp.myapplication.helpers.Resource
 import kotlinx.coroutines.flow.Flow
 

@@ -7,6 +7,7 @@ import com.tuapp.myapplication.data.remote.responses.categorieResponse.Categorie
 import com.tuapp.myapplication.data.remote.responses.categorieResponse.CategoriesOptionsResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -34,7 +35,7 @@ interface CategoriesService {
         @Body createCategorieRequest: CreateOrUpdateCategorieRequest
     ): CommonResponse
 
-    @POST("categoria/actualizar/{id}")
+    @PATCH("categoria/actualizar/{id}")
     suspend fun updateCategorie(
         @Path("id") id: Int,
         @Body updateCategorieRequest: CreateOrUpdateCategorieRequest
