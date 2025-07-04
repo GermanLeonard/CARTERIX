@@ -11,7 +11,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Link
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
@@ -51,6 +62,7 @@ fun GrupalFinanceScreen(
     val grupos by viewModel.listaGrupos.collectAsState()
     var showJoinDialog by rememberSaveable { mutableStateOf(false) }
     var showCreateDialog by rememberSaveable { mutableStateOf(false) }
+    var showLeaveFinanceDialog by rememberSaveable { mutableStateOf(false) }
 
     val createdFinance by viewModel.createdFinance.collectAsStateWithLifecycle()
     val creatingError by viewModel.creatingError.collectAsStateWithLifecycle()
@@ -60,6 +72,8 @@ fun GrupalFinanceScreen(
 
     val joinedFinance by viewModel.joinedFinance.collectAsStateWithLifecycle()
     val joiningError by viewModel.joiningError.collectAsStateWithLifecycle()
+    val leavedFinance by viewModel.leavedUser.collectAsStateWithLifecycle()
+    var selectedFinance by rememberSaveable { mutableStateOf(0) }
 
     LaunchedEffect(userCredentials) {
         nombre = userCredentials?.nombre ?: ""
@@ -83,6 +97,19 @@ fun GrupalFinanceScreen(
             showJoinDialog = false
             viewModel.resetJoinedState()
         }
+    }
+
+    LaunchedEffect(leavedFinance) {
+        if(leavedFinance){
+            viewModel.getFinancesList()
+            selectedFinance = 0
+            showLeaveFinanceDialog = false
+            viewModel.resetLeavedState()
+        }
+    }
+
+    fun onClick() {
+        showLeaveFinanceDialog = true
     }
 
     Scaffold(
@@ -144,7 +171,10 @@ fun GrupalFinanceScreen(
                                 modifier = Modifier.fillMaxSize()
                             ) {
                                 items(grupos) { grupo ->
-                                    GrupoItem(grupo, navController, viewModel, nombre)
+                                    GrupoItem(grupo, navController, nombre, onClick = { id ->
+                                        showLeaveFinanceDialog = true
+                                        selectedFinance = id
+                                    })
                                 }
                             }
                         }
@@ -178,9 +208,25 @@ fun GrupalFinanceScreen(
         )
     }
 
+
+    if(showLeaveFinanceDialog){
+        LeaveFinanceDialog(
+            onDismiss = {
+                showLeaveFinanceDialog = false
+            },
+            onLeave = {
+                viewModel.leaveFinance(finanzaId = selectedFinance)
+            },
+            viewModel
+        )
+    }
+
     if (showCreateDialog) {
         CreateGroupDialog(
-            onDismiss = { showCreateDialog = false },
+            onDismiss = {
+                showCreateDialog = false
+                selectedFinance = 0
+                        },
             onCreate = { titulo, descripcion ->
                 viewModel.createFinance(titulo, descripcion)
             },
@@ -191,7 +237,13 @@ fun GrupalFinanceScreen(
 }
 
 @Composable
-fun GrupoItem(grupo: FinancesListResponseDomain, navController: NavHostController, finanzasViewModel: FinanzasViewModel, nombre: String) {
+fun GrupoItem(
+    grupo: FinancesListResponseDomain,
+    navController: NavHostController,
+    nombre: String,
+    onClick: (Int) -> Unit
+) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -223,9 +275,7 @@ fun GrupoItem(grupo: FinancesListResponseDomain, navController: NavHostControlle
                     }
                     if(nombre != grupo.nombre_admin) {
                         IconButton(
-                            onClick = {
-                                finanzasViewModel.leaveFinance(grupo.finanza_id)
-                            },
+                            onClick = { onClick(grupo.finanza_id) },
                             modifier = Modifier.align(Alignment.TopEnd)
                         ) {
                             Icon(

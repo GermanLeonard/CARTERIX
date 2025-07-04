@@ -286,24 +286,39 @@ class FinanzasViewModel(
         _createdFinance.value = false
     }
 
+    private var _loadingLeave = MutableStateFlow(false)
+    val loadingLeave: StateFlow<Boolean> = _loadingLeave
+
+    private var _leavedUser = MutableStateFlow(false)
+    val leavedUser: StateFlow<Boolean> = _leavedUser
+
+    private var _leavingError = MutableStateFlow("")
+    val leavingError: StateFlow<String> = _leavingError
+
     fun leaveFinance(finanzaId: Int) {
         viewModelScope.launch {
             finanzaRepository.leaveFinance(finanzaId)
                 .collect { resource ->
                     when(resource){
                         is Resource.Loading -> {
-                            //Manejen el "cargando"
+                            _loadingLeave.value = true
+                            _leavingError.value = ""
                         }
                         is Resource.Success -> {
-                            //Manejen el "success"
-                            resource.data
+                            _leavedUser.value = resource.data.success
+                            _loadingLeave.value = false
                         }
                         is Resource.Error -> {
-                            //Manejen el "error"
+                            _leavingError.value = resource.message
+                            _loadingLeave.value = false
                         }
                     }
                 }
         }
+    }
+
+    fun resetLeavedState() {
+        _leavedUser.value = false
     }
 
     private var _loadingDelete = MutableStateFlow(false)
