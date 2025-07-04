@@ -40,8 +40,8 @@ fun EditProfileScreen(
     var confirmarContrasena by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(userCredentials) {
-        if(nombre.isBlank()) nombre = userCredentials.nombre
-        if(email.isBlank()) email = userCredentials.correo
+        if(nombre.isBlank()) nombre = userCredentials?.nombre ?: ""
+        if(email.isBlank()) email = userCredentials?.correo ?: ""
     }
 
     val loadingChangeProfile by userViewModel.loadingChangeProfile.collectAsStateWithLifecycle()

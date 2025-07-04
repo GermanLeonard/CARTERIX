@@ -34,8 +34,8 @@ class UserRepositoryImpl(
     private val sensitiveInfoRepository: SensitiveInfoRepository
 ): UserRepository {
 
-    override fun getCredentials(): Flow<UserDataDomain> {
-        return userDao.getUser().map { it.toDomain() }
+    override fun getCredentials(): Flow<UserDataDomain?> {
+        return userDao.getUser().map { it?.toDomain() }
     }
 
     override suspend fun checkUserAndDeleteToken() {
@@ -62,10 +62,6 @@ class UserRepositoryImpl(
                 emit(Resource.Success(registerResponse.toDomain()))
             }
         }catch (e: HttpException) {
-            //OJO
-            //EN EL FRONT
-            //MANEJEN LOS ERRORES, CODIGO 400: BAD REQUEST,
-            // 409: CONFLICTO (ej. correo ya usado), 500 ERROR DEL SERVIDOR
             val msg = errorParsing(e)
 
             emit(Resource.Error(httpCode = e.code(), message = msg))

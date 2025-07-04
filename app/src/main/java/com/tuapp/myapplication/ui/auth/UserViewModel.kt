@@ -1,5 +1,6 @@
 package com.tuapp.myapplication.ui.auth
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -16,6 +17,7 @@ import com.tuapp.myapplication.data.repository.sensitive.SensitiveInfoRepository
 import com.tuapp.myapplication.data.repository.user.UserRepository
 import com.tuapp.myapplication.helpers.Resource
 import com.tuapp.myapplication.helpers.TokenState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +25,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class UserViewModel(
     sensitiveInfoRepository: SensitiveInfoRepository,
@@ -39,15 +42,10 @@ class UserViewModel(
     //Esta funcion sera usada para traer el nombre y el correo y usarlo en la vista de cambiar perfil,
     //en los campos nombre y correo, para que se puedan modificar y al darle guardar se llama la
     // funcion change profile
-    val userCredential: StateFlow<UserDataDomain> = userRepository.getCredentials().stateIn(
+    val userCredential: StateFlow<UserDataDomain?> = userRepository.getCredentials().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = UserDataDomain(
-            id = 0,
-            finanzaId = 0,
-            nombre = "",
-            correo = "",
-        )
+        initialValue = null
     )
 
     fun checkUser(){
@@ -197,10 +195,12 @@ class UserViewModel(
 
     fun closeSession() {
         viewModelScope.launch {
-            userRepository.closeSession()
-            _isLoggedIn.value = false
+            withContext(Dispatchers.IO) {
+                userRepository.closeSession()
+            }
         }
     }
+
 
     private val _token: StateFlow<TokenState> = sensitiveInfoRepository.authenticationToken.map { TokenState.Loaded(it) as TokenState }
         .onStart { emit(TokenState.Loading) }

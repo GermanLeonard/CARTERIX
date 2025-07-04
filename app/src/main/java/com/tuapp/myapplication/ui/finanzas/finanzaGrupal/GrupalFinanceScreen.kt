@@ -62,7 +62,7 @@ fun GrupalFinanceScreen(
     val joiningError by viewModel.joiningError.collectAsStateWithLifecycle()
 
     LaunchedEffect(userCredentials) {
-        nombre = userCredentials.nombre
+        nombre = userCredentials?.nombre ?: ""
     }
 
     LaunchedEffect(Unit) {

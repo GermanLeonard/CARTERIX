@@ -68,7 +68,7 @@ fun GroupDetailsScreen(
 
     LaunchedEffect(details) {
         isAdmin = details.finanza_miembros.find {
-            it.nombre_usuario == userCredentials.nombre
+            it.nombre_usuario == (userCredentials?.nombre ?: "")
         }?.rol_usuario == 1
     }
 
@@ -190,12 +190,14 @@ fun GroupDetailsScreen(
 
                     // Lista de miembros
                     items(details.finanza_miembros) { miembro ->
-                        MemberCard(
-                            miembro = miembro,
-                            isCurrentUserAdmin = isAdmin,
-                            currentUserName = userCredentials.nombre,
-                            onDeleteClick = { showDeleteConfirmation = miembro.id_usuario }
-                        )
+                        userCredentials?.let {
+                            MemberCard(
+                                miembro = miembro,
+                                isCurrentUserAdmin = isAdmin,
+                                currentUserName = it.nombre,
+                                onDeleteClick = { showDeleteConfirmation = miembro.id_usuario }
+                            )
+                        }
                     }
 
                     item {

@@ -27,6 +27,7 @@ import com.tuapp.myapplication.profile.components.LogoutDialog
 import com.tuapp.myapplication.ui.auth.UserViewModel
 import com.tuapp.myapplication.ui.components.CustomTopBar
 import com.tuapp.myapplication.ui.navigation.EditProfile
+import com.tuapp.myapplication.ui.navigation.LoginScreen
 import com.tuapp.myapplication.ui.navigation.Routes
 
 @Composable
@@ -72,13 +73,13 @@ fun ProfileScreen(
                             .offset(y = (-40).dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
-                            val letraInicial = datosUsuario.value.nombre.firstOrNull()?.toString() ?: "?"
+                            val letraInicial = datosUsuario.value?.nombre?.firstOrNull()?.toString() ?: "?"
 
                             Text(letraInicial, fontSize = 30.sp, fontWeight = FontWeight.Bold, color = verde)
                         }
                     }
 
-                    Text(datosUsuario.value.nombre, fontSize = 25.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 12.dp))
+                    datosUsuario.value?.let { Text(it.nombre, fontSize = 25.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 12.dp)) }
 
                     Spacer(modifier = Modifier.height(50.dp))
 
@@ -95,6 +96,7 @@ fun ProfileScreen(
                 LogoutDialog(
                     onConfirm = {
                         userViewModel.closeSession()
+                        //navController.navigate(LoginScreen)
                         showLogoutDialog = false
                     },
                     onDismiss = { showLogoutDialog = false }

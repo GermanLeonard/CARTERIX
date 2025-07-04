@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
 
-    fun getCredentials(): Flow<UserDataDomain>
+    fun getCredentials(): Flow<UserDataDomain?>
     suspend fun closeSession()
     suspend fun checkUserAndDeleteToken()
 

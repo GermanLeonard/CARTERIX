@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.map
 
 
 suspend fun getFinanceId(userDao: UserDao): Int {
-    return userDao.getUser().map { it.finanzaId }.firstOrNull() ?: 0
+    return userDao.getUser().map { it?.finanzaId ?: 0 }.firstOrNull() ?: 0
 }
