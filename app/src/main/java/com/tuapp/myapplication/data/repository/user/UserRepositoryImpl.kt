@@ -50,6 +50,7 @@ class UserRepositoryImpl(
     }
 
     override suspend fun closeSession() {
+        userDao.clearUser()
         sensitiveInfoRepository.clearToken()
     }
 
