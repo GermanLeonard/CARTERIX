@@ -77,7 +77,7 @@ fun RegisterScreen(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    painter = painterResource(id = R.drawable.carterix),
                     contentDescription = "Logo",
                     tint = verde,
                     modifier = Modifier.size(48.dp)
